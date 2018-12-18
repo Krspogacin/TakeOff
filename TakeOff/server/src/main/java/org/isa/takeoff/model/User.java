@@ -2,6 +2,8 @@ package org.isa.takeoff.model;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -12,10 +14,16 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
-public class User{
+public class User implements UserDetails {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,6 +76,9 @@ public class User{
 	
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<VehicleRating> vehicleRatings = new ArrayList<>();
+	
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Authority authority;
 	
 	public User() { }
 	
@@ -161,6 +172,78 @@ public class User{
 		this.imagePath = imagePath;
 	}
 	
+	public boolean addAirCompanyRating(AirCompanyRating e) {
+		return companyRatings.add(e);
+	}
+	
+	public boolean removeAirCompanyRating(Object o) {
+		return companyRatings.remove(o);
+	}
+
+	public AirCompanyRating getAirCompanyRating(int index) {
+		return companyRatings.get(index);
+	}
+	
+	public boolean addFlightRating(FlightRating e) {
+		return flightRatings.add(e);
+	}
+	
+	public boolean removeFlightRating(Object o) {
+		return flightRatings.remove(o);
+	}
+
+	public FlightRating getFlightRating(int index) {
+		return flightRatings.get(index);
+	}
+	
+	public boolean addHotelRating(HotelRating e) {
+		return hotelRatings.add(e);
+	}
+	
+	public boolean removeHotelRating(Object o) {
+		return hotelRatings.remove(o);
+	}
+
+	public HotelRating getHotelRating(int index) {
+		return hotelRatings.get(index);
+	}
+	
+	public boolean addRoomRating(RoomRating e) {
+		return roomRatings.add(e);
+	}
+	
+	public boolean removeRoomRating(Object o) {
+		return roomRatings.remove(o);
+	}
+
+	public RoomRating getRoomRating(int index) {
+		return roomRatings.get(index);
+	}
+	
+	public boolean addRentACarRating(RentACarRating e) {
+		return rentACarRatings.add(e);
+	}
+	
+	public boolean removeRentACarRating(Object o) {
+		return rentACarRatings.remove(o);
+	}
+
+	public RentACarRating getRentACarRating(int index) {
+		return rentACarRatings.get(index);
+	}
+	
+	public boolean addVehicleRating(VehicleRating e) {
+		return vehicleRatings.add(e);
+	}
+	
+	public boolean removeVehicleRating(Object o) {
+		return vehicleRatings.remove(o);
+	}
+
+	public VehicleRating getVehicleRating(int index) {
+		return vehicleRatings.get(index);
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -179,5 +262,34 @@ public class User{
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(id);
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return new ArrayList<>(Arrays.asList(this.authority));
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 }

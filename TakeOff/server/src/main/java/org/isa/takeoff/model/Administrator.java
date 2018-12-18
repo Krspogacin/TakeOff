@@ -1,17 +1,27 @@
 package org.isa.takeoff.model;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-public class Administrator {
-	
-	public enum AdminType {SYS_ADMIN, AIRCOMPANY_ADMIN, HOTEL_ADMIN, RENTACAR_ADMIN};
+public class Administrator implements UserDetails {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,16 +36,18 @@ public class Administrator {
 	@Column(name="email", unique = true, nullable=false)
 	private String email;
 	
-	@Column(name="type", nullable=false)
-	private AdminType type;
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "admin_authority",
+            joinColumns = @JoinColumn(name = "admin_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
+    private List<Authority> authorities;
 	
 	public Administrator() { }
 
-	public Administrator(String username, String password, String email, AdminType type) {
+	public Administrator(String username, String password, String email) {
 		this.username = username;
 		this.password = password;
 		this.email = email;
-		this.type = type;
 	}
 
 	public Long getId() {
@@ -66,14 +78,6 @@ public class Administrator {
 		this.email = email;
 	}
 	
-	public AdminType getType() {
-		return type;
-	}
-
-	public void setType(AdminType type) {
-		this.type = type;
-	}
-	
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -94,4 +98,32 @@ public class Administrator {
 		return Objects.hashCode(id);
 	}
 
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return this.authorities;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isEnabled() {
+		return true;
+	}
 }
