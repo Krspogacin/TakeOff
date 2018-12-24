@@ -4,8 +4,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -17,6 +19,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import org.isa.takeoff.dto.UserDTO;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -59,31 +62,33 @@ public class User implements UserDetails {
 	@Column(name="imagePath", nullable=true)
 	private String imagePath;
 	
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<AirCompanyRating> companyRatings = new ArrayList<>();
+	@Column(name="enabled", nullable=false)
+	private boolean enabled;
 	
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<FlightRating> flightRatings = new ArrayList<>();
+	private Set<AirCompanyRating> companyRatings = new HashSet<>();
 	
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<HotelRating> hotelRatings = new ArrayList<>();
+	private Set<FlightRating> flightRatings = new HashSet<>();
 	
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<RoomRating> roomRatings = new ArrayList<>();
+	private Set<HotelRating> hotelRatings = new HashSet<>();
 	
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<RentACarRating> rentACarRatings = new ArrayList<>();
+	private Set<RoomRating> roomRatings = new HashSet<>();
 	
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<VehicleRating> vehicleRatings = new ArrayList<>();
+	private Set<RentACarRating> rentACarRatings = new HashSet<>();
+	
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<VehicleRating> vehicleRatings = new HashSet<>();
 	
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Authority authority;
 	
 	public User() { }
 	
-	public User(String username, String password, String email, String firstName, 
-							String lastName, String phoneNumber, String address) {
+	public User(String username, String password, String email, String firstName, String lastName, String phoneNumber, String address) {
 		this.username = username;
 		this.password = password;
 		this.email = email;
@@ -93,6 +98,11 @@ public class User implements UserDetails {
 		this.address = address;
 	}
 
+	public User(UserDTO userDTO)
+	{
+		this(userDTO.getUsername(), userDTO.getPassword(), userDTO.getEmail(), userDTO.getFirstName(), userDTO.getLastName(), userDTO.getPhoneNumber(), userDTO.getAddress());
+	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -148,8 +158,8 @@ public class User implements UserDetails {
 	public String getAddress() {
 		return address;
 	}
-
-	public void setCountry(String address) {
+	
+	public void setAddress(String address) {
 		this.address = address;
 	}
 
@@ -172,78 +182,63 @@ public class User implements UserDetails {
 		this.imagePath = imagePath;
 	}
 	
-	public boolean addAirCompanyRating(AirCompanyRating e) {
-		return companyRatings.add(e);
+	public void setEnabled(boolean enabled){
+		this.enabled = enabled;
 	}
 	
-	public boolean removeAirCompanyRating(Object o) {
-		return companyRatings.remove(o);
+	@Override
+	public boolean isEnabled() {
+		return enabled;
+	}
+	
+	public List<AirCompanyRating> getCompanyRatings() {
+		return new ArrayList<>(companyRatings);
 	}
 
-	public AirCompanyRating getAirCompanyRating(int index) {
-		return companyRatings.get(index);
-	}
-	
-	public boolean addFlightRating(FlightRating e) {
-		return flightRatings.add(e);
-	}
-	
-	public boolean removeFlightRating(Object o) {
-		return flightRatings.remove(o);
+	public void setCompanyRatings(List<AirCompanyRating> companyRatings) {
+		this.companyRatings = new HashSet<>(companyRatings);
 	}
 
-	public FlightRating getFlightRating(int index) {
-		return flightRatings.get(index);
-	}
-	
-	public boolean addHotelRating(HotelRating e) {
-		return hotelRatings.add(e);
-	}
-	
-	public boolean removeHotelRating(Object o) {
-		return hotelRatings.remove(o);
+	public List<FlightRating> getFlightRatings() {
+		return new ArrayList<>(flightRatings);
 	}
 
-	public HotelRating getHotelRating(int index) {
-		return hotelRatings.get(index);
-	}
-	
-	public boolean addRoomRating(RoomRating e) {
-		return roomRatings.add(e);
-	}
-	
-	public boolean removeRoomRating(Object o) {
-		return roomRatings.remove(o);
+	public void setFlightRatings(List<FlightRating> flightRatings) {
+		this.flightRatings = new HashSet<>(flightRatings);
 	}
 
-	public RoomRating getRoomRating(int index) {
-		return roomRatings.get(index);
-	}
-	
-	public boolean addRentACarRating(RentACarRating e) {
-		return rentACarRatings.add(e);
-	}
-	
-	public boolean removeRentACarRating(Object o) {
-		return rentACarRatings.remove(o);
+	public List<HotelRating> getHotelRatings() {
+		return new ArrayList<>(hotelRatings);
 	}
 
-	public RentACarRating getRentACarRating(int index) {
-		return rentACarRatings.get(index);
-	}
-	
-	public boolean addVehicleRating(VehicleRating e) {
-		return vehicleRatings.add(e);
-	}
-	
-	public boolean removeVehicleRating(Object o) {
-		return vehicleRatings.remove(o);
+	public void setHotelRatings(List<HotelRating> hotelRatings) {
+		this.hotelRatings = new HashSet<>(hotelRatings);
 	}
 
-	public VehicleRating getVehicleRating(int index) {
-		return vehicleRatings.get(index);
+	public List<RoomRating> getRoomRatings() {
+		return new ArrayList<>(roomRatings);
 	}
-	
+
+	public void setRoomRatings(List<RoomRating> roomRatings) {
+		this.roomRatings = new HashSet<>(roomRatings);
+	}
+
+	public List<RentACarRating> getRentACarRatings() {
+		return new ArrayList<>(rentACarRatings);
+	}
+
+	public void setRentACarRatings(List<RentACarRating> rentACarRatings) {
+		this.rentACarRatings = new HashSet<>(rentACarRatings);
+	}
+
+	public List<VehicleRating> getVehicleRatings() {
+		return new ArrayList<>(vehicleRatings);
+	}
+
+	public void setVehicleRatings(List<VehicleRating> vehicleRatings) {
+		this.vehicleRatings = new HashSet<>(vehicleRatings);
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -253,15 +248,15 @@ public class User implements UserDetails {
 			return false;
 		}
 		User that = (User) o;
-		if (that.id == null || id == null) {
+		if (that.username == null || username == null) {
 			return false;
 		}
-		return Objects.equals(id, that.id);
+		return Objects.equals(username, that.username);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(id);
+		return Objects.hashCode(username);
 	}
 
 	@Override
@@ -269,6 +264,10 @@ public class User implements UserDetails {
 		return new ArrayList<>(Arrays.asList(this.authority));
 	}
 
+	public void setAuthority(Authority authority) {
+		this.authority = authority;
+	}
+	
 	@JsonIgnore
 	@Override
 	public boolean isAccountNonExpired() {
@@ -284,12 +283,6 @@ public class User implements UserDetails {
 	@JsonIgnore
 	@Override
 	public boolean isCredentialsNonExpired() {
-		return true;
-	}
-
-	@JsonIgnore
-	@Override
-	public boolean isEnabled() {
 		return true;
 	}
 }

@@ -1,8 +1,10 @@
 package org.isa.takeoff.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -30,16 +32,16 @@ public class RentACar {
 	private String description;
 	
 	@OneToMany(mappedBy = "rentACar", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<Service> services = new ArrayList<>();
+	private Set<Service> services = new HashSet<>();
 	
 	@OneToMany(mappedBy ="rentACar", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<Vehicle> vehicles = new ArrayList<>();
+	private Set<Vehicle> vehicles = new HashSet<>();
 	
 	@OneToMany(mappedBy = "rentACar", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<Office> offices = new ArrayList<>();
+	private Set<Office> offices = new HashSet<>();
 	
 	@OneToMany(mappedBy = "rentACar", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<RentACarRating> rentACarRatings = new ArrayList<>();
+	private Set<RentACarRating> rentACarRatings = new HashSet<>();
 	
 	public RentACar() { }
 	
@@ -80,55 +82,39 @@ public class RentACar {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-	public boolean addService(Service e) {
-		return services.add(e);
-	}
-	
-	public boolean removeService(Object o) {
-		return services.remove(o);
+		
+	public List<Service> getServices() {
+		return new ArrayList<>(services);
 	}
 
-	public Service getService(int index) {
-		return services.get(index);
-	}
-	
-	public boolean addVehicle(Vehicle e) {
-		return vehicles.add(e);
-	}
-	
-	public boolean removeVehicle(Object o) {
-		return vehicles.remove(o);
+	public void setServices(List<Service> services) {
+		this.services = new HashSet<>(services);
 	}
 
-	public Vehicle getVehicle(int index) {
-		return vehicles.get(index);
-	}
-	
-	public boolean addOffice(Office e) {
-		return offices.add(e);
-	}
-	
-	public boolean removeOffice(Object o) {
-		return offices.remove(o);
+	public List<Vehicle> getVehicles() {
+		return new ArrayList<>(vehicles);
 	}
 
-	public Office getOffice(int index) {
-		return offices.get(index);
-	}
-	
-	public boolean addRentACarRating(RentACarRating e) {
-		return rentACarRatings.add(e);
-	}
-	
-	public boolean removeRentACarRating(Object o) {
-		return rentACarRatings.remove(o);
+	public void setVehicles(List<Vehicle> vehicles) {
+		this.vehicles = new HashSet<>(vehicles);
 	}
 
-	public RentACarRating getRentACarRating(int index) {
-		return rentACarRatings.get(index);
+	public List<Office> getOffices() {
+		return new ArrayList<>(offices);
 	}
-	
+
+	public void setOffices(List<Office> offices) {
+		this.offices = new HashSet<>(offices);
+	}
+
+	public List<RentACarRating> getRentACarRatings() {
+		return new ArrayList<>(rentACarRatings);
+	}
+
+	public void setRentACarRatings(List<RentACarRating> rentACarRatings) {
+		this.rentACarRatings = new HashSet<>(rentACarRatings);
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {

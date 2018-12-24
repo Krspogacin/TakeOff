@@ -3,11 +3,11 @@ package org.isa.takeoff.controller;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.isa.takeoff.model.User;
 import org.isa.takeoff.security.AuthenticationRequest;
 import org.isa.takeoff.security.TokenUtils;
+import org.isa.takeoff.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,24 +22,32 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/auth", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AuthenticationController 
 {
 	@Autowired
-	TokenUtils tokenUtils;
+	private TokenUtils tokenUtils;
 
+	@Autowired
+	private UserService userService;
+	
 	@Autowired
 	private AuthenticationManager authenticationManager;
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest, HttpServletResponse response) throws AuthenticationException, IOException
+	public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws AuthenticationException, IOException
 	{
-		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-																			authenticationRequest.getUsername(),
-																			authenticationRequest.getPassword()));
-
+		User user = this.userService.findByUsername(authenticationRequest.getUsername());
+		if (user == null || !user.isEnabled())
+		{
+			return ResponseEntity.badRequest().body(null);
+		}
+		
+		Authentication authentication = this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+																				authenticationRequest.getUsername(),
+																				authenticationRequest.getPassword()));
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		User user = (User) authentication.getPrincipal();
+		user = (User) authentication.getPrincipal();
 		String token = tokenUtils.generateToken(user.getUsername());
 		return ResponseEntity.ok(token);
 	}

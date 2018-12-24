@@ -1,8 +1,10 @@
 package org.isa.takeoff.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -31,7 +33,7 @@ public class Vehicle {
 	private Integer year;
 	
 	@OneToMany(mappedBy = "vehicle", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<VehicleRating> vehicleRatings = new ArrayList<>();
+	private Set<VehicleRating> vehicleRatings = new HashSet<>();
 	
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private RentACar rentACar;
@@ -68,16 +70,12 @@ public class Vehicle {
 		this.year = year;
 	}
 	
-	public boolean addVehicleRating(VehicleRating e) {
-		return vehicleRatings.add(e);
-	}
-	
-	public boolean removeVehicleRating(Object o) {
-		return vehicleRatings.remove(o);
+	public List<VehicleRating> getVehicleRatings() {
+		return new ArrayList<>(vehicleRatings);
 	}
 
-	public VehicleRating getVehicleRating(int index) {
-		return vehicleRatings.get(index);
+	public void setVehicleRatings(List<VehicleRating> vehicleRatings) {
+		this.vehicleRatings = new HashSet<>(vehicleRatings);
 	}
 
 	public RentACar getRentACar() {

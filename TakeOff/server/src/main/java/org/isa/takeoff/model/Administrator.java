@@ -1,8 +1,11 @@
 package org.isa.takeoff.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -40,7 +43,7 @@ public class Administrator implements UserDetails {
     @JoinTable(name = "admin_authority",
             joinColumns = @JoinColumn(name = "admin_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
-    private List<Authority> authorities;
+    private Set<Authority> authorities;
 	
 	public Administrator() { }
 
@@ -100,7 +103,11 @@ public class Administrator implements UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return this.authorities;
+		return new ArrayList<>(this.authorities);
+	}
+	
+	public void setAuthorities(List<Authority> authorities) {
+		this.authorities = new HashSet<>(authorities);
 	}
 
 	@JsonIgnore
