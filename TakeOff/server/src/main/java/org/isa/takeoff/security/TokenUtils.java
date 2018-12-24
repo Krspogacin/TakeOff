@@ -24,6 +24,9 @@ public class TokenUtils
 	@Value("300")
 	private int EXPIRES_IN;
 
+	@Value("172800")
+	private int ACTIVATION_LINK_EXPIRES_IN;
+	
 	@Value("Authorization")
 	private String AUTH_HEADER;
 
@@ -35,13 +38,13 @@ public class TokenUtils
 				.setIssuer(APP_NAME)
 				.setSubject(username)
 				.setIssuedAt(new Date())
-				.setExpiration(generateExpirationDate())
+				.setExpiration(generateExpirationDate(EXPIRES_IN))
 				.signWith(SIGNATURE_ALGORITHM, SECRET).compact();
 	}
 
-	private Date generateExpirationDate()
+	private Date generateExpirationDate(int expiresIn)
 	{
-		return new Date(new Date().getTime() + EXPIRES_IN * 1000);
+		return new Date(new Date().getTime() + expiresIn * 1000);
 	}
 
 	public String refreshToken(String token) 
@@ -53,7 +56,7 @@ public class TokenUtils
 			claims.setIssuedAt(new Date());
 			refreshedToken = Jwts.builder()
 					.setClaims(claims)
-					.setExpiration(generateExpirationDate())
+					.setExpiration(this.generateExpirationDate(EXPIRES_IN))
 					.signWith(SIGNATURE_ALGORITHM, SECRET).compact();
 		}
 		catch (Exception e) 
@@ -147,5 +150,15 @@ public class TokenUtils
 		}
 
 		return null;
+	}
+	
+	public String generateActivationToken(String username) 
+	{
+		return Jwts.builder()
+				.setIssuer(APP_NAME)
+				.setSubject(username)
+				.setIssuedAt(new Date())
+				.setExpiration(this.generateExpirationDate(ACTIVATION_LINK_EXPIRES_IN))
+				.signWith(SIGNATURE_ALGORITHM, SECRET).compact();
 	}
 }

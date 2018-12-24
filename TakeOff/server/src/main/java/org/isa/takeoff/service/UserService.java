@@ -5,7 +5,6 @@ import java.util.List;
 import org.isa.takeoff.model.User;
 import org.isa.takeoff.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,22 +16,35 @@ public class UserService implements UserDetailsService
 	@Autowired
 	private UserRepository userRepository;
 
-	public User findOne(Long id) throws AccessDeniedException 
+	public User findOne(Long id) 
 	{
-		User u = userRepository.findById(id).get();
-		return u;
+		return this.userRepository.findById(id).get();
 	}
 
-	public List<User> findAll() throws AccessDeniedException 
+	public List<User> findAll() 
 	{
-		List<User> result = userRepository.findAll();
-		return result;
+		return this.userRepository.findAll();
 	}
 
+	public User save(User user) 
+	{
+		return this.userRepository.save(user);
+	}
+	
+	public User findByUsername(String username) 
+	{
+		return this.userRepository.findByUsername(username);
+	}
+	
+	public User findByEmail(String email) 
+	{
+		return this.userRepository.findByEmail(email);
+	}
+	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException 
 	{
-		User user = userRepository.findByUsername(username);
+		User user = this.userRepository.findByUsername(username);
 		if (user == null) 
 		{
 			throw new UsernameNotFoundException("No user found with username '" + username + "'.");

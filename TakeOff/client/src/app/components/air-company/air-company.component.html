@@ -1,4 +1,64 @@
 <h1>{{company.name}}</h1>
+<input type="text" [(ngModel)]="company.name">
 
-<p>Address: {{company.address}}</p>
-<p>Description: {{company.description}}</p>
+Address: <input [(ngModel)]="company.address">
+Description: <input [(ngModel)]="company.description">
+
+<h3>Destinations:</h3>
+<table border="5px">
+    <thead>
+        <th>id</th>
+        <th>airport</th>
+        <th>city</th>
+        <th>country</th>
+    </thead>
+    <tbody>
+        <tr *ngFor="let dest of destinations">
+            <td>{{dest.id}}</td>
+            <td>{{dest.airportName}}</td>
+            <td>{{dest.city}}</td>
+            <td>{{dest.country}}</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Flights:</h3>
+
+<ol>
+    <li *ngFor="let flight of flights">
+        {{flight.id}}
+        <input type="datetime-local" [(ngModel)]="flight.takeOffDate">
+        {{flight.landingDate}}
+        {{flight.duration}}
+        {{flight.distance}}
+        {{flight.numberOfTransfers}}
+        {{flight.ticketPrice}}
+        <button routerLink="/flights/{{flight.id}}">Info</button>
+    </li>
+</ol>
+
+<label>Take off date</label>
+<input type="datetime-local" [(ngModel)]="form.takeOffDate">
+<br />
+<label>Landing date</label>
+<input type="datetime-local" [(ngModel)]="form.landingDate">
+<br />
+<label>Flight distance</label>
+<input type="text" [(ngModel)]="form.distance">
+<br />
+<label>Number of transfers</label>
+<input type="number" [(ngModel)]="form.numberOfTransfers">
+<br />
+<label>Destinations</label>
+<select [(ngModel)]="form.destinations" size="3" multiple>
+    <option *ngFor="let dest of destinations" [ngValue]="dest">
+        {{dest.city}}
+    </option>
+</select>
+<br />
+<label>Ticket price</label>
+<input type="number" [(ngModel)]="form.ticketPrice">
+<br />
+<button (click)="addFlight()">Add flight</button>
+
+<button (click)="updateCompany()">Save</button>

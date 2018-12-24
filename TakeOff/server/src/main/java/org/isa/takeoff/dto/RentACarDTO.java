@@ -1,31 +1,27 @@
 package org.isa.takeoff.dto;
 
-import org.isa.takeoff.model.AirCompany;
+import org.isa.takeoff.model.RentACar;
 
-public class AirCompanyDTO {
-
+public class RentACarDTO 
+{
 	private Long id;
 	private String name;
 	private String address;
 	private String description;
-	private Long version;
-
-	public AirCompanyDTO() {
-
+	
+	public RentACarDTO() { }
+	
+	public RentACarDTO(RentACar rentACar)
+	{
+		this(rentACar.getId(), rentACar.getName(), rentACar.getAddress(), rentACar.getDescription());
 	}
-
-	public AirCompanyDTO(AirCompany airCompany) {
-		this(airCompany.getId(), airCompany.getName(), airCompany.getAddress(), airCompany.getDescription(),
-				airCompany.getVersion());
-	}
-
-	public AirCompanyDTO(Long id, String name, String address, String description, Long version) {
-		super();
+	
+	public RentACarDTO(Long id, String name, String address, String description) 
+	{
 		this.id = id;
 		this.name = name;
 		this.address = address;
 		this.description = description;
-		this.version = version;
 	}
 
 	public Long getId() {
@@ -59,13 +55,4 @@ public class AirCompanyDTO {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-	public Long getVersion() {
-		return version;
-	}
-
-	public void setVersion(Long version) {
-		this.version = version;
-	}
-
 }

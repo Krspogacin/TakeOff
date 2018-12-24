@@ -1,44 +1,59 @@
 package org.isa.takeoff.model;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.ManyToMany;
+import javax.persistence.Version;
 
 @Entity
-public class Destination {	
+public class Destination {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	@Column(name="country", nullable = false)
+
+	@Column(name = "country", nullable = false)
 	private String country;
-	
-	@Column(name="city", nullable = false)
+
+	@Column(name = "city", nullable = false)
 	private String city;
-	
-	@Column(name="airportName", nullable = false)
+
+	@Column(name = "airportName", nullable = false)
 	private String airportName;
-	
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Flight flight;
-	
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private AirCompany company;
-	
-	public Destination() { }
-	
+
+	@ManyToMany(mappedBy = "destinations")
+	private Set<AirCompany> companies = new HashSet<>();
+
+	@ManyToMany(mappedBy = "transferDestinations")
+	private Set<Flight> flights = new HashSet<>();
+
+	@Version
+	private Long version;
+
+	public Destination() {
+	}
+
 	public Destination(String country, String city, String airportName) {
 		this.country = country;
 		this.city = city;
 		this.airportName = airportName;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getCountry() {
@@ -65,30 +80,30 @@ public class Destination {
 		this.airportName = airportName;
 	}
 
-	public Long getId() {
-		return id;
-	}
-	
-	public void setId(Long id) {
-		this.id = id;
+	public List<AirCompany> getCompanies() {
+		return new ArrayList<>(companies);
 	}
 
-	public Flight getFlight() {
-		return flight;
+	public void setCompanies(Set<AirCompany> companies) {
+		this.companies = companies;
 	}
 
-	public void setFlight(Flight flight) {
-		this.flight = flight;
+	public List<Flight> getFlights() {
+		return new ArrayList<>(flights);
 	}
 
-	public AirCompany getCompany() {
-		return company;
+	public void setFlights(Set<Flight> flights) {
+		this.flights = flights;
 	}
 
-	public void setCompany(AirCompany company) {
-		this.company = company;
+	public Long getVersion() {
+		return version;
 	}
-	
+
+	public void setVersion(Long version) {
+		this.version = version;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
