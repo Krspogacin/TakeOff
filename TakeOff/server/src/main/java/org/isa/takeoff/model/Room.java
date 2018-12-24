@@ -2,8 +2,10 @@ package org.isa.takeoff.model;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -17,51 +19,53 @@ import javax.persistence.OneToMany;
 
 @Entity
 public class Room {
-	
-	public enum RoomType { APARTMAN, STUDIO, DUPLEX };
-	
+
+	public enum RoomType {
+		APARTMAN, STUDIO, DUPLEX
+	};
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name="price", nullable = false)
+	@Column(name = "price", nullable = false)
 	private Double price;
-	
-	@Column(name="startingDate", nullable = false)
+
+	@Column(name = "startingDate", nullable = false)
 	private LocalDate startingDate;
-	
-	@Column(name="endingDate", nullable = false)
+
+	@Column(name = "endingDate", nullable = false)
 	private LocalDate endingDate;
-	
-	@Column(name="discount")
+
+	@Column(name = "discount")
 	private Double discount;
-	
-	@Column(name="isReserved", nullable = false)
+
+	@Column(name = "isReserved", nullable = false)
 	private boolean isReserved;
-	
-	@Column(name="floor", nullable = false)
+
+	@Column(name = "floor", nullable = false)
 	private Integer floor;
-	
-	@Column(name="numberOfBeds", nullable = false)
+
+	@Column(name = "numberOfBeds", nullable = false)
 	private Integer numberOfBeds;
-	
-	@Column(name="type", nullable = false)
+
+	@Column(name = "type", nullable = false)
 	private RoomType type;
-	
-	@Column(name="hasBalcony")
+
+	@Column(name = "hasBalcony")
 	private boolean hasBalcony;
-	
-	@Column(name="hasAirCondition")
+
+	@Column(name = "hasAirCondition")
 	private boolean hasAirCondition;
-	
+
 	@OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<RoomRating> roomRatings = new ArrayList<>();
-	
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Hotel hotel;
-	
+	private Set<RoomRating> roomRatings = new HashSet<>();
+
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Hotel hotel;
+
 	public Room() {
-		
+
 	}
 
 	public Room(Double price, LocalDate startingDate, LocalDate endingDate, Integer floor, Integer numberOfBeds,
@@ -162,17 +166,13 @@ public class Room {
 	public void setHasAirCondition(Boolean hasAirCondition) {
 		this.hasAirCondition = hasAirCondition;
 	}
-	
+
 	public boolean addRoomRating(RoomRating e) {
 		return roomRatings.add(e);
 	}
-	
+
 	public boolean removeRoomRating(Object o) {
 		return roomRatings.remove(o);
-	}
-
-	public RoomRating getRoomRating(int index) {
-		return roomRatings.get(index);
 	}
 
 	public Hotel getHotel() {
@@ -182,7 +182,15 @@ public class Room {
 	public void setHotel(Hotel hotel) {
 		this.hotel = hotel;
 	}
-	
+
+	public ArrayList<RoomRating> getRoomRatings() {
+		return new ArrayList<RoomRating>(roomRatings);
+	}
+
+	public void setRoomRatings(Set<RoomRating> roomRatings) {
+		this.roomRatings = roomRatings;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -202,5 +210,5 @@ public class Room {
 	public int hashCode() {
 		return Objects.hashCode(id);
 	}
-	
+
 }

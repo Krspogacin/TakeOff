@@ -1,0 +1,22 @@
+<!--
+<h1>{{hotel.name}}</h1>
+
+<p>Address: {{hotel.address}}</p>
+<p>Description: {{hotel.description}}</p>
+-->
+
+<table border="1">
+    <tr>
+        <td>Name</td>
+        <td>Address</td>
+        <td>Description</td>
+    </tr>
+    <tr *ngFor="let h of hotels">
+        <td>{{h.name}}</td>
+        <td>{{h.address}}</td>
+        <td>{{h.description}}</td>
+    </tr>
+</table>
+
+
+<button mat-raised-button (click)="openDialog()"></button>

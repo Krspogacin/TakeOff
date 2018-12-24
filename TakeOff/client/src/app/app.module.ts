@@ -5,6 +5,9 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule, RoutingComponents } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatButtonModule, MatCheckboxModule, MatDialogModule, MatInputModule, MatFormFieldModule} from '@angular/material';
+
 
 @NgModule({
   declarations: [
@@ -15,7 +18,13 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    BrowserAnimationsModule,
+    MatButtonModule, 
+    MatCheckboxModule,
+    MatDialogModule,
+    MatInputModule,
+    MatFormFieldModule
   ],
   providers: [],
   bootstrap: [AppComponent]
