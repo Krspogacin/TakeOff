@@ -8,21 +8,24 @@ public class AirCompanyDTO {
 	private String name;
 	private String address;
 	private String description;
+	private Long version;
 
 	public AirCompanyDTO() {
 
 	}
 
 	public AirCompanyDTO(AirCompany airCompany) {
-		this(airCompany.getId(), airCompany.getName(), airCompany.getAddress(), airCompany.getDescription());
+		this(airCompany.getId(), airCompany.getName(), airCompany.getAddress(), airCompany.getDescription(),
+				airCompany.getVersion());
 	}
 
-	public AirCompanyDTO(Long id, String name, String address, String description) {
+	public AirCompanyDTO(Long id, String name, String address, String description, Long version) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.address = address;
 		this.description = description;
+		this.version = version;
 	}
 
 	public Long getId() {
@@ -55,6 +58,14 @@ public class AirCompanyDTO {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 
 }

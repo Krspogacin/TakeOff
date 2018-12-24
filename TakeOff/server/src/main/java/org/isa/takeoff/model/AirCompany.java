@@ -1,8 +1,10 @@
 package org.isa.takeoff.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -11,39 +13,56 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.Version;
 
 @Entity
 public class AirCompany {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	@Column(name="name", unique = true, nullable = false)
+
+	@Column(name = "name", unique = true, nullable = false)
 	private String name;
-	
-	@Column(name="address", nullable = false)
+
+	@Column(name = "address", nullable = false)
 	private String address;
-	
-	@Column(name="description", nullable = true)
+
+	@Column(name = "description", nullable = true)
 	private String description;
-	
-	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<Destination> destinations = new ArrayList<>();
+
+	@ManyToMany
+	@JoinTable(name = "air_company_destination", joinColumns = @JoinColumn(name = "company_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "dest_id", referencedColumnName = "id"))
+	private Set<Destination> destinations = new HashSet<>();
 
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<Flight> flights = new ArrayList<>();
-	
+	private Set<Flight> flights = new HashSet<>();
+
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<AirCompanyRating> companyRatings = new ArrayList<>();
-	
-	public AirCompany() { } 
-	
+	private Set<AirCompanyRating> companyRatings = new HashSet<>();
+
+	@Version
+	private Long version;
+
+	public AirCompany() {
+	}
+
 	public AirCompany(String name, String address, String description) {
 		this.name = name;
 		this.address = address;
 		this.description = description;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getName() {
@@ -71,65 +90,37 @@ public class AirCompany {
 	}
 
 	public List<Destination> getDestinations() {
-		return destinations;
+		return new ArrayList<>(destinations);
 	}
 
-	public void setDestinations(List<Destination> destinations) {
+	public void setDestinations(Set<Destination> destinations) {
 		this.destinations = destinations;
 	}
 
 	public List<Flight> getFlights() {
-		return flights;
+		return new ArrayList<>(flights);
 	}
 
-	public void setFlights(List<Flight> flights) {
+	public void setFlights(Set<Flight> flights) {
 		this.flights = flights;
 	}
 
-	public Long getId() {
-		return id;
-	}
-	
-	public void setId(Long id) {
-		this.id = id;
+	public Set<AirCompanyRating> getCompanyRatings() {
+		return companyRatings;
 	}
 
-	public boolean addLocation(Destination e) {
-		return destinations.add(e);
+	public void setCompanyRatings(Set<AirCompanyRating> companyRatings) {
+		this.companyRatings = companyRatings;
 	}
 
-	public boolean removeLocation(Object o) {
-		return destinations.remove(o);
+	public Long getVersion() {
+		return version;
 	}
 
-	public Destination getLocation(int index) {
-		return destinations.get(index);
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 
-	public boolean addFlight(Flight e) {
-		return flights.add(e);
-	}
-	
-	public boolean removeFlight(Object o) {
-		return flights.remove(o);
-	}
-
-	public Flight getFlight(int index) {
-		return flights.get(index);
-	}
-	
-	public boolean addAirCompanyRating(AirCompanyRating e) {
-		return companyRatings.add(e);
-	}
-	
-	public boolean removeAirCompanyRating(Object o) {
-		return companyRatings.remove(o);
-	}
-
-	public AirCompanyRating getAirCompanyRating(int index) {
-		return companyRatings.get(index);
-	}
-	
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {

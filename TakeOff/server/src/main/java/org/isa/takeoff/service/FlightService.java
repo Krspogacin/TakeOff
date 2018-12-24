@@ -2,8 +2,8 @@ package org.isa.takeoff.service;
 
 import java.util.List;
 
-import org.isa.takeoff.model.AirCompany;
-import org.isa.takeoff.repository.AirCompanyRepository;
+import org.isa.takeoff.model.Flight;
+import org.isa.takeoff.repository.FlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -11,27 +11,27 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-public class AirCompanyService {
+public class FlightService {
 
 	@Autowired
-	private AirCompanyRepository airCompanyRepository;
+	private FlightRepository flightRepository;
 
-	public AirCompany findOne(Long id) {
-		return airCompanyRepository.findById(id).get();
+	public Flight findOne(Long id) {
+		return flightRepository.findById(id).get();
 	}
 
-	public List<AirCompany> findAll() {
-		return airCompanyRepository.findAll();
+	public List<Flight> findAll() {
+		return flightRepository.findAll();
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public AirCompany save(AirCompany airCompany) {
-		return airCompanyRepository.save(airCompany);
+	public Flight save(Flight flight) {
+		return flightRepository.save(flight);
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void delete(Long id) {
-		airCompanyRepository.deleteById(id);
+		flightRepository.deleteById(id);
 	}
 
 }

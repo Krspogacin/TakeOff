@@ -10,18 +10,20 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class FlightRating implements Serializable{
-	
+public class FlightRating implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@ManyToOne
-	@JoinColumn(name="flight_id", referencedColumnName="id")
+	@JoinColumn(name = "flight_id", referencedColumnName = "id")
 	private Flight flight;
-	
+
 	@Id
 	@ManyToOne
-	@JoinColumn(name="user_id", referencedColumnName="id")
+	@JoinColumn(name = "user_id", referencedColumnName = "id")
 	private User user;
-	
+
 	@Column(name = "rating", nullable = false)
 	private Double rating;
 
@@ -48,22 +50,22 @@ public class FlightRating implements Serializable{
 	public void setRating(Double rating) {
 		this.rating = rating;
 	}
-	
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
- 
-        if (o == null || getClass() != o.getClass()) 
-            return false;
- 
-        FlightRating that = (FlightRating) o;
-        return Objects.equals(flight, that.flight) &&
-        		Objects.equals(user, that.user);
-    }
- 
-    @Override
-    public int hashCode() {
-        return Objects.hash(flight, user);
-    }
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+
+		if (o == null || getClass() != o.getClass())
+			return false;
+
+		FlightRating that = (FlightRating) o;
+		return Objects.equals(flight, that.flight) && Objects.equals(user, that.user);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(flight, user);
+	}
 
 }
