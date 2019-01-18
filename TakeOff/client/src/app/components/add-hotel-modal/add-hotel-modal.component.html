@@ -1,0 +1,33 @@
+<h1 mat-dialog-title>Create hotel</h1>
+<div mat-dialog-content>
+  <table>
+    <tr>
+      <td>Hotel name:</td>
+      <td>
+        <mat-form-field>
+          <input type="text" matInput [(ngModel)]="hotel.name">
+        </mat-form-field>
+      </td>
+    </tr>
+    <tr>
+        <td>Hotel address:</td>
+        <td>
+          <mat-form-field>
+            <input type="text" matInput [(ngModel)]="hotel.address">
+          </mat-form-field>
+        </td>
+    </tr>
+    <tr>
+        <td>Hotel description:</td>
+        <td>
+          <mat-form-field>
+            <input matInput type="text" [(ngModel)]="hotel.description">
+          </mat-form-field>
+        </td>
+    </tr>
+  </table>
+  <div mat-dialog-actions>
+    <button mat-button [mat-dialog-close]="hotel" cdkFocusInitial>Ok</button>
+    <button mat-button (click)="onNoClick()">Cancel</button>
+  </div>
+</div>

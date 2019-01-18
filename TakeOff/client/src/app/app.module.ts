@@ -7,8 +7,10 @@ import { AppRoutingModule, RoutingComponents } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 import { MaterialModule } from './material';
 import { RegistrationDialogComponent } from './components/registration-dialog/registration-dialog.component';
+import { AddHotelModalComponent } from './components/add-hotel-modal/add-hotel-modal.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SuccessfulRegistrationComponent } from './components/successful-registration/successful-registration.component';
 import { LoginDialogComponent } from './components/login-dialog/login-dialog.component';
@@ -30,12 +32,14 @@ import { VehicleDialogComponent } from './components/vehicle-dialog/vehicle-dial
         RentACarComponent,
         RentACarDialogComponent,
         VehicleDialogComponent,
+        AddHotelModalComponent
     ],
     entryComponents: [
         RegistrationDialogComponent,
         LoginDialogComponent,
         RentACarDialogComponent,
-        VehicleDialogComponent
+        VehicleDialogComponent,
+        AddHotelModalComponent
     ],
     imports: [
         BrowserModule,

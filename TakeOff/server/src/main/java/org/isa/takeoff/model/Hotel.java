@@ -1,8 +1,10 @@
 package org.isa.takeoff.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -15,29 +17,29 @@ import javax.persistence.OneToMany;
 
 @Entity
 public class Hotel {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	@Column(name="name", unique = true, nullable = false)
+
+	@Column(name = "name", unique = true, nullable = false)
 	private String name;
-	
-	@Column(name="address", nullable = false)
+
+	@Column(name = "address", nullable = false)
 	private String address;
-	
-	@Column(name="description", nullable = true)
+
+	@Column(name = "description", nullable = true)
 	private String description;
-	
+
 	@OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<Room> rooms = new ArrayList<>();
-	
+	private Set<Room> rooms = new HashSet<>();
+
 	@OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<Service> services = new ArrayList<>();
-	
+	private Set<Service> services = new HashSet<>();
+
 	@OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<HotelRating> hotelRatings = new ArrayList<>();
-	
+	private Set<HotelRating> hotelRatings = new HashSet<>();
+
 	public Long getId() {
 		return id;
 	}
@@ -69,43 +71,55 @@ public class Hotel {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
+
+	public List<Room> getRooms() {
+		return new ArrayList<Room>(rooms);
+	}
+
+	public void setRooms(Set<Room> rooms) {
+		this.rooms = rooms;
+	}
+
+	public List<Service> getServices() {
+		return new ArrayList<Service>(services);
+	}
+
+	public void setServices(Set<Service> services) {
+		this.services = services;
+	}
+
+	public List<HotelRating> getHotelRatings() {
+		return new ArrayList<HotelRating>(hotelRatings);
+	}
+
+	public void setHotelRatings(Set<HotelRating> hotelRatings) {
+		this.hotelRatings = hotelRatings;
+	}
+
 	public boolean addRoom(Room e) {
 		return rooms.add(e);
 	}
-	
+
 	public boolean removeRoom(Object o) {
 		return rooms.remove(o);
 	}
 
-	public Room getRoom(int index) {
-		return rooms.get(index);
-	}
-	
 	public boolean addService(Service e) {
 		return services.add(e);
 	}
-	
+
 	public boolean removeService(Object o) {
 		return services.remove(o);
 	}
 
-	public Service getService(int index) {
-		return services.get(index);
-	}
-	
 	public boolean addHotelRating(HotelRating e) {
 		return hotelRatings.add(e);
 	}
-	
+
 	public boolean removeHotelRating(Object o) {
 		return hotelRatings.remove(o);
 	}
 
-	public HotelRating getHotelRating(int index) {
-		return hotelRatings.get(index);
-	}
-	
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {

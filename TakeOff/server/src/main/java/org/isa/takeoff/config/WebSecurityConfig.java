@@ -60,6 +60,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 			.exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
 			.authorizeRequests()
 			.antMatchers("/").permitAll()
+			.antMatchers("/hotels/**").permitAll()
 			.antMatchers("/companies/**").permitAll()
 			.antMatchers("/flights/**").permitAll()
 			.antMatchers("/users/**").permitAll()
