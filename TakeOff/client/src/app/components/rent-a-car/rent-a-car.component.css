@@ -1,0 +1,18 @@
+.stretch {
+    width: 100%;
+    overflow: hidden;
+}
+
+.header {
+    text-align: center;
+}
+
+.button-right {
+    float: right;
+    margin: 5px;
+}
+
+.vehicle-card {
+    max-width: 20%;
+    margin: 0% 2.5% 0% 0%;
+}

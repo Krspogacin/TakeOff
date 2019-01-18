@@ -7,19 +7,21 @@ public class OfficeDTO
 	private Long id;
 	private String address;
 	private RentACarDTO rentACar;
+	private Long version;
 	
 	public OfficeDTO() { }
 	
 	public OfficeDTO(Office office)
 	{
-		this(office.getId(), office.getAddress(), new RentACarDTO(office.getRentACar()));
+		this(office.getId(), office.getAddress(), new RentACarDTO(office.getRentACar()), office.getVersion());
 	}
 	
-	public OfficeDTO(Long id, String address, RentACarDTO rentACar)
+	public OfficeDTO(Long id, String address, RentACarDTO rentACar, Long version)
 	{
 		this.id = id;
 		this.address = address;
 		this.rentACar = rentACar;
+		this.version = version;
 	}
 
 	public Long getId() {
@@ -44,5 +46,13 @@ public class OfficeDTO
 
 	public void setRentACar(RentACarDTO rentACar) {
 		this.rentACar = rentACar;
+	}
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 }

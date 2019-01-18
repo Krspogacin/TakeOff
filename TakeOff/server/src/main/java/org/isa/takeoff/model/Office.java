@@ -10,6 +10,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Version;
+
+import org.isa.takeoff.dto.OfficeDTO;
 
 @Entity
 public class Office {
@@ -23,6 +26,21 @@ public class Office {
 	
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private RentACar rentACar;
+
+	@Version
+	private Long version;
+
+	public Office() { }
+	
+	public Office(String address) 
+	{
+		this.address = address;
+	}
+
+	public Office(OfficeDTO officeDTO)
+	{
+		this(officeDTO.getAddress());
+	}
 
 	public Long getId() {
 		return id;
@@ -48,6 +66,14 @@ public class Office {
 		this.rentACar = rentACar;
 	}
 	
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {

@@ -1,3 +1,54 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+.fields-container {
+    display: flex;
+    flex-direction: column;
+}
+  
+.fields-container > * {
+    width: 100%;
+}
+
+.app-loading {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+.app-loading .spinner {
+    margin: 0 auto;
+}
+
+.img-container {
+    width: 256px;
+    height: 256px;
+    background-color: grey;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.img-preview {
+    margin: 0;
+    background-color: rgba(255, 255, 255, 1);
+    max-width: 256px;
+    max-height: 256px;
+}
+
+.btn-loadImg {
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+mat-card img{
+    object-fit: cover;
+    height: 50%;
+}

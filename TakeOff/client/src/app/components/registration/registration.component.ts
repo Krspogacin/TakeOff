@@ -1,6 +1,8 @@
 import { Component, OnInit, Inject} from '@angular/core';
-import {MatDialog} from '@angular/material';
-import { RegistrationDialogComponent } from 'src/app/registration-dialog/registration-dialog.component';
+import { MatDialog } from '@angular/material';
+import { RegistrationDialogComponent } from 'src/app/components/registration-dialog/registration-dialog.component';
+import { RegistrationService } from 'src/app/services/registration/registration.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-registration',
@@ -9,12 +11,23 @@ import { RegistrationDialogComponent } from 'src/app/registration-dialog/registr
 })
 export class RegistrationComponent {
 
-  constructor(public dialog: MatDialog) { }
+  constructor(private registrationService: RegistrationService, public dialog: MatDialog, private router: Router) { }
 
   openRegistrationDialog() {
-    const dialogRef = this.dialog.open(RegistrationDialogComponent, { disableClose: true });
+    const dialogRef = this.dialog.open(RegistrationDialogComponent,
+      { data: undefined,
+        disableClose: true,
+        autoFocus : true,
+        width: '40%' });
     dialogRef.afterClosed().subscribe(
-      data => console.log('Dialog output:', data)
+      (data) => {
+        if (data) {
+          this.registrationService.registerUser(data).subscribe(
+            (user) => {
+              this.router.navigate(['/users/successful_registration']);
+            });
+        }
+      }
     );
   }
 }

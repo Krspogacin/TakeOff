@@ -62,6 +62,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 			.antMatchers("/").permitAll()
 			.antMatchers("/companies/**").permitAll()
 			.antMatchers("/flights/**").permitAll()
+			.antMatchers("/users/**").permitAll()
+			.antMatchers("/rent-a-cars/**").permitAll()
+			.antMatchers("/vehicles/**").permitAll()
 			.anyRequest().authenticated().and()
 			.addFilterBefore(new TokenAuthenticationFilter(tokenUtils, userService), BasicAuthenticationFilter.class);
 
@@ -71,6 +74,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 		web.ignoring().antMatchers(HttpMethod.POST, "/login");
+		web.ignoring().antMatchers(HttpMethod.GET, "/logout_user");
 		web.ignoring().antMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "/favicon.ico", "/**/*.html", "/**/*.css", "/**/*.js");
 	}
 }

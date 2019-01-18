@@ -38,7 +38,7 @@ public class EmailService
 			helper.setTo(user.getEmail());
 			helper.setFrom(env.getProperty("spring.mail.username"));
 			helper.setSubject("TakeOff - Account Activation");
-			String message = "Hello, <br><br>"
+			String message = "Hello, " + user.getUsername()  + "<br><br>"
 						   + "Thank you for registering your TakeOff account. To finally activate your account please "
 						   + "<a href=\"" + makeActivationLink(user.getUsername(), request) + "\">click here.</a><br><br>"
 						   + "Regards, <br><br>"
@@ -80,6 +80,7 @@ public class EmailService
 	        url.append(":").append(serverPort);
 	    }
 
+	    url.append("/#");
 	    url.append(contextPath).append(servletPath);
 
 	    return url.toString();

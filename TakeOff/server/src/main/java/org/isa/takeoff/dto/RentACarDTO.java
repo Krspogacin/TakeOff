@@ -8,20 +8,22 @@ public class RentACarDTO
 	private String name;
 	private String address;
 	private String description;
+	private Long version;
 	
 	public RentACarDTO() { }
 	
 	public RentACarDTO(RentACar rentACar)
 	{
-		this(rentACar.getId(), rentACar.getName(), rentACar.getAddress(), rentACar.getDescription());
+		this(rentACar.getId(), rentACar.getName(), rentACar.getAddress(), rentACar.getDescription(), rentACar.getVersion());
 	}
 	
-	public RentACarDTO(Long id, String name, String address, String description) 
+	public RentACarDTO(Long id, String name, String address, String description, Long version) 
 	{
 		this.id = id;
 		this.name = name;
 		this.address = address;
 		this.description = description;
+		this.version = version;
 	}
 
 	public Long getId() {
@@ -54,5 +56,13 @@ public class RentACarDTO
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 }

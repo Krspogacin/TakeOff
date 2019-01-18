@@ -1,0 +1,46 @@
+<h1 mat-dialog-title>Add new vehicle</h1>
+<mat-dialog-content [formGroup]="vehicleForm" class="fields-container">
+    <mat-form-field>
+        <input matInput type="text" formControlName="brand" placeholder="Brand">
+        <mat-error *ngIf="vehicleForm.get('brand').invalid && (vehicleForm.get('brand').dirty || vehicleForm.get('brand').touched)">
+            <div *ngIf="vehicleForm.get('brand').errors.required"> Brand is required.</div>
+        </mat-error>
+    </mat-form-field>
+    <br>
+    <mat-form-field>
+        <input matInput type="text" formControlName="model" placeholder="Model">
+        <mat-error *ngIf="vehicleForm.get('model').invalid && (vehicleForm.get('model').dirty || vehicleForm.get('model').touched)">
+            <div *ngIf="vehicleForm.get('model').errors.required"> Model is required.</div>
+        </mat-error>
+    </mat-form-field>
+    <br>
+    <mat-form-field>
+        <input matInput type="number" formControlName="year" placeholder="Year">
+        <mat-error *ngIf="vehicleForm.get('year').invalid && (vehicleForm.get('year').dirty || vehicleForm.get('year').touched)">
+            <div *ngIf="vehicleForm.get('year').errors.required"> Year is required.</div>
+            <div *ngIf="!vehicleForm.get('year').errors.required &&
+                        (vehicleForm.get('year').errors.min || vehicleForm.get('year').errors.max)">
+                        Year is not in range {{minYear}} - {{currentYear}}!</div>
+        </mat-error>
+        <mat-hint>
+            Year must be between {{minYear}} and {{currentYear}}. <br>
+        </mat-hint>
+    </mat-form-field>
+    <br><br>
+    <div class="img-container">
+        <img *ngIf="imgSrc" class="img-preview" src={{imgSrc}} alt="Could not load image."/>
+    </div>
+    <button mat-button color="primary" class="btn-loadImg" (click)="fileInput.click()"><mat-icon>add_circle_outline</mat-icon> Add photo of a vehicle</button>
+    <input [hidden]="true" type="file" accept="image/*" (change)="onFileSelected($event)" #fileInput>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-raised-button 
+          color="primary"
+          type="submit"
+          (click)="submitForm()"
+          [disabled]="vehicleForm.invalid">
+        <span *ngIf="!update">Add</span>
+        <span *ngIf="update">Update</span>
+    </button>
+  <button mat-raised-button [mat-dialog-close]>Cancel</button>
+</mat-dialog-actions>

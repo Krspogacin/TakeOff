@@ -1,6 +1,7 @@
 package org.isa.takeoff.model;
 
-import java.time.LocalDateTime;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,8 +18,10 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Version;
 
 import org.isa.takeoff.dto.UserDTO;
 import org.springframework.security.core.GrantedAuthority;
@@ -54,13 +58,15 @@ public class User implements UserDetails {
 	private String address;
 	
 	@Column(name="dateOfBirth", nullable=true)
-	private LocalDateTime dateOfBirth;
+	private LocalDate dateOfBirth;
 	
 	@Column(name="aboutMe", nullable=true)
 	private String aboutMe;
 	
-	@Column(name="imagePath", nullable=true)
-	private String imagePath;
+	@Lob
+	@Basic(fetch = FetchType.LAZY)
+	@Column(name="image", nullable=true)
+	private byte[] image;
 	
 	@Column(name="enabled", nullable=false)
 	private boolean enabled;
@@ -86,9 +92,13 @@ public class User implements UserDetails {
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Authority authority;
 	
+	@Version
+	private Long version;
+
+	
 	public User() { }
 	
-	public User(String username, String password, String email, String firstName, String lastName, String phoneNumber, String address) {
+	public User(String username, String password, String email, String firstName, String lastName, String phoneNumber, String address, LocalDate dateofBirth, String aboutMe, byte[] image) {
 		this.username = username;
 		this.password = password;
 		this.email = email;
@@ -96,11 +106,14 @@ public class User implements UserDetails {
 		this.lastName = lastName;
 		this.phoneNumber = phoneNumber;
 		this.address = address;
+		this.dateOfBirth = dateofBirth;
+		this.aboutMe = aboutMe;
+		this.image = image;
 	}
 
 	public User(UserDTO userDTO)
 	{
-		this(userDTO.getUsername(), userDTO.getPassword(), userDTO.getEmail(), userDTO.getFirstName(), userDTO.getLastName(), userDTO.getPhoneNumber(), userDTO.getAddress());
+		this(userDTO.getUsername(), userDTO.getPassword(), userDTO.getEmail(), userDTO.getFirstName(), userDTO.getLastName(), userDTO.getPhoneNumber(), userDTO.getAddress(), userDTO.getDateOfBirth(), userDTO.getAboutMe(), (userDTO.getImage() == null) ? null : userDTO.getImage().getBytes(StandardCharsets.UTF_8));
 	}
 	
 	public Long getId() {
@@ -163,10 +176,10 @@ public class User implements UserDetails {
 		this.address = address;
 	}
 
-	public LocalDateTime getDateOfBirth() {
+	public LocalDate getDateOfBirth() {
 		return dateOfBirth;
 	}
-	public void setDateOfBirth(LocalDateTime dateOfBirth) {
+	public void setDateOfBirth(LocalDate dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
 	}
 	public String getAboutMe() {
@@ -175,11 +188,13 @@ public class User implements UserDetails {
 	public void setAboutMe(String aboutMe) {
 		this.aboutMe = aboutMe;
 	}
-	public String getImagePath() {
-		return imagePath;
+
+	public byte[] getImage() {
+		return image;
 	}
-	public void setImagePath(String imagePath) {
-		this.imagePath = imagePath;
+
+	public void setImage(byte[] image) {
+		this.image = image;
 	}
 	
 	public void setEnabled(boolean enabled){

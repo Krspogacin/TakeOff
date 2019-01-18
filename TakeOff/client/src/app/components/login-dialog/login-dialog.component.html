@@ -1,0 +1,17 @@
+<h1 mat-dialog-title>Login</h1>
+<mat-dialog-content [formGroup]="loginForm" class="fields-container">
+    <mat-form-field>
+        <input matInput type="text" formControlName="username" placeholder="Username">
+    </mat-form-field>
+    <br>
+    <mat-form-field>
+        <input matInput type="password" formControlName="password" placeholder="Password">
+        <mat-error *ngIf="loginForm.get('password').errors && loginForm.get('password').errors.loginFailed"> 
+          Invalid username and/or password.
+        </mat-error>
+    </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-raised-button color="primary" type="submit" (click)="submitForm()">Login</button>
+  <button mat-raised-button [mat-dialog-close]>Cancel</button>
+</mat-dialog-actions>

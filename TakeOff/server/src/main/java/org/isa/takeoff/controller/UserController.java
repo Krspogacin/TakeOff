@@ -10,9 +10,12 @@ import java.util.List;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.isa.takeoff.dto.AdministratorDTO;
 import org.isa.takeoff.dto.UserDTO;
+import org.isa.takeoff.model.Administrator;
 import org.isa.takeoff.model.Authority;
 import org.isa.takeoff.model.User;
+import org.isa.takeoff.service.AdministratorService;
 import org.isa.takeoff.service.AuthorityService;
 import org.isa.takeoff.service.EmailService;
 import org.isa.takeoff.service.UserService;
@@ -21,7 +24,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,6 +39,9 @@ public class UserController
 	private UserService userService;
 	
 	@Autowired
+	private AdministratorService administratorService;
+	
+	@Autowired
 	private AuthorityService authorityService;
 	
 	@Autowired
@@ -44,14 +49,13 @@ public class UserController
 	
 	@Autowired
 	public PasswordEncoder passwordEncoder;
-	
-	@RequestMapping(method = GET, value = "/{id}")
-	@PreAuthorize("hasRole('SYS_ADMIN')")
-	public ResponseEntity<UserDTO> getUserById(@PathVariable Long id)
+		
+	@RequestMapping(method = GET, value = "/getUserByUsername/{username}")
+	public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username)
 	{
 		try 
 		{
-			User user = this.userService.findOne(id);
+			User user = this.userService.findByUsername(username);
 			UserDTO userDTO = new UserDTO(user);
 			return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
 		}
@@ -60,9 +64,23 @@ public class UserController
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-
+	
+	@RequestMapping(method = GET, value = "/getAdminByUsername/{username}")
+	public ResponseEntity<AdministratorDTO> getAdminByUsername(@PathVariable String username)
+	{
+		try 
+		{
+			Administrator admin = this.administratorService.findByUsername(username);
+			AdministratorDTO adminDTO = new AdministratorDTO(admin);
+			return new ResponseEntity<AdministratorDTO>(adminDTO, HttpStatus.OK);
+		}
+		catch (Exception e) 
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@RequestMapping(method = GET)
-	@PreAuthorize("hasRole('SYS_ADMIN')")
 	public ResponseEntity<List<UserDTO>> getAllUsers()
 	{
 		List<User> users = this.userService.findAll();
@@ -72,6 +90,46 @@ public class UserController
 			usersDTO.add(new UserDTO(user));
 		}
 		return new ResponseEntity<List<UserDTO>>(usersDTO, HttpStatus.OK);
+	}
+	
+	@RequestMapping(method = GET, value = "/checkUsername/{username}")
+	public ResponseEntity<?> checkUsername(@PathVariable String username)
+	{
+		User user = this.userService.findByUsername(username);
+		if (user != null)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		Administrator admin = this.administratorService.findByUsername(username);
+		if (admin != null)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		else
+		{
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(method = GET, value = "/checkEmail/{email}")
+	public ResponseEntity<?> checkEmail(@PathVariable String email)
+	{
+		User user = this.userService.findByEmail(email);
+		if (user != null)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		Administrator admin = this.administratorService.findByEmail(email);
+		if (admin != null)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		else
+		{
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
 	}
 	
 	@RequestMapping(method = POST, value = "/register", consumes="application/json")

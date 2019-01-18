@@ -14,6 +14,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Version;
+
+import org.isa.takeoff.dto.RentACarDTO;
 
 @Entity
 public class RentACar {
@@ -43,12 +46,21 @@ public class RentACar {
 	@OneToMany(mappedBy = "rentACar", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<RentACarRating> rentACarRatings = new HashSet<>();
 	
+	@Version
+	private Long version;
+	
 	public RentACar() { }
 	
-	public RentACar(String name, String address) {
+	public RentACar(String name, String address, String description) {
 		super();
 		this.name = name;
 		this.address = address;
+		this.description = description;
+	}
+	
+	public RentACar(RentACarDTO rentACarDTO)
+	{
+		this(rentACarDTO.getName(), rentACarDTO.getAddress(), rentACarDTO.getDescription());
 	}
 
 	public Long getId() {
@@ -115,6 +127,14 @@ public class RentACar {
 		this.rentACarRatings = new HashSet<>(rentACarRatings);
 	}
 
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {

@@ -1,6 +1,6 @@
 package org.isa.takeoff.dto;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import org.isa.takeoff.model.User;
 
@@ -14,9 +14,9 @@ public class UserDTO
 	private String lastName;
 	private String phoneNumber;
 	private String address;
-	private LocalDateTime dateOfBirth;
+	private LocalDate dateOfBirth;
 	private String aboutMe;
-	private String imagePath;
+	private String image;
 	private boolean enabled;
 	
 	public UserDTO() { }
@@ -24,11 +24,11 @@ public class UserDTO
 	public UserDTO(User user)
 	{
 		this(user.getId(), user.getUsername(), user.getPassword(), user.getEmail(), user.getFirstName(), user.getLastName(),
-			 user.getPhoneNumber(), user.getAddress(), user.getDateOfBirth(), user.getAboutMe(), user.getImagePath(), user.isEnabled());
+			 user.getPhoneNumber(), user.getAddress(), user.getDateOfBirth(), user.getAboutMe(), user.getImage() == null ? null : new String(user.getImage()), user.isEnabled());
 	}
 	
 	public UserDTO(Long id, String username, String password, String email, String firstName, String lastName,
-			String phoneNumber, String address, LocalDateTime dateOfBirth, String aboutMe, String imagePath,
+			String phoneNumber, String address, LocalDate dateOfBirth, String aboutMe, String image,
 			boolean enabled) {
 		super();
 		this.id = id;
@@ -41,7 +41,7 @@ public class UserDTO
 		this.address = address;
 		this.dateOfBirth = dateOfBirth;
 		this.aboutMe = aboutMe;
-		this.imagePath = imagePath;
+		this.image = image;
 		this.enabled = enabled;
 	}
 
@@ -109,11 +109,11 @@ public class UserDTO
 		this.address = address;
 	}
 
-	public LocalDateTime getDateOfBirth() {
+	public LocalDate getDateOfBirth() {
 		return dateOfBirth;
 	}
 
-	public void setDateOfBirth(LocalDateTime dateOfBirth) {
+	public void setDateOfBirth(LocalDate dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
 	}
 
@@ -125,12 +125,12 @@ public class UserDTO
 		this.aboutMe = aboutMe;
 	}
 
-	public String getImagePath() {
-		return imagePath;
+	public String getImage() {
+		return image;
 	}
 
-	public void setImagePath(String imagePath) {
-		this.imagePath = imagePath;
+	public void setImage(String image) {
+		this.image = image;
 	}
 
 	public boolean isEnabled() {

@@ -1,0 +1,11 @@
+<div *ngIf="!waiting">
+  <p *ngIf="verificationStatus == 200">
+    User is verified. Please log in to continue browsing our site :)
+  </p>
+  <p *ngIf="verificationStatus == 400">
+    User is already verified!
+  </p>
+  <p *ngIf="verificationStatus == 404">
+    User is not found!
+  </p>
+</div>
