@@ -1,11 +1,13 @@
-<mat-toolbar color="primary">
+<mat-toolbar color="primary" style="overflow: hidden; position: fixed; z-index: 999;">
         <mat-toolbar-row>
-                <a style="text-decoration: none; color:hotpink" href="">TakeOff</a>
+                <a style="text-decoration: none; color: white" href="">TakeOff</a>
             
                 <span class="fill"></span>
 
-                <button mat-raised-button color="accent">Login</button>&nbsp;&nbsp;
-                <button mat-raised-button color="accent">Registration</button>
+                <button mat-raised-button style="background-color: orange; color: white;">Login</button>&nbsp;&nbsp;
+                <button mat-raised-button style="background-color: orange; color: white;">Registration</button>
         </mat-toolbar-row>
 </mat-toolbar>
-<router-outlet></router-outlet>
+<div style="padding-top: 50px;">
+        <router-outlet></router-outlet>
+</div>
