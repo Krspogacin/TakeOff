@@ -4,19 +4,30 @@
 <p>Address: {{hotel.address}}</p>
 <p>Description: {{hotel.description}}</p>
 -->
+<h2 style="padding: 0% 0% 0% 2.5%;">List of hotels:</h2>
+<div style="display:flex; flex-wrap: wrap" *ngIf="hotels">
+<mat-card *ngFor="let h of hotels.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)" class="example-card">
+    <mat-card-header>
+        <mat-card-title>{{h.name}}</mat-card-title>
+    </mat-card-header>
+    <img mat-card-image src="https://hotelperrakis.com/wp-content/uploads/slider-back-hotel.jpg">
+    <mat-card-content>
+        <p>
+        <b>Address</b> : {{h.address}} <br/>
+        <b>Description</b> : {{h.description}}
+        </p> 
+    </mat-card-content>
+    <mat-card-actions>
+        <button mat-button>RESERVE</button>
+    </mat-card-actions>
+</mat-card>
+</div>
+<mat-paginator [length] = hotels.length
+              [pageSize] = "10"
+              [pageSizeOptions] = "[5, 10, 20]"
+              [showFirstLastButtons]="true"
+              (page)="pageFunction($event)">
+</mat-paginator>
 
-<table border="1">
-    <tr>
-        <td>Name</td>
-        <td>Address</td>
-        <td>Description</td>
-    </tr>
-    <tr *ngFor="let h of hotels">
-        <td>{{h.name}}</td>
-        <td>{{h.address}}</td>
-        <td>{{h.description}}</td>
-    </tr>
-</table>
 
-
-<button mat-raised-button (click)="openDialog()"></button>
+<button mat-button (click)="openDialog()">Create hotel</button>

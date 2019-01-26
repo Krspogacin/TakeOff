@@ -1,11 +1,11 @@
 <h1 mat-dialog-title>Create hotel</h1>
-<div mat-dialog-content>
+<mat-dialog-content [formGroup]="hotelForm">
   <table>
     <tr>
       <td>Hotel name:</td>
       <td>
         <mat-form-field>
-          <input type="text" matInput [(ngModel)]="hotel.name">
+          <input matInput type="text" formControlName="name" placeholder="Name">
         </mat-form-field>
       </td>
     </tr>
@@ -13,7 +13,7 @@
         <td>Hotel address:</td>
         <td>
           <mat-form-field>
-            <input type="text" matInput [(ngModel)]="hotel.address">
+            <input matInput type="text" formControlName="address" placeholder="Address">
           </mat-form-field>
         </td>
     </tr>
@@ -21,13 +21,13 @@
         <td>Hotel description:</td>
         <td>
           <mat-form-field>
-            <input matInput type="text" [(ngModel)]="hotel.description">
+            <input matInput type="text" formControlName="description" placeholder="Description">
           </mat-form-field>
         </td>
     </tr>
   </table>
-  <div mat-dialog-actions>
-    <button mat-button [mat-dialog-close]="hotel" cdkFocusInitial>Ok</button>
-    <button mat-button (click)="onNoClick()">Cancel</button>
-  </div>
-</div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="hotelForm.value">Ok</button>
+  <button mat-button  [mat-dialog-close]>Cancel</button>
+</mat-dialog-actions>

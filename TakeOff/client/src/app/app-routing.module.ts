@@ -11,8 +11,10 @@ import { SuccessfulRegistrationComponent } from './components/successful-registr
 import { LoginComponent } from './components/login/login.component';
 import { VerifyUserComponent } from './components/verify-user/verify-user.component';
 import { RentACarComponent } from './components/rent-a-car/rent-a-car.component';
+import { HomepageComponent } from './components/homepage/homepage.component';
 
 const routes: Routes = [
+  { path: '', component: HomepageComponent},
   { path: 'companies/:id', component: AirCompanyComponent },
   { path: 'flights/:id', component: FlightComponent },
   { path: 'hotels', component : HotelComponent },
@@ -38,4 +40,5 @@ export const RoutingComponents = [AirCompanyComponent,
                                   SuccessfulRegistrationComponent,
                                   VerifyUserComponent,
                                   LoginComponent,
-                                  RentACarComponent];
+                                  RentACarComponent,
+                                  HomepageComponent];

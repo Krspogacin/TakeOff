@@ -54,7 +54,7 @@ public class HotelController {
 
 		Hotel hotel = new Hotel();
 		hotel.setName(hotelDTO.getName());
-		hotel.setAddress(hotelDTO.getName());
+		hotel.setAddress(hotelDTO.getAddress());
 		hotel.setDescription(hotelDTO.getDescription());
 
 		hotel = hotelService.save(hotel);

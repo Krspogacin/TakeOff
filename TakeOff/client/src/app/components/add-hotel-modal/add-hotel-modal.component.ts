@@ -1,22 +1,23 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
-
-export interface DialogData {
-  hotel : {};
-}
+import { MatDialogRef} from '@angular/material';
+import { FormControl, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-add-hotel-modal',
   templateUrl: 'add-hotel-modal.component.html',
 })
-export class AddHotelModalComponent{
+export class AddHotelModalComponent implements OnInit{
   
-  constructor(
-    public dialogRef: MatDialogRef<AddHotelModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData) { }
+  hotelForm: FormGroup;
 
-  onNoClick() : void {
-    this.dialogRef.close();
-  }
+  constructor(private dialogRef: MatDialogRef<AddHotelModalComponent>) { }
+
+    ngOnInit() {
+      this.hotelForm = new FormGroup({
+        name: new FormControl(),
+        address: new FormControl(),
+        description: new FormControl(),
+     });
+    }
 
 }
