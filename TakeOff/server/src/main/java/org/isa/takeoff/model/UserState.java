@@ -1,21 +1,19 @@
 package org.isa.takeoff.model;
 
-import java.util.List;
-
 public class UserState 
 {	
     private String accessToken;
     private String username;
     private boolean isEnabled;
-    private List<String> authorities;
+    private String authority;
 
     public UserState() { }
 
-    public UserState(String accessToken, String username, boolean isEnabled, List<String> authorities) {
+    public UserState(String accessToken, String username, boolean isEnabled, String authority) {
 		this.accessToken = accessToken;
 		this.username = username;
 		this.isEnabled = isEnabled;
-		this.authorities = authorities;
+		this.authority = authority;
 	}
 
 	public String getAccessToken() {
@@ -42,11 +40,11 @@ public class UserState
 		this.isEnabled = isEnabled;
 	}
 
-	public List<String> getAuthorities() {
-		return authorities;
+	public String getAuthority() {
+		return authority;
 	}
 
-	public void setAuthorities(List<String> authorities) {
-		this.authorities = authorities;
+	public void setAuthorities(String authority) {
+		this.authority = authority;
 	}
 }

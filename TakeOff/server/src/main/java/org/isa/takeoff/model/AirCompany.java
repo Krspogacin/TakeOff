@@ -93,24 +93,24 @@ public class AirCompany {
 		return new ArrayList<>(destinations);
 	}
 
-	public void setDestinations(Set<Destination> destinations) {
-		this.destinations = destinations;
+	public void setDestinations(List<Destination> destinations) {
+		this.destinations = new HashSet<>(destinations);
 	}
 
 	public List<Flight> getFlights() {
 		return new ArrayList<>(flights);
 	}
 
-	public void setFlights(Set<Flight> flights) {
-		this.flights = flights;
+	public void setFlights(List<Flight> flights) {
+		this.flights = new HashSet<>(flights);
 	}
 
 	public Set<AirCompanyRating> getCompanyRatings() {
 		return companyRatings;
 	}
 
-	public void setCompanyRatings(Set<AirCompanyRating> companyRatings) {
-		this.companyRatings = companyRatings;
+	public void setCompanyRatings(List<AirCompanyRating> companyRatings) {
+		this.companyRatings = new HashSet<>(companyRatings);
 	}
 
 	public Long getVersion() {

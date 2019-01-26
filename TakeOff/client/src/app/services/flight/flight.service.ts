@@ -16,11 +16,19 @@ export class FlightService {
     return this.http.get('/flights/' + id + '/destinations');
   }
 
+  setFlightDestinations(id, destinations) {
+    return this.http.put('/flights/' + id + '/destinations', destinations);
+  }
+
+  getFlightTickets(id: number) {
+    return this.http.get('/flights/' + id + '/tickets');
+  }
+
   addFlight(flight) {
     return this.http.post('/flights', flight);
   }
 
-  addFlightDestinations() {
-
+  updateFlight(flight) {
+    return this.http.put('/flights', flight);
   }
 }

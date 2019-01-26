@@ -10,32 +10,47 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Version;
 
 @Entity
 public class Ticket {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	@Column(name="discount")
+
+	@Column(name = "number", nullable = false)
+	private Integer number;
+
+	@Column(name = "discount")
 	private Double discount;
-	
-	@Column(name="isOnDiscount")
+
+	@Column(name = "isOnDiscount")
 	private boolean isOnDiscount;
-	
-	@Column(name="isReserved", nullable = false)
+
+	@Column(name = "isReserved", nullable = false)
 	private boolean isReserved;
-	
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Flight flight;
-	
+
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Flight flight;
+
+	@Version
+	private Long version;
+
 	public Long getId() {
 		return id;
 	}
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public Integer getNumber() {
+		return number;
+	}
+
+	public void setNumber(Integer number) {
+		this.number = number;
 	}
 
 	public Double getDiscount() {
@@ -46,19 +61,19 @@ public class Ticket {
 		this.discount = discount;
 	}
 
-	public Boolean getIsOnDiscount() {
+	public boolean getIsOnDiscount() {
 		return isOnDiscount;
 	}
 
-	public void setIsOnDiscount(Boolean isOnDiscount) {
+	public void setIsOnDiscount(boolean isOnDiscount) {
 		this.isOnDiscount = isOnDiscount;
 	}
 
-	public Boolean getIsReserved() {
+	public boolean getIsReserved() {
 		return isReserved;
 	}
 
-	public void setIsReserved(Boolean isReserved) {
+	public void setIsReserved(boolean isReserved) {
 		this.isReserved = isReserved;
 	}
 
@@ -69,7 +84,15 @@ public class Ticket {
 	public void setFlight(Flight flight) {
 		this.flight = flight;
 	}
-	
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {

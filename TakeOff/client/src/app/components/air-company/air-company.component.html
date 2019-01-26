@@ -1,64 +1,51 @@
-<h1>{{company.name}}</h1>
-<input type="text" [(ngModel)]="company.name">
+<div *ngIf="!loadingCompany && !loadingFlights && !loadingDestinations">
+    <div *ngIf="companyExists">
+        <h1>{{company.name}}</h1>
 
-Address: <input [(ngModel)]="company.address">
-Description: <input [(ngModel)]="company.description">
+        <div *ngIf="userRole && userRole === 'ROLE_USER'">
+            <button mat-raised-button color="primary" (click)="openAddFlightDialog()">
+                <mat-icon>add</mat-icon> Add flight
+            </button>
+            <button mat-raised-button color="primary" (click)="openUpdateDialog()">
+                <mat-icon>edit</mat-icon> Update
+            </button>
+        </div>
 
-<h3>Destinations:</h3>
-<table border="5px">
-    <thead>
-        <th>id</th>
-        <th>airport</th>
-        <th>city</th>
-        <th>country</th>
-    </thead>
-    <tbody>
-        <tr *ngFor="let dest of destinations">
-            <td>{{dest.id}}</td>
-            <td>{{dest.airportName}}</td>
-            <td>{{dest.city}}</td>
-            <td>{{dest.country}}</td>
-        </tr>
-    </tbody>
-</table>
+        <p><b>Address:</b> {{company.address}} </p>
+        <p><b>Description:</b> {{company.description}} </p>
 
-<h3>Flights:</h3>
+        <h3>Destinations:</h3>
+        <mat-form-field>
+            <mat-chip-list>
+                <mat-chip *ngFor="let dest of destinations" color="primary">
+                    {{dest.city}}, {{dest.country}}
+                </mat-chip>
+            </mat-chip-list>
+        </mat-form-field>
 
-<ol>
-    <li *ngFor="let flight of flights">
-        {{flight.id}}
-        <input type="datetime-local" [(ngModel)]="flight.takeOffDate">
-        {{flight.landingDate}}
-        {{flight.duration}}
-        {{flight.distance}}
-        {{flight.numberOfTransfers}}
-        {{flight.ticketPrice}}
-        <button routerLink="/flights/{{flight.id}}">Info</button>
-    </li>
-</ol>
+        <h3>Flights:</h3>
+        <mat-card class="example-card" *ngFor="let flight of flights">
+            <mat-card-header>
+                <mat-card-title>{{flight.takeOffDate | date}}</mat-card-title>
+                <mat-card-subtitle>take off</mat-card-subtitle>
 
-<label>Take off date</label>
-<input type="datetime-local" [(ngModel)]="form.takeOffDate">
-<br />
-<label>Landing date</label>
-<input type="datetime-local" [(ngModel)]="form.landingDate">
-<br />
-<label>Flight distance</label>
-<input type="text" [(ngModel)]="form.distance">
-<br />
-<label>Number of transfers</label>
-<input type="number" [(ngModel)]="form.numberOfTransfers">
-<br />
-<label>Destinations</label>
-<select [(ngModel)]="form.destinations" size="3" multiple>
-    <option *ngFor="let dest of destinations" [ngValue]="dest">
-        {{dest.city}}
-    </option>
-</select>
-<br />
-<label>Ticket price</label>
-<input type="number" [(ngModel)]="form.ticketPrice">
-<br />
-<button (click)="addFlight()">Add flight</button>
+                <mat-card-title>{{flight.landingDate}}</mat-card-title>
+                <mat-card-subtitle>landing</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <p><b>Distance:</b> {{flight.distance}} </p>
+                <p><b>Ticket price:</b> {{flight.ticketPrice | currency}} </p>
+            </mat-card-content>
+            <mat-card-actions>
+                <button mat-stroked-button color="primary" routerLink="/flights/{{flight.id}}">DETAILS</button>
+            </mat-card-actions>
+        </mat-card>
 
-<button (click)="updateCompany()">Save</button>
+    </div>
+
+    <div *ngIf="!companyExists">
+        <p>
+            Air company not found!
+        </p>
+    </div>
+</div>

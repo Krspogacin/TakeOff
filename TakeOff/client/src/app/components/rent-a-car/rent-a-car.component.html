@@ -1,39 +1,43 @@
 <div *ngIf="!loadingRentACar && !loadingVehicles" class="strech">
   <div *ngIf="rentACarExists" class="stretch">
     <h1 class="header">{{rentACar.name}}</h1>
-    <div *ngIf="!userRoles || userRoles.includes('ROLE_USER')">
+    <div *ngIf="!userRole || userRole === 'ROLE_USER'">
       <button mat-raised-button color="primary" class="button-right" (click)="openAddVehicleDialog()"><mat-icon>add</mat-icon> Add vehicle</button>
       <button mat-raised-button color="primary" class="button-right" (click)="openUpdateDialog()"><mat-icon>edit</mat-icon> Update</button>
     </div>
     <p><b>Address:</b> {{rentACar.address}}</p>
     <p><b>Description:</b> {{(!rentACar.description) ? '✗' : rentACar.description}}</p>
-    <div>
-      <br><br>
-      <h2 style="padding: 0% 0% 0% 2.5%;">List of vehicles:</h2>
-      <div style="display:flex; flex-direction: row;" *ngIf="vehicles">
-        <mat-card *ngFor="let vehicle of vehicles" class="vehicle-card">
-          <mat-card-header>
-            <mat-card-title>{{vehicle.brand}}</mat-card-title>
-          </mat-card-header>
-          <img mat-card-image src="{{vehicle.image}}" alt="Vehicle photo">
-          <mat-card-content>
-            <p><b>Model:</b> {{vehicle.model}}</p>
-            <p><b>Year:</b> {{vehicle.year}}</p>
-            <p *ngIf="vehicle.reserved"><b>Reserved: ✓</b></p>
-            <p *ngIf="!vehicle.reserved"><b>Reserved: ✗</b></p>
-          </mat-card-content>
-          <mat-card-actions *ngIf="!userRoles || userRoles.includes('ROLE_USER')">
-            <button mat-button color="primary" (click)="openUpdateVehicleDialog(vehicle)"><mat-icon>edit</mat-icon></button>
-            <span matTooltip="Cannot be deleted because it is reserved!" [matTooltipDisabled]="!vehicle.reserved">
-              <button mat-button color="primary" (click)="deleteVehicle(vehicle.id)" [disabled]="vehicle.reserved"><mat-icon>delete</mat-icon></button>
-            </span>
-          </mat-card-actions>
-        </mat-card>
-      </div>
-      <div *ngIf="!vehicles || vehicles.length == 0">
-        <h4>This rent a car service does not have any vehicle yet!</h4>
-      </div>
+    <div class="div-mat-card" *ngIf="vehicles">
+      <mat-card *ngFor="let vehicle of vehicles.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)" class="vehicle-card">
+        <mat-card-header>
+          <mat-card-title>{{vehicle.brand}}</mat-card-title>
+        </mat-card-header>
+        <img mat-card-image src="{{vehicle.image}}" alt="Vehicle photo">
+        <mat-card-content>
+          <p><b>Model:</b> {{vehicle.model}}</p>
+          <p><b>Year:</b> {{vehicle.year}}</p>
+          <p *ngIf="vehicle.reserved"><b>Reserved: ✓</b></p>
+          <p *ngIf="!vehicle.reserved"><b>Reserved: ✗</b></p>
+        </mat-card-content>
+        <mat-card-actions *ngIf="!userRoles || userRoles.includes('ROLE_USER')">
+          <button mat-button color="primary" (click)="openUpdateVehicleDialog(vehicle)"><mat-icon>edit</mat-icon></button>
+          <span matTooltip="Cannot be deleted because it is reserved!" [matTooltipDisabled]="!vehicle.reserved">
+            <button mat-button color="primary" (click)="deleteVehicle(vehicle.id)" [disabled]="vehicle.reserved"><mat-icon>delete</mat-icon></button>
+          </span>
+        </mat-card-actions>
+      </mat-card>
     </div>
+    <mat-paginator
+      [length]="vehicles.length"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="pageOptions"
+      [showFirstLastButtons]="true"
+      (page)="switchPage($event)">
+    </mat-paginator>
+    <div *ngIf="!vehicles || vehicles.length == 0">
+      <h4>This rent a car service does not have any vehicle yet!</h4>
+    </div>
+    <br><br>
   </div>
   <div *ngIf="!rentACarExists">
     <p>
@@ -41,3 +45,4 @@
     </p>
   </div>
 </div>
+

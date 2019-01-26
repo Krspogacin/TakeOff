@@ -13,6 +13,11 @@
 }
 
 .vehicle-card {
-    max-width: 20%;
-    margin: 0% 2.5% 0% 0%;
+    width: 15%;
+    margin: 0% 2% 5% 0%;
+}
+
+.div-mat-card {
+    display: flex;
+    flex-wrap: wrap;
 }

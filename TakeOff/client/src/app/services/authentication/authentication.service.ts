@@ -10,8 +10,8 @@ export class AuthenticationService {
 
   constructor(private http: HttpClient) { }
 
-  setUserState(user: string) {
-    localStorage.setItem(this.userKey, JSON.stringify(user));
+  setUserState(userState: string) {
+    localStorage.setItem(this.userKey, JSON.stringify(userState));
   }
 
   removeUserState() {
@@ -39,11 +39,11 @@ export class AuthenticationService {
     return JSON.parse(localStorage.getItem(this.userKey)).isEnabled;
   }
 
-  getAuthorities(): string {
+  getAuthority(): string {
     if (!JSON.parse(localStorage.getItem(this.userKey))) {
       return null;
     }
-    return JSON.parse(localStorage.getItem(this.userKey)).authorities;
+    return JSON.parse(localStorage.getItem(this.userKey)).authority;
   }
 
   login(authRequest: any) {

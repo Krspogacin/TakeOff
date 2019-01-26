@@ -1,40 +1,40 @@
-<label>Take off date</label>
-<input type="datetime-local" [(ngModel)]="flight.takeOffDate">
-<br />
-<label>Landing date</label>
-<input type="datetime-local" [(ngModel)]="flight.landingDate">
-<br />
-<label>Flight distance</label>
-<input type="text" [(ngModel)]="flight.distance">
-<br />
-<label>Number of transfers</label>
-<input type="number" [(ngModel)]="flight.numberOfTransfers">
-<br />
-<label>Destinations</label>
-<select>
-    <option *ngFor="let dest of destinations" [ngValue]="dest">
-        {{dest.city}}
-    </option>
-</select>
-<br />
-<label>Ticket price</label>
-<input type="number" [(ngModel)]="flight.ticketPrice">
-<br />
+<div *ngIf="!loadingFlight && !loadingDestinations">
+  <div *ngIf="flightExists">
+    <h2>Flight details</h2>
 
-<h3>Destinations:</h3>
-<table border="5px">
-  <thead>
-    <th>id</th>
-    <th>airport</th>
-    <th>city</th>
-    <th>country</th>
-  </thead>
-  <tbody>
-    <tr *ngFor="let dest of destinations">
-      <td>{{dest.id}}</td>
-      <td>{{dest.airportName}}</td>
-      <td>{{dest.city}}</td>
-      <td>{{dest.country}}</td>
-    </tr>
-  </tbody>
-</table>
+    <div *ngIf="userRole && userRole === 'ROLE_USER'">
+      <button mat-raised-button color="primary" (click)="openUpdateDialog()">
+        <mat-icon>edit</mat-icon> Update
+      </button>
+    </div>
+
+    <p><b>Take off date:</b> {{flight.takeOffDate | date}} </p>
+    <p><b>Landing date:</b> {{flight.landingDate}} </p>
+    <p><b>Distance:</b> {{flight.distance}} </p>
+    <p><b>Ticket price:</b> {{flight.ticketPrice | currency}} </p>
+    <h3>Destinations:</h3>
+    <mat-form-field>
+      <mat-chip-list>
+        <mat-chip *ngFor="let dest of destinations" color="primary">
+          {{dest.city}}, {{dest.country}}
+        </mat-chip>
+      </mat-chip-list>
+    </mat-form-field>
+    <br>
+    <button mat-stroked-button color="primary" (click)="addRow()">Add Row</button>
+    <button mat-stroked-button color="primary" (click)="addColumn()">Add Column</button>
+    <button mat-stroked-button color="primary" (click)="getCart()">Get Cart</button>
+
+  </div>
+
+  <div *ngIf="!flightExists">
+    <p>
+      Flight not found!
+    </p>
+  </div>
+
+</div>
+
+<div id="map-container"></div>
+<div id="legend-container"></div>
+<div id="shoppingCart-container"></div>

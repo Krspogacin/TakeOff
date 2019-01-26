@@ -8,6 +8,9 @@ public class AdministratorDTO
 	private String username;
 	private String password;
 	private String email;
+	private AirCompanyDTO airCompanyDTO;
+	private HotelDTO hotelDTO;
+	private RentACarDTO rentACarDTO;
 	
 	public AdministratorDTO() { }
 	
@@ -53,5 +56,29 @@ public class AdministratorDTO
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public AirCompanyDTO getAirCompanyDTO() {
+		return airCompanyDTO;
+	}
+
+	public void setAirCompanyDTO(AirCompanyDTO airCompanyDTO) {
+		this.airCompanyDTO = airCompanyDTO;
+	}
+
+	public HotelDTO getHotelDTO() {
+		return hotelDTO;
+	}
+
+	public void setHotelDTO(HotelDTO hotelDTO) {
+		this.hotelDTO = hotelDTO;
+	}
+
+	public RentACarDTO getRentACarDTO() {
+		return rentACarDTO;
+	}
+
+	public void setRentACarDTO(RentACarDTO rentACarDTO) {
+		this.rentACarDTO = rentACarDTO;
 	}	
 }

@@ -1,16 +1,23 @@
 package org.isa.takeoff.model;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class RoomRating implements Serializable{
+public class RoomReservation implements Serializable{
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 	
 	@Id
 	@ManyToOne
@@ -22,9 +29,23 @@ public class RoomRating implements Serializable{
 	@JoinColumn(name="user_id", referencedColumnName="id")
 	private User user;
 	
-	@Column(name = "rating", nullable = false)
+	@Column(name = "rating", nullable = true)
 	private Double rating;
+	
+	@Column(name = "reservationStartDate", nullable = false)
+	private LocalDate reservationStartDate;
+	
+	@Column(name = "reservationEndDate", nullable = false)
+	private LocalDate reservationEndDate;
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
 	public Room getRoom() {
 		return room;
 	}
@@ -49,14 +70,30 @@ public class RoomRating implements Serializable{
 		this.rating = rating;
 	}
 	
-    @Override
+    public LocalDate getReservationStartDate() {
+		return reservationStartDate;
+	}
+
+	public void setReservationStartDate(LocalDate reservationStartDate) {
+		this.reservationStartDate = reservationStartDate;
+	}
+
+	public LocalDate getReservationEndDate() {
+		return reservationEndDate;
+	}
+
+	public void setReservationEndDate(LocalDate reservationEndDate) {
+		this.reservationEndDate = reservationEndDate;
+	}
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
  
         if (o == null || getClass() != o.getClass()) 
             return false;
  
-        RoomRating that = (RoomRating) o;
+        RoomReservation that = (RoomReservation) o;
         return Objects.equals(room, that.room) &&
         		Objects.equals(user, that.user);
     }

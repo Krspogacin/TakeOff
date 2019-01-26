@@ -10,6 +10,7 @@ import org.isa.takeoff.model.AirCompany;
 import org.isa.takeoff.model.Destination;
 import org.isa.takeoff.model.Flight;
 import org.isa.takeoff.service.AirCompanyService;
+import org.isa.takeoff.service.DestinationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,6 +27,9 @@ public class AirCompanyController {
 
 	@Autowired
 	private AirCompanyService airCompanyService;
+
+	@Autowired
+	private DestinationService destinationService;
 
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<AirCompanyDTO>> getCompanies() {
@@ -108,6 +112,46 @@ public class AirCompanyController {
 		try {
 			AirCompany company = airCompanyService.findOne(id);
 			List<Destination> destinations = company.getDestinations();
+
+			List<DestinationDTO> destinationsDTO = new ArrayList<>();
+			for (Destination d : destinations) {
+				destinationsDTO.add(new DestinationDTO(d));
+			}
+
+			return new ResponseEntity<>(destinationsDTO, HttpStatus.OK);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@RequestMapping(value = "/{id}/destinations", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<DestinationDTO>> setCompanyDestinations(@PathVariable Long id,
+			@RequestBody List<DestinationDTO> destinationsDTO) {
+
+		try {
+			AirCompany company = airCompanyService.findOne(id);
+
+			List<Destination> destinations = new ArrayList<>();
+			for (DestinationDTO d : destinationsDTO) { 
+				destinations.add(destinationService.findOne(d.getId()));
+			}
+			
+			company.setDestinations(destinations);
+			airCompanyService.save(company);
+
+			return new ResponseEntity<>(destinationsDTO, HttpStatus.OK);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@RequestMapping(value = "/destinations", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<DestinationDTO>> getAllDestinations() {
+
+		try {
+			List<Destination> destinations = destinationService.findAll();
 
 			List<DestinationDTO> destinationsDTO = new ArrayList<>();
 			for (Destination d : destinations) {

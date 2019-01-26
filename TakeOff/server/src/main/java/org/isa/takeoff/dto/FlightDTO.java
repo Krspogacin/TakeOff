@@ -10,9 +10,9 @@ public class FlightDTO {
 	private LocalDateTime takeOffDate;
 	private LocalDateTime landingDate;
 	private Double distance;
-	private Integer numberOfTransfers;
 	private Double ticketPrice;
 	private AirCompanyDTO company;
+	private FlightDiagramDTO diagram;
 	private Long version;
 
 	public FlightDTO() {
@@ -21,20 +21,20 @@ public class FlightDTO {
 
 	public FlightDTO(Flight flight) {
 		this(flight.getId(), flight.getTakeOffDate(), flight.getLandingDate(), flight.getDistance(),
-				flight.getNumberOfTransfers(), flight.getTicketPrice(), new AirCompanyDTO(flight.getCompany()),
-				flight.getVersion());
+				flight.getTicketPrice(), new AirCompanyDTO(flight.getCompany()),
+				new FlightDiagramDTO(flight.getDiagram()), flight.getVersion());
 	}
 
-	public FlightDTO(Long id, LocalDateTime takeOffDate, LocalDateTime landingDate, Double distance,
-			Integer numberOfTransfers, Double ticketPrice, AirCompanyDTO company, Long version) {
+	public FlightDTO(Long id, LocalDateTime takeOffDate, LocalDateTime landingDate, Double distance, Double ticketPrice,
+			AirCompanyDTO company, FlightDiagramDTO diagram, Long version) {
 		super();
 		this.id = id;
 		this.takeOffDate = takeOffDate;
 		this.landingDate = landingDate;
 		this.distance = distance;
-		this.numberOfTransfers = numberOfTransfers;
 		this.ticketPrice = ticketPrice;
 		this.company = company;
+		this.diagram = diagram;
 		this.version = version;
 	}
 
@@ -70,14 +70,6 @@ public class FlightDTO {
 		this.distance = distance;
 	}
 
-	public Integer getNumberOfTransfers() {
-		return numberOfTransfers;
-	}
-
-	public void setNumberOfTransfers(Integer numberOfTransfers) {
-		this.numberOfTransfers = numberOfTransfers;
-	}
-
 	public Double getTicketPrice() {
 		return ticketPrice;
 	}
@@ -92,6 +84,14 @@ public class FlightDTO {
 
 	public void setCompany(AirCompanyDTO company) {
 		this.company = company;
+	}
+
+	public FlightDiagramDTO getDiagram() {
+		return diagram;
+	}
+
+	public void setDiagram(FlightDiagramDTO diagram) {
+		this.diagram = diagram;
 	}
 
 	public Long getVersion() {

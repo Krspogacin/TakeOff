@@ -1,15 +1,19 @@
 package org.isa.takeoff.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.isa.takeoff.dto.AirCompanyDTO;
 import org.isa.takeoff.dto.DestinationDTO;
 import org.isa.takeoff.dto.FlightDTO;
+import org.isa.takeoff.dto.TicketDTO;
 import org.isa.takeoff.model.AirCompany;
 import org.isa.takeoff.model.Destination;
 import org.isa.takeoff.model.Flight;
+import org.isa.takeoff.model.FlightDiagram;
+import org.isa.takeoff.model.Ticket;
 import org.isa.takeoff.service.AirCompanyService;
+import org.isa.takeoff.service.DestinationService;
 import org.isa.takeoff.service.FlightService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,7 +34,10 @@ public class FlightController {
 
 	@Autowired
 	private AirCompanyService airCompanyService;
-	
+
+	@Autowired
+	private DestinationService destinationService;
+
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<FlightDTO> getFlight(@PathVariable Long id) {
 
@@ -56,8 +63,25 @@ public class FlightController {
 			AirCompany company = airCompanyService.findOne(flightDTO.getCompany().getId());
 
 			Flight flight = new Flight(flightDTO.getTakeOffDate(), flightDTO.getLandingDate(), flightDTO.getDistance(),
-					flightDTO.getNumberOfTransfers(), flightDTO.getTicketPrice());
+					flightDTO.getTicketPrice());
 
+			List<Ticket> tickets = new ArrayList<>();
+			for (int i = 0; i < 9; i++) {
+				for (int j = 0; j < 9; j++) {
+					if (!(i == 4 || j == 4 || (i == 0 && (j == 0 || j == 8)))) {
+						Ticket t = new Ticket();
+						t.setNumber(i * 9 + j);
+						t.setFlight(flight);
+						tickets.add(t);
+					}
+				}
+			}
+
+			FlightDiagram diagram = new FlightDiagram(9, 9, new ArrayList<>(Arrays.asList(4)),
+					new ArrayList<>(Arrays.asList(4)));
+
+			flight.setDiagram(diagram);
+			flight.setTickets(tickets);
 			flight.setCompany(company);
 			flight = flightService.save(flight);
 
@@ -76,7 +100,6 @@ public class FlightController {
 			flight.setTakeOffDate(flightDTO.getTakeOffDate());
 			flight.setLandingDate(flightDTO.getLandingDate());
 			flight.setDistance(flightDTO.getDistance());
-			flight.setNumberOfTransfers(flightDTO.getNumberOfTransfers());
 			flight.setTicketPrice(flightDTO.getTicketPrice());
 			flight = flightService.save(flight);
 
@@ -107,17 +130,20 @@ public class FlightController {
 		}
 	}
 
-	@RequestMapping(value = "/{id}/destinations", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<DestinationDTO>> addFlightDestinations(@PathVariable Long id,
+	@RequestMapping(value = "/{id}/destinations", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<DestinationDTO>> setFlightDestinations(@PathVariable Long id,
 			@RequestBody List<DestinationDTO> destinationsDTO) {
 
 		try {
 			Flight flight = flightService.findOne(id);
-			List<Destination> destinations = flight.getTransferDestinations();
 
+			List<Destination> destinations = new ArrayList<>();
 			for (DestinationDTO d : destinationsDTO) {
-				
+				destinations.add(destinationService.findOne(d.getId()));
 			}
+
+			flight.setTransferDestinations(destinations);
+			flightService.save(flight);
 
 			return new ResponseEntity<>(destinationsDTO, HttpStatus.OK);
 
@@ -125,6 +151,25 @@ public class FlightController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
+	}
+
+	@RequestMapping(value = "/{id}/tickets", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<TicketDTO>> getFlightTickets(@PathVariable Long id) {
+
+		try {
+			Flight flight = flightService.findOne(id);
+			List<Ticket> tickets = flight.getTickets();
+
+			List<TicketDTO> ticketsDTO = new ArrayList<>();
+			for (Ticket t : tickets) {
+				ticketsDTO.add(new TicketDTO(t));
+			}
+
+			return new ResponseEntity<>(ticketsDTO, HttpStatus.OK);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
 }

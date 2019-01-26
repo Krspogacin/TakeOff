@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { RentACarService } from 'src/app/services/rent-a-car/rent-a-car.service';
 import { ActivatedRoute } from '@angular/router';
-import { MatDialog, MatSnackBar, MatSnackBarRef } from '@angular/material';
+import { MatDialog, MatSnackBar, PageEvent, MatPaginator, MatPaginatorIntl} from '@angular/material';
 import { RentACarDialogComponent } from '../rent-a-car-dialog/rent-a-car-dialog.component';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { VehicleService } from 'src/app/services/vehicle/vehicle.service';
@@ -20,7 +20,10 @@ export class RentACarComponent implements OnInit {
   rentACar: any = null;
   vehicles: any = null;
   message: string;
-  userRoles: Array<any>;
+  userRole: string = null;
+  pageSize = 10;
+  pageIndex = 0;
+  pageOptions = [5, 10, 25, 50];
 
   constructor(private rentACarService: RentACarService,
               private authService: AuthenticationService,
@@ -35,12 +38,11 @@ export class RentACarComponent implements OnInit {
       this.rentACarService.getRentACarById(id).subscribe(
         (data) => {
           this.rentACar = data;
-          this.userRoles = new Array();
-          this.userRoles.push.apply(this.userRoles, this.authService.getAuthorities());
+          this.userRole = this.authService.getAuthority();
           this.rentACarExists = true;
           this.loadingRentACar = false;
         },
-        (error) => {
+        () => {
           this.loadingRentACar = false;
         }
       );
@@ -50,12 +52,17 @@ export class RentACarComponent implements OnInit {
           this.vehicles = vehicles;
           this.loadingVehicles = false;
         },
-        (error) => {
+        () => {
           this.loadingVehicles = false;
         }
       );
 
     }
+  }
+
+  switchPage(event: PageEvent) {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
   }
 
   openUpdateDialog() {
