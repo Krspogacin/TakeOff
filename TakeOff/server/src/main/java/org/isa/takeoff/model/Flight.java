@@ -19,6 +19,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Version;
 
 @Entity
@@ -37,9 +38,6 @@ public class Flight {
 	@Column(name = "distance", nullable = false)
 	private Double distance;
 
-	@Column(name = "numberOfTransfers", nullable = false)
-	private Integer numberOfTransfers;
-
 	@ManyToMany
 	@JoinTable(name = "flight_destination", joinColumns = @JoinColumn(name = "flight_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "dest_id", referencedColumnName = "id"))
 	private Set<Destination> transferDestinations = new HashSet<>();
@@ -56,18 +54,19 @@ public class Flight {
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private AirCompany company;
 
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private FlightDiagram diagram;
+
 	@Version
 	private Long version;
 
 	public Flight() {
 	}
 
-	public Flight(LocalDateTime takeOffDate, LocalDateTime landingDate, double distance, int numberOfTransfers,
-			Double ticketPrice) {
+	public Flight(LocalDateTime takeOffDate, LocalDateTime landingDate, double distance, Double ticketPrice) {
 		this.takeOffDate = takeOffDate;
 		this.landingDate = landingDate;
 		this.distance = distance;
-		this.numberOfTransfers = numberOfTransfers;
 		this.ticketPrice = ticketPrice;
 	}
 
@@ -103,28 +102,20 @@ public class Flight {
 		this.distance = distance;
 	}
 
-	public Integer getNumberOfTransfers() {
-		return numberOfTransfers;
-	}
-
-	public void setNumberOfTransfers(Integer numberOfTransfers) {
-		this.numberOfTransfers = numberOfTransfers;
-	}
-
 	public List<Destination> getTransferDestinations() {
 		return new ArrayList<>(transferDestinations);
 	}
 
-	public void setTransferDestinations(Set<Destination> transferDestinations) {
-		this.transferDestinations = transferDestinations;
+	public void setTransferDestinations(List<Destination> transferDestinations) {
+		this.transferDestinations = new HashSet<>(transferDestinations);
 	}
 
 	public List<Ticket> getTickets() {
 		return new ArrayList<>(tickets);
 	}
 
-	public void setTickets(Set<Ticket> tickets) {
-		this.tickets = tickets;
+	public void setTickets(List<Ticket> tickets) {
+		this.tickets = new HashSet<>(tickets);
 	}
 
 	public Double getTicketPrice() {
@@ -139,8 +130,8 @@ public class Flight {
 		return new ArrayList<>(flightRatings);
 	}
 
-	public void setFlightRatings(Set<FlightRating> flightRatings) {
-		this.flightRatings = flightRatings;
+	public void setFlightRatings(List<FlightRating> flightRatings) {
+		this.flightRatings = new HashSet<>(flightRatings);
 	}
 
 	public AirCompany getCompany() {
@@ -149,6 +140,14 @@ public class Flight {
 
 	public void setCompany(AirCompany company) {
 		this.company = company;
+	}
+
+	public FlightDiagram getDiagram() {
+		return diagram;
+	}
+
+	public void setDiagram(FlightDiagram diagram) {
+		this.diagram = diagram;
 	}
 
 	public Long getVersion() {

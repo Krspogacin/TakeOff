@@ -16,6 +16,14 @@ export class AirCompanyService {
     return this.http.get('/companies/' + id + '/destinations');
   }
 
+  setCompanyDestinations(id, destinations) {
+    return this.http.put('/companies/' + id + '/destinations', destinations);
+  }
+
+  getAllDestinations() {
+    return this.http.get('companies/destinations');
+  }
+
   getCompanyFlights(id: number) {
     return this.http.get('/companies/' + id + '/flights');
   }

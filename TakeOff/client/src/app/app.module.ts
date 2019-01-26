@@ -35,6 +35,7 @@ import { VehicleDialogComponent } from './components/vehicle-dialog/vehicle-dial
         AddHotelModalComponent
     ],
     entryComponents: [
+        RoutingComponents,
         RegistrationDialogComponent,
         LoginDialogComponent,
         RentACarDialogComponent,
