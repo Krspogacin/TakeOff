@@ -59,7 +59,7 @@ public class Room {
 	private boolean hasAirCondition;
 
 	@OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<RoomRating> roomRatings = new HashSet<>();
+	private Set<RoomReservation> roomReservations = new HashSet<>();
 
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Hotel hotel;
@@ -167,12 +167,12 @@ public class Room {
 		this.hasAirCondition = hasAirCondition;
 	}
 
-	public boolean addRoomRating(RoomRating e) {
-		return roomRatings.add(e);
+	public boolean addRoomRating(RoomReservation e) {
+		return roomReservations.add(e);
 	}
 
 	public boolean removeRoomRating(Object o) {
-		return roomRatings.remove(o);
+		return roomReservations.remove(o);
 	}
 
 	public Hotel getHotel() {
@@ -183,12 +183,12 @@ public class Room {
 		this.hotel = hotel;
 	}
 
-	public ArrayList<RoomRating> getRoomRatings() {
-		return new ArrayList<RoomRating>(roomRatings);
+	public ArrayList<RoomReservation> getRoomRatings() {
+		return new ArrayList<RoomReservation>(roomReservations);
 	}
 
-	public void setRoomRatings(Set<RoomRating> roomRatings) {
-		this.roomRatings = roomRatings;
+	public void setRoomRatings(Set<RoomReservation> roomRatings) {
+		this.roomReservations = roomRatings;
 	}
 
 	@Override

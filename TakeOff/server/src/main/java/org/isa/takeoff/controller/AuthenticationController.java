@@ -2,7 +2,6 @@ package org.isa.takeoff.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -57,12 +56,7 @@ public class AuthenticationController
 		else
 		{
 			String token = tokenUtils.generateToken(user.getUsername());
-			List<String> authorities = new ArrayList<>();
-			for (GrantedAuthority authority : user.getAuthorities())
-			{
-				authorities.add(((Authority)authority).getName());
-			}
-			userState = new UserState(token, user.getUsername(), user.isEnabled(), authorities);
+			userState = new UserState(token, user.getUsername(), user.isEnabled(), ((Authority)((ArrayList<? extends GrantedAuthority>)user.getAuthorities()).get(0)).getName());
 		}
 		
 		if (notUser)
@@ -75,12 +69,7 @@ public class AuthenticationController
 			else
 			{
 				String token = tokenUtils.generateToken(user.getUsername());
-				List<String> authorities = new ArrayList<>();
-				for (GrantedAuthority authority : user.getAuthorities())
-				{
-					authorities.add(((Authority)authority).getName());
-				}
-				userState = new UserState(token, user.getUsername(), admin.isEnabled(), authorities);
+				userState = new UserState(token, admin.getUsername(), admin.isEnabled(), ((Authority)((ArrayList<? extends GrantedAuthority>)admin.getAuthorities()).get(0)).getName());
 			}
 		}
 		

@@ -42,7 +42,7 @@ public class Vehicle
 	private boolean reserved;
 	
 	@OneToMany(mappedBy = "vehicle", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<VehicleRating> vehicleRatings = new HashSet<>();
+	private Set<VehicleReservation> vehicleReservations = new HashSet<>();
 	
 	@ManyToOne(fetch = FetchType.EAGER)
 	private RentACar rentACar;
@@ -110,12 +110,12 @@ public class Vehicle
 		this.reserved = reserved;
 	}
 
-	public List<VehicleRating> getVehicleRatings() {
-		return new ArrayList<>(vehicleRatings);
+	public List<VehicleReservation> getVehicleRatings() {
+		return new ArrayList<>(vehicleReservations);
 	}
 
-	public void setVehicleRatings(List<VehicleRating> vehicleRatings) {
-		this.vehicleRatings = new HashSet<>(vehicleRatings);
+	public void setVehicleRatings(List<VehicleReservation> vehicleRatings) {
+		this.vehicleReservations = new HashSet<>(vehicleRatings);
 	}
 
 	public RentACar getRentACar() {
