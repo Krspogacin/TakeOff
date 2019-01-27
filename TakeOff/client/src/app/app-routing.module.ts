@@ -14,9 +14,10 @@ import { RentACarComponent } from './components/rent-a-car/rent-a-car.component'
 import { HomepageComponent } from './components/homepage/homepage.component';
 import { AirCompanyDialogComponent } from './components/air-company-dialog/air-company-dialog.component';
 import { FlightDialogComponent } from './components/flight-dialog/flight-dialog.component';
+import { UserProfileComponent } from './components/user-profile/user-profile.component';
 
 const routes: Routes = [
-  { path: '', component: HomepageComponent},
+  { path: '', component: HomepageComponent },
   { path: 'companies/:id', component: AirCompanyComponent },
   { path: 'flights/:id', component: FlightComponent },
   { path: 'hotels', component: HotelComponent },
@@ -24,6 +25,7 @@ const routes: Routes = [
   { path: 'users/successful_registration', component: SuccessfulRegistrationComponent },
   { path: 'users/register/verify', component: VerifyUserComponent },
   { path: 'users/login', component: LoginComponent },
+  { path: 'users/profile', component: UserProfileComponent },
   { path: 'rent-a-cars/:id', component: RentACarComponent },
   { path: '**', component: NotFoundComponent }
 ];
@@ -35,14 +37,15 @@ const routes: Routes = [
 export class AppRoutingModule { }
 
 export const RoutingComponents = [AirCompanyComponent,
-                                  NotFoundComponent,
-                                  RegistrationComponent,
-                                  FlightComponent,
-                                  HotelComponent,
-                                  SuccessfulRegistrationComponent,
-                                  VerifyUserComponent,
-                                  LoginComponent,
-                                  RentACarComponent,
-                                  HomepageComponent,
-                                  AirCompanyDialogComponent,
-                                  FlightDialogComponent];
+  NotFoundComponent,
+  RegistrationComponent,
+  FlightComponent,
+  HotelComponent,
+  SuccessfulRegistrationComponent,
+  VerifyUserComponent,
+  LoginComponent,
+  RentACarComponent,
+  HomepageComponent,
+  AirCompanyDialogComponent,
+  FlightDialogComponent,
+  UserProfileComponent];

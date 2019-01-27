@@ -11,9 +11,11 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.isa.takeoff.dto.AdministratorDTO;
+import org.isa.takeoff.dto.FriendDTO;
 import org.isa.takeoff.dto.UserDTO;
 import org.isa.takeoff.model.Administrator;
 import org.isa.takeoff.model.Authority;
+import org.isa.takeoff.model.Friend;
 import org.isa.takeoff.model.User;
 import org.isa.takeoff.service.AdministratorService;
 import org.isa.takeoff.service.AuthorityService;
@@ -24,6 +26,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -186,4 +190,37 @@ public class UserController
 		user = this.userService.save(user);
 		return new ResponseEntity<UserDTO>(new UserDTO(user), HttpStatus.OK);
 	}
+	
+	@RequestMapping(method = GET, value = "/{username}")
+	public ResponseEntity<UserDTO> getLoggedInUser(@PathVariable String username){
+		
+		User user = userService.findByUsername(username);
+			
+		if(user != null) {
+			return new ResponseEntity<>(new UserDTO(user), HttpStatus.OK);
+		}else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);						
+		}
+	}
+	
+	@RequestMapping(method = GET, value = "/{username}/friends")
+	public ResponseEntity<List<FriendDTO>> getUserFriends(@PathVariable String username){
+		
+		User user = userService.findByUsername(username);
+		
+		if(user != null) {	
+			List<Friend> friends = user.getFriends();
+			
+			List<FriendDTO> friendsDTO = new ArrayList<>();
+			for(Friend f : friends) {
+				friendsDTO.add(new FriendDTO(f));
+			}
+				
+			return new ResponseEntity<>(friendsDTO, HttpStatus.OK);
+			
+		}else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);						
+		}
+	}
+
 }

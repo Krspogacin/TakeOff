@@ -21,6 +21,9 @@ public class Ticket {
 
 	@Column(name = "number", nullable = false)
 	private Integer number;
+	
+	@Column(name = "type")
+	private String type;
 
 	@Column(name = "discount")
 	private Double discount;
@@ -51,6 +54,14 @@ public class Ticket {
 
 	public void setNumber(Integer number) {
 		this.number = number;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	public Double getDiscount() {

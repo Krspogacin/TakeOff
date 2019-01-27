@@ -1,0 +1,65 @@
+<h1 *ngIf="userExists" [ngClass]="{'profile-header': userExists}">{{user.username}}</h1>
+<img id="profileImg" [ngClass]="{'profile-img': userExists}" alt="Profile image">
+<div *ngIf="!loadingUser">
+  <div *ngIf="userExists">
+    <div>
+      <div id="first-container">
+        <mat-form-field appearance="outline">
+          <mat-label>First name</mat-label>
+          <input type="text" matInput [(ngModel)]="user.firstName">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Last name</mat-label>
+          <input type="text" matInput [(ngModel)]="user.lastName">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input type="email" matInput [(ngModel)]="user.email">
+        </mat-form-field>
+      </div>
+
+      <div id="second-container">
+        <mat-form-field appearance="outline">
+          <mat-label>Phone number</mat-label>
+          <input type="text" matInput [(ngModel)]="user.phoneNumber">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Address</mat-label>
+          <input type="text" matInput [(ngModel)]="user.address">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Date of birth</mat-label>
+          <input matInput [matDatepicker]="picker" [(ngModel)]="user.dateOfBirth" disabled>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker disabled="false"></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div id="third-container">
+        <mat-form-field appearance="outline">
+          <mat-label>About me</mat-label>
+          <textarea matInput [(ngModel)]="user.aboutMe" rows="5"></textarea>
+        </mat-form-field>
+      </div>
+
+
+      <div>
+        <h3>Friends:</h3>
+        <mat-list>
+          <mat-list-item *ngFor="let friend of friends">
+            <img matListAvatar src="{{friend.user2.image}}" alt="">
+            <h3 matLine> {{friend.user2.firstName }} {{friend.user2.lastName}}</h3>
+          </mat-list-item>
+        </mat-list>
+      </div>
+
+    </div>
+  </div>
+
+  <div *ngIf="!userExists">
+    <p>
+      User not found!
+    </p>
+  </div>
+
+</div>

@@ -6,6 +6,7 @@ public class TicketDTO {
 
 	private Long id;
 	private Integer number;
+	private String type;
 	private Double discount;
 	private boolean isOnDiscount;
 	private boolean isReserved;
@@ -17,11 +18,11 @@ public class TicketDTO {
 	}
 
 	public TicketDTO(Ticket ticket) {
-		this(ticket.getId(), ticket.getNumber(), ticket.getDiscount(), ticket.getIsOnDiscount(), ticket.getIsReserved(),
-				new FlightDTO(ticket.getFlight()), ticket.getVersion());
+		this(ticket.getId(), ticket.getNumber(), ticket.getType(), ticket.getDiscount(), ticket.getIsOnDiscount(),
+				ticket.getIsReserved(), new FlightDTO(ticket.getFlight()), ticket.getVersion());
 	}
 
-	public TicketDTO(Long id, Integer number, Double discount, boolean isOnDiscount, boolean isReserved,
+	public TicketDTO(Long id, Integer number, String type, Double discount, boolean isOnDiscount, boolean isReserved,
 			FlightDTO flight, Long version) {
 		super();
 		this.id = id;
@@ -47,6 +48,14 @@ public class TicketDTO {
 
 	public void setNumber(Integer number) {
 		this.number = number;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	public Double getDiscount() {

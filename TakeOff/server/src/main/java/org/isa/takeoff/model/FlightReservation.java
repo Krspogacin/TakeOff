@@ -10,7 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class FlightRating implements Serializable {
+public class FlightReservation implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -59,7 +59,7 @@ public class FlightRating implements Serializable {
 		if (o == null || getClass() != o.getClass())
 			return false;
 
-		FlightRating that = (FlightRating) o;
+		FlightReservation that = (FlightReservation) o;
 		return Objects.equals(flight, that.flight) && Objects.equals(user, that.user);
 	}
 

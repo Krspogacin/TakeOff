@@ -38,3 +38,7 @@
 <div id="map-container"></div>
 <div id="legend-container"></div>
 <div id="shoppingCart-container"></div>
+
+<div *ngIf="flightExists">
+  <button mat-stroked-button color="primary" (click)="bookFlight()">Book flight</button>
+</div>

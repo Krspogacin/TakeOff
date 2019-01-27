@@ -171,5 +171,25 @@ public class FlightController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
+	
+	@RequestMapping(value = "/{id}/reservations", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<TicketDTO>> reserveFlightTickets(@PathVariable Long id,
+			@RequestBody List<TicketDTO> ticketsDTO) {
+
+		try {
+			Flight flight = flightService.findOne(id);
+			List<Ticket> tickets = flight.getTickets();
+
+//			List<TicketDTO> ticketsDTO = new ArrayList<>();
+//			for (Ticket t : tickets) {
+//				ticketsDTO.add(new TicketDTO(t));
+//			}
+
+			return new ResponseEntity<>(ticketsDTO, HttpStatus.OK);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
 
 }

@@ -31,74 +31,81 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class User implements UserDetails {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	@Column(name="username", unique = true, nullable = false)
+
+	@Column(name = "username", unique = true, nullable = false)
 	private String username;
-	
-	@Column(name="password", nullable=false)
+
+	@Column(name = "password", nullable = false)
 	private String password;
-	
-	@Column(name="email", unique = true, nullable=false)
+
+	@Column(name = "email", unique = true, nullable = false)
 	private String email;
-	
-	@Column(name="firstName", nullable=false)
+
+	@Column(name = "firstName", nullable = false)
 	private String firstName;
-	
-	@Column(name="lastName", nullable=false)
+
+	@Column(name = "lastName", nullable = false)
 	private String lastName;
-	
-	@Column(name="phoneNumber", nullable=false)
+
+	@Column(name = "phoneNumber", nullable = false)
 	private String phoneNumber;
-	
-	@Column(name="address", nullable=false)
+
+	@Column(name = "address", nullable = false)
 	private String address;
-	
-	@Column(name="dateOfBirth", nullable=true)
+
+	@Column(name = "dateOfBirth", nullable = true)
 	private LocalDate dateOfBirth;
-	
-	@Column(name="aboutMe", nullable=true)
+
+	@Column(name = "aboutMe", nullable = true)
 	private String aboutMe;
-	
+
 	@Lob
 	@Basic(fetch = FetchType.LAZY)
-	@Column(name="image", nullable=true)
+	@Column(name = "image", nullable = true)
 	private byte[] image;
-	
-	@Column(name="enabled", nullable=false)
+
+	@Column(name = "enabled", nullable = false)
 	private boolean enabled;
+
+	@OneToMany(mappedBy = "user1", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<Friend> friends = new HashSet<>();
 	
+	@OneToMany(mappedBy = "user2", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<Friend> friendsOf = new HashSet<>();
+
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<AirCompanyRating> companyRatings = new HashSet<>();
-	
+
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<FlightRating> flightRatings = new HashSet<>();
-	
+	private Set<FlightReservation> flightRatings = new HashSet<>();
+
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<HotelRating> hotelRatings = new HashSet<>();
-	
+
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<RoomReservation> roomRatings = new HashSet<>();
-	
+
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<RentACarRating> rentACarRatings = new HashSet<>();
-	
+
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<VehicleReservation> vehicleRatings = new HashSet<>();
-	
+
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Authority authority;
-	
+	private Authority authority;
+
 	@Version
 	private Long version;
 
-	
-	public User() { }
-	
-	public User(String username, String password, String email, String firstName, String lastName, String phoneNumber, String address, LocalDate dateofBirth, String aboutMe, byte[] image) {
+	public User() {
+	}
+
+	public User(String username, String password, String email, String firstName, String lastName, String phoneNumber,
+			String address, LocalDate dateofBirth, String aboutMe, byte[] image) {
 		this.username = username;
 		this.password = password;
 		this.email = email;
@@ -111,15 +118,17 @@ public class User implements UserDetails {
 		this.image = image;
 	}
 
-	public User(UserDTO userDTO)
-	{
-		this(userDTO.getUsername(), userDTO.getPassword(), userDTO.getEmail(), userDTO.getFirstName(), userDTO.getLastName(), userDTO.getPhoneNumber(), userDTO.getAddress(), userDTO.getDateOfBirth(), userDTO.getAboutMe(), (userDTO.getImage() == null) ? null : userDTO.getImage().getBytes(StandardCharsets.UTF_8));
+	public User(UserDTO userDTO) {
+		this(userDTO.getUsername(), userDTO.getPassword(), userDTO.getEmail(), userDTO.getFirstName(),
+				userDTO.getLastName(), userDTO.getPhoneNumber(), userDTO.getAddress(), userDTO.getDateOfBirth(),
+				userDTO.getAboutMe(),
+				(userDTO.getImage() == null) ? null : userDTO.getImage().getBytes(StandardCharsets.UTF_8));
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
-	
+
 	public void setId(Long id) {
 		this.id = id;
 	}
@@ -151,15 +160,19 @@ public class User implements UserDetails {
 	public String getFirstName() {
 		return firstName;
 	}
+
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
+
 	public String getLastName() {
 		return lastName;
 	}
+
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
+
 	public String getPhoneNumber() {
 		return phoneNumber;
 	}
@@ -171,7 +184,7 @@ public class User implements UserDetails {
 	public String getAddress() {
 		return address;
 	}
-	
+
 	public void setAddress(String address) {
 		this.address = address;
 	}
@@ -179,12 +192,15 @@ public class User implements UserDetails {
 	public LocalDate getDateOfBirth() {
 		return dateOfBirth;
 	}
+
 	public void setDateOfBirth(LocalDate dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
 	}
+
 	public String getAboutMe() {
 		return aboutMe;
 	}
+
 	public void setAboutMe(String aboutMe) {
 		this.aboutMe = aboutMe;
 	}
@@ -196,16 +212,32 @@ public class User implements UserDetails {
 	public void setImage(byte[] image) {
 		this.image = image;
 	}
-	
-	public void setEnabled(boolean enabled){
+
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-	
+
 	@Override
 	public boolean isEnabled() {
 		return enabled;
 	}
-	
+
+	public List<Friend> getFriends() {
+		return new ArrayList<>(friends);
+	}
+
+	public void setFriends(List<Friend> friends) {
+		this.friends = new HashSet<>(friends);
+	}
+
+	public List<Friend> getFriendsOf() {
+		return new ArrayList<>(friendsOf);
+	}
+
+	public void setFriendsOf(List<Friend> friendsOf) {
+		this.friendsOf = new HashSet<>(friendsOf);
+	}
+
 	public List<AirCompanyRating> getCompanyRatings() {
 		return new ArrayList<>(companyRatings);
 	}
@@ -214,11 +246,11 @@ public class User implements UserDetails {
 		this.companyRatings = new HashSet<>(companyRatings);
 	}
 
-	public List<FlightRating> getFlightRatings() {
+	public List<FlightReservation> getFlightRatings() {
 		return new ArrayList<>(flightRatings);
 	}
 
-	public void setFlightRatings(List<FlightRating> flightRatings) {
+	public void setFlightRatings(List<FlightReservation> flightRatings) {
 		this.flightRatings = new HashSet<>(flightRatings);
 	}
 
@@ -282,7 +314,7 @@ public class User implements UserDetails {
 	public void setAuthority(Authority authority) {
 		this.authority = authority;
 	}
-	
+
 	@JsonIgnore
 	@Override
 	public boolean isAccountNonExpired() {
@@ -299,5 +331,13 @@ public class User implements UserDetails {
 	@Override
 	public boolean isCredentialsNonExpired() {
 		return true;
+	}
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 }

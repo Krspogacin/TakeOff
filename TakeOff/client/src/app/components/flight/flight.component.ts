@@ -162,6 +162,13 @@ export class FlightComponent implements OnInit {
     );
   }
 
+  bookFlight() {
+    this.message = 'Work in progress';
+    this.showSnackBar();
+
+    // show stepper ...
+  }
+
   showSnackBar() {
     if (!this.message) {
       return;
