@@ -1,0 +1,63 @@
+<button *ngIf="userRole === 'ROLE_USER'" mat-raised-button (click)="openAddRentACarDialog()" color="primary" style="margin: 2.5% 0% 0% 0%;"><mat-icon>add</mat-icon> Add Rent A Car</button>
+<mat-form-field style="float: right; padding-right: 3%; padding-top: 2%;">
+    <mat-select placeholder="Sort by" (selectionChange)="sort($event.value)" [(ngModel)]="selected" style="width: 110%;">
+        <mat-select-trigger>
+            {{selectedOption.viewValue}} <mat-icon color="primary">{{selectedOption.icon}}</mat-icon>
+        </mat-select-trigger>
+        <mat-option *ngFor="let option of sortOptions" [value]="option.value">{{option.viewValue}} <mat-icon color="primary">{{option.icon}}</mat-icon></mat-option>
+    </mat-select>
+</mat-form-field>
+<div style="text-align: center;">
+    <mat-form-field>
+        <input matInput [(ngModel)]="nameParam" placeholder="Search by name">
+    </mat-form-field>    
+    <button mat-raised-button color="primary" style="margin-left: 3%" (click)="searchName(nameParam)">
+        Search <mat-icon>search</mat-icon>
+    </button>
+</div>
+<br>
+<div class="div-mat-card" *ngIf="!loading && rentACars">
+  <mat-card *ngFor="let rentACar of rentACars.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize) | nameFilter : nameFilterParam; let i = index" 
+            class="rent-a-car-card mat-elevation-z8">
+      <mat-card-header>
+          <mat-card-title>{{rentACar.name}}</mat-card-title>
+      </mat-card-header>
+      <img mat-card-image src="http://www.rentacarmms.rs/slike/iznajmljivanje-automobila.jpg" alt="No photo" class="card-image">
+      <mat-card-content>
+        <p><b>Address</b> : {{rentACar.location.address}}</p>
+        <p><b>Description:</b> {{(!rentACar.description) ? '✗' : rentACar.description}}</p> 
+        <b>Rating: </b>
+        <span style="display: flex; flex-direction: row">
+            <div class="star-ratings-css">
+                <div class="star-ratings-css-top" [ngStyle]="{'width': ((rentACar.rating * 100) / 5) + '%'}">
+                    <!-- <span (mouseover)="hoverRating(i, 1)">★</span>
+                    <span (mouseover)="hoverRating(i, 2)">★</span>
+                    <span (mouseover)="hoverRating(i, 3)">★</span>
+                    <span (mouseover)="hoverRating(i, 4)">★</span>
+                    <span (mouseover)="hoverRating(i, 5)">★</span> -->
+                    ★★★★★
+                </div>
+                <div>
+                    <!-- <span (mouseover)="hoverRating(i, 1)">★</span>
+                    <span (mouseover)="hoverRating(i, 2)">★</span>
+                    <span (mouseover)="hoverRating(i, 3)">★</span>
+                    <span (mouseover)="hoverRating(i, 4)">★</span>
+                    <span (mouseover)="hoverRating(i, 5)">★</span> -->
+                    ★★★★★
+                </div>
+            </div>
+            <p style="padding-left: 20px;">{{rentACar.rating}}/5</p>
+        </span>
+      </mat-card-content>
+      <mat-card-actions>
+          <button mat-raised-button color="primary" [routerLink]="[ '/rent-a-cars', rentACar.id ]"> Details <mat-icon>arrow_forward</mat-icon></button>
+      </mat-card-actions>
+  </mat-card>
+</div>
+<mat-paginator *ngIf="rentACars && rentACars.length > 0" 
+              [length] = rentACars.length
+              [pageSize] = "pageSize"
+              [pageSizeOptions] = "[5, 10, 25, 100]"
+              [showFirstLastButtons]="true"
+              (page)="switchPage($event)">
+</mat-paginator>

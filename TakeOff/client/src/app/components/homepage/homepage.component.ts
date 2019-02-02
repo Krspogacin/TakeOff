@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 
 @Component({
   selector: 'app-homepage',
@@ -7,9 +8,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomepageComponent implements OnInit {
 
-  constructor() { }
+  userRole: string = null;
+
+  constructor(private authService: AuthenticationService) { }
 
   ngOnInit() {
+    this.authService.onSubject.subscribe(
+      () => {
+        this.userRole = this.authService.getAuthority();
+      }
+    );
+    this.userRole = this.authService.getAuthority();
   }
 
 }

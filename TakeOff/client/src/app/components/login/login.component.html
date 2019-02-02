@@ -1,2 +1,1 @@
-<button mat-button (click)="openLoginDialog()"><mat-icon>person</mat-icon> Login</button>
-<button *ngIf="thereIsLoggedInUser" mat-button (click)="logout()"><mat-icon>exit_to_app</mat-icon> Logout</button>
+<button mat-raised-button style="background-color: orange; color: white;" *ngIf="!thereIsLoggedInUser" (click)="openLoginDialog()"><mat-icon>person</mat-icon> Login</button>

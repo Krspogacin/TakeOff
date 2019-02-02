@@ -14,38 +14,52 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Version;
 
+import org.isa.takeoff.dto.LocationDTO;
+
 @Entity
-public class Destination {
+public class Location {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(name = "address", nullable = false)
+	private String address;
+	
 	@Column(name = "country", nullable = false)
 	private String country;
 
 	@Column(name = "city", nullable = false)
 	private String city;
-
-	@Column(name = "airportName", nullable = false)
-	private String airportName;
+	
+	@Column(name = "latitude", nullable = false)
+	private Double latitude;
+	
+	@Column(name = "longitude", nullable = false)
+	private Double longitude;
 
 	@ManyToMany(mappedBy = "destinations")
 	private Set<AirCompany> companies = new HashSet<>();
 
 	@ManyToMany(mappedBy = "transferDestinations")
 	private Set<Flight> flights = new HashSet<>();
-
+	
 	@Version
 	private Long version;
 
-	public Destination() {
+	public Location() {
 	}
 
-	public Destination(String country, String city, String airportName) {
+	public Location(String address, String country, String city, Double latitude, Double longitude) {
+		this.address = address;
 		this.country = country;
 		this.city = city;
-		this.airportName = airportName;
+		this.latitude = latitude;
+		this.longitude = longitude;
+	}
+
+	public Location(LocationDTO locationDTO) {
+		this(locationDTO.getAddress(), locationDTO.getCountry(), locationDTO.getCity(), locationDTO.getLatitude(), locationDTO.getLongitude());
 	}
 
 	public Long getId() {
@@ -54,6 +68,14 @@ public class Destination {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	public String getCountry() {
@@ -72,12 +94,20 @@ public class Destination {
 		this.city = city;
 	}
 
-	public String getAirportName() {
-		return airportName;
+	public Double getLatitude() {
+		return latitude;
 	}
 
-	public void setAirportName(String airportName) {
-		this.airportName = airportName;
+	public void setLatitude(Double latitude) {
+		this.latitude = latitude;
+	}
+
+	public Double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(Double longitude) {
+		this.longitude = longitude;
 	}
 
 	public List<AirCompany> getCompanies() {
@@ -112,7 +142,7 @@ public class Destination {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		Destination that = (Destination) o;
+		Location that = (Location) o;
 		if (that.id == null || id == null) {
 			return false;
 		}

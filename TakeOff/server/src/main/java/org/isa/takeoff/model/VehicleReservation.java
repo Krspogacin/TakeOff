@@ -1,6 +1,5 @@
 package org.isa.takeoff.model;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -13,31 +12,26 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class VehicleReservation implements Serializable{
+public class VehicleReservation {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Id
 	@ManyToOne
 	@JoinColumn(name="vehicle_id", referencedColumnName="id")
 	private Vehicle vehicle;
 	
-	@Id
 	@ManyToOne
 	@JoinColumn(name="user_id", referencedColumnName="id")
 	private User user;
-	
-	@Column(name = "rating", nullable = true)
-	private Double rating;
 	
 	@Column(name = "reservationStartDate", nullable = false)
 	private LocalDate reservationStartDate;
 	
 	@Column(name = "reservationEndDate", nullable = false)
 	private LocalDate reservationEndDate;
-
+	
 	public Long getId() {
 		return id;
 	}
@@ -60,14 +54,6 @@ public class VehicleReservation implements Serializable{
 
 	public void setUser(User user) {
 		this.user = user;
-	}
-
-	public Double getRating() {
-		return rating;
-	}
-
-	public void setRating(Double rating) {
-		this.rating = rating;
 	}
 	
     public LocalDate getReservationStartDate() {

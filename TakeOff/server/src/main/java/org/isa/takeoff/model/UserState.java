@@ -6,14 +6,16 @@ public class UserState
     private String username;
     private boolean isEnabled;
     private String authority;
+    private String image;
 
     public UserState() { }
 
-    public UserState(String accessToken, String username, boolean isEnabled, String authority) {
+    public UserState(String accessToken, String username, boolean isEnabled, String authority, String image) {
 		this.accessToken = accessToken;
 		this.username = username;
 		this.isEnabled = isEnabled;
 		this.authority = authority;
+		this.image = image;
 	}
 
 	public String getAccessToken() {
@@ -44,7 +46,15 @@ public class UserState
 		return authority;
 	}
 
-	public void setAuthorities(String authority) {
+	public void setAuthority(String authority) {
 		this.authority = authority;
+	}
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
 	}
 }

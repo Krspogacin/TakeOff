@@ -40,7 +40,7 @@ public class Flight {
 
 	@ManyToMany
 	@JoinTable(name = "flight_destination", joinColumns = @JoinColumn(name = "flight_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "dest_id", referencedColumnName = "id"))
-	private Set<Destination> transferDestinations = new HashSet<>();
+	private Set<Location> transferDestinations = new HashSet<>();
 
 	@OneToMany(mappedBy = "flight", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Ticket> tickets = new HashSet<>();
@@ -102,11 +102,11 @@ public class Flight {
 		this.distance = distance;
 	}
 
-	public List<Destination> getTransferDestinations() {
+	public List<Location> getTransferDestinations() {
 		return new ArrayList<>(transferDestinations);
 	}
 
-	public void setTransferDestinations(List<Destination> transferDestinations) {
+	public void setTransferDestinations(List<Location> transferDestinations) {
 		this.transferDestinations = new HashSet<>(transferDestinations);
 	}
 

@@ -1,46 +1,95 @@
-<h1 mat-dialog-title>Add new vehicle</h1>
-<mat-dialog-content [formGroup]="vehicleForm" class="fields-container">
-    <mat-form-field>
-        <input matInput type="text" formControlName="brand" placeholder="Brand">
-        <mat-error *ngIf="vehicleForm.get('brand').invalid && (vehicleForm.get('brand').dirty || vehicleForm.get('brand').touched)">
-            <div *ngIf="vehicleForm.get('brand').errors.required"> Brand is required.</div>
-        </mat-error>
-    </mat-form-field>
-    <br>
-    <mat-form-field>
-        <input matInput type="text" formControlName="model" placeholder="Model">
-        <mat-error *ngIf="vehicleForm.get('model').invalid && (vehicleForm.get('model').dirty || vehicleForm.get('model').touched)">
-            <div *ngIf="vehicleForm.get('model').errors.required"> Model is required.</div>
-        </mat-error>
-    </mat-form-field>
-    <br>
-    <mat-form-field>
-        <input matInput type="number" formControlName="year" placeholder="Year">
-        <mat-error *ngIf="vehicleForm.get('year').invalid && (vehicleForm.get('year').dirty || vehicleForm.get('year').touched)">
-            <div *ngIf="vehicleForm.get('year').errors.required"> Year is required.</div>
-            <div *ngIf="!vehicleForm.get('year').errors.required &&
-                        (vehicleForm.get('year').errors.min || vehicleForm.get('year').errors.max)">
-                        Year is not in range {{minYear}} - {{currentYear}}!</div>
-        </mat-error>
-        <mat-hint>
-            Year must be between {{minYear}} and {{currentYear}}. <br>
-        </mat-hint>
-    </mat-form-field>
-    <br><br>
-    <div class="img-container">
-        <img *ngIf="imgSrc" class="img-preview" src={{imgSrc}} alt="Could not load image."/>
-    </div>
-    <button mat-button color="primary" class="btn-loadImg" (click)="fileInput.click()"><mat-icon>add_circle_outline</mat-icon> Add photo of a vehicle</button>
-    <input [hidden]="true" type="file" accept="image/*" (change)="onFileSelected($event)" #fileInput>
-</mat-dialog-content>
-<mat-dialog-actions>
-    <button mat-raised-button 
-          color="primary"
-          type="submit"
-          (click)="submitForm()"
-          [disabled]="vehicleForm.invalid">
-        <span *ngIf="!update">Add</span>
-        <span *ngIf="update">Update</span>
-    </button>
-  <button mat-raised-button [mat-dialog-close]>Cancel</button>
-</mat-dialog-actions>
+<div>
+    <h1 mat-dialog-title *ngIf="!update">Add new vehicle</h1>
+    <h1 mat-dialog-title *ngIf="update">Edit vehicle data</h1>
+    <mat-dialog-content [formGroup]="vehicleForm" class="fields-container">
+        <mat-form-field>
+            <input matInput type="text" formControlName="brand" placeholder="Brand" required>
+            <mat-error *ngIf="vehicleForm.get('brand').invalid && (vehicleForm.get('brand').dirty || vehicleForm.get('brand').touched)">
+                <div *ngIf="vehicleForm.get('brand').errors.required"> Brand is required.</div>
+            </mat-error>
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+            <input matInput type="text" formControlName="model" placeholder="Model" required>
+            <mat-error *ngIf="vehicleForm.get('model').invalid && (vehicleForm.get('model').dirty || vehicleForm.get('model').touched)">
+                <div *ngIf="vehicleForm.get('model').errors.required"> Model is required.</div>
+            </mat-error>
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+            <input matInput type="number" formControlName="year" placeholder="Year" autocomplete="off" required>
+            <mat-error *ngIf="vehicleForm.get('year').invalid && (vehicleForm.get('year').dirty || vehicleForm.get('year').touched)">
+                <div *ngIf="vehicleForm.get('year').errors.required"> Year is required.</div>
+                <div *ngIf="!vehicleForm.get('year').errors.required &&
+                            (vehicleForm.get('year').errors.min || vehicleForm.get('year').errors.max)">
+                            Year is not in range {{minYear}} - {{currentYear}}!</div>
+            </mat-error>
+            <mat-hint>
+                Year must be between {{minYear}} and {{currentYear}}. <br>
+            </mat-hint>
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+            <mat-select placeholder="Fuel type" formControlName="fuel" required>
+                <mat-option *ngFor="let fuelType of fuelTypes" [value]="fuelType">
+                {{fuelType}}
+                </mat-option>
+            </mat-select>
+            <mat-error *ngIf="vehicleForm.get('fuel').invalid && (vehicleForm.get('fuel').dirty || vehicleForm.get('fuel').touched)">
+                <div *ngIf="vehicleForm.get('fuel').errors.required"> Fuel type is required.</div>
+            </mat-error>
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+            <input matInput type="number" formControlName="numOfSeats" placeholder="Number of seats" autocomplete="off" required>
+            <mat-error *ngIf="vehicleForm.get('numOfSeats').invalid && (vehicleForm.get('numOfSeats').dirty || vehicleForm.get('numOfSeats').touched)">
+                <div *ngIf="vehicleForm.get('numOfSeats').errors.required"> Number of seats is required.</div>
+                <div *ngIf="!vehicleForm.get('numOfSeats').errors.required &&
+                            (vehicleForm.get('numOfSeats').errors.min || vehicleForm.get('numOfSeats').errors.max)">
+                            Number of seats is not in range {{minSeats}} - {{maxSeats}}!</div>
+            </mat-error>
+            <mat-hint>
+                Number of seats must be between {{minSeats}} and {{maxSeats}}. <br>
+            </mat-hint>
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+            <mat-select placeholder="Transmission type" formControlName="transmission" required>
+                <mat-option *ngFor="let transmissionType of transmissionTypes" [value]="transmissionType">
+                {{transmissionType}}
+                </mat-option>
+            </mat-select>
+            <mat-error *ngIf="vehicleForm.get('transmission').invalid && (vehicleForm.get('transmission').dirty || vehicleForm.get('transmission').touched)">
+                <div *ngIf="vehicleForm.get('transmission').errors.required"> Transmission type is required.</div>
+            </mat-error>
+        </mat-form-field>
+        <br>
+        <h3>Enter prices for this vehicle: </h3>
+        <div class="box">
+            <mat-list>
+                <div *ngFor="let mainService of mainServices; let i = index" style="display: flex;">
+                    <mat-list-item>{{mainService.name}}</mat-list-item>
+                    <mat-form-field>
+                        <input matInput type="number" placeholder="Enter price" 
+                            [formControlName]="mainService.name + mainService.id"
+                            autocomplete="off" required>
+                    </mat-form-field>
+                </div>
+            </mat-list>
+        </div>
+        <br><br>
+        <div class="img-container">
+            <img *ngIf="imgSrc" class="img-preview" src={{imgSrc}} alt="Could not load image."/>
+        </div>
+        <button mat-button color="primary" class="btn-loadImg" (click)="fileInput.click()"><mat-icon>add_circle_outline</mat-icon> Add photo of a vehicle</button>
+        <input [hidden]="true" type="file" accept="image/*" (change)="onFileSelected($event)" #fileInput>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button mat-raised-button color="primary" type="submit"
+                (click)="submitForm()" [disabled]="vehicleForm.invalid">
+            <span *ngIf="!update">Add</span>
+            <span *ngIf="update">Update</span>
+        </button>
+      <button mat-raised-button [mat-dialog-close]>Cancel</button>
+    </mat-dialog-actions>
+</div>

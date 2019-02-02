@@ -4,41 +4,27 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class RentACarRating implements Serializable{
-	
-	@Id
-	@ManyToOne
-	@JoinColumn(name="rentacar_id", referencedColumnName="id")
-	private RentACar rentACar;
-	
-	@Id
-	@ManyToOne
-	@JoinColumn(name="user_id", referencedColumnName="id")
-	private User user;
+public class RentACarRating implements Serializable
+{
+	@EmbeddedId
+	private RentACarRatingId id;
 	
 	@Column(name = "rating", nullable = false)
 	private Double rating;
 
-	public RentACar getRentACar() {
-		return rentACar;
+	public RentACarRatingId getId() {
+		return id;
 	}
 
-	public void setRentACar(RentACar rentACar) {
-		this.rentACar = rentACar;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
+	public void setId(RentACarRatingId id) {
+		this.id = id;
 	}
 
 	public Double getRating() {
@@ -57,13 +43,11 @@ public class RentACarRating implements Serializable{
             return false;
  
         RentACarRating that = (RentACarRating) o;
-        return Objects.equals(rentACar, that.rentACar) &&
-        		Objects.equals(user, that.user);
+        return Objects.equals(id, that.id);
     }
  
     @Override
     public int hashCode() {
-        return Objects.hash(rentACar, user);
+        return Objects.hash(id);
     }
-
 }

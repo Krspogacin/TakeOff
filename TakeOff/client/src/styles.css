@@ -60,3 +60,35 @@ body{
 .fill{
     flex: 1 1 auto;
 }
+
+.div-mat-card {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.star-ratings-css {
+    unicode-bidi: bidi-override;
+    color: #c5c5c5;
+    font-size: 30px;
+    position: relative;
+    text-shadow: 0px 1px 0 #a2a2a2;
+}
+.star-ratings-css-top {
+    color: #e7711b;
+    position: absolute;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.card-image{
+    object-fit: fill;
+}
+
+.mat-card-avatar-custom {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    object-fit: cover;
+    margin-right: 10%;
+}

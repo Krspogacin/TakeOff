@@ -14,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Version;
 
 import org.isa.takeoff.dto.RentACarDTO;
@@ -28,14 +29,14 @@ public class RentACar {
 	@Column(name="name", unique = true, nullable = false)
 	private String name;
 	
-	@Column(name="address", nullable = false)
-	private String address;
+	@OneToOne(fetch = FetchType.EAGER)
+	private Location location;	
 	
 	@Column(name="description", nullable = true)
 	private String description;
 	
 	@OneToMany(mappedBy = "rentACar", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<Service> services = new HashSet<>();
+	private Set<RentACarMainService> rentACarMainServices = new HashSet<>();
 	
 	@OneToMany(mappedBy ="rentACar", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Vehicle> vehicles = new HashSet<>();
@@ -43,7 +44,7 @@ public class RentACar {
 	@OneToMany(mappedBy = "rentACar", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Office> offices = new HashSet<>();
 	
-	@OneToMany(mappedBy = "rentACar", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "id.rentACar", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<RentACarRating> rentACarRatings = new HashSet<>();
 	
 	@Version
@@ -51,16 +52,15 @@ public class RentACar {
 	
 	public RentACar() { }
 	
-	public RentACar(String name, String address, String description) {
+	public RentACar(String name, String description) {
 		super();
 		this.name = name;
-		this.address = address;
 		this.description = description;
 	}
 	
 	public RentACar(RentACarDTO rentACarDTO)
 	{
-		this(rentACarDTO.getName(), rentACarDTO.getAddress(), rentACarDTO.getDescription());
+		this(rentACarDTO.getName(), rentACarDTO.getDescription());
 	}
 
 	public Long getId() {
@@ -79,12 +79,12 @@ public class RentACar {
 		this.name = name;
 	}
 
-	public String getAddress() {
-		return address;
+	public Location getLocation() {
+		return location;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
 	public String getDescription() {
@@ -95,12 +95,12 @@ public class RentACar {
 		this.description = description;
 	}
 		
-	public List<Service> getServices() {
-		return new ArrayList<>(services);
+	public List<RentACarMainService> getMainServicesRentACar() {
+		return new ArrayList<>(rentACarMainServices);
 	}
 
-	public void setServices(List<Service> services) {
-		this.services = new HashSet<>(services);
+	public void setMainServicesRentACar(List<RentACarMainService> rentACarMainServices) {
+		this.rentACarMainServices = new HashSet<>(rentACarMainServices);
 	}
 
 	public List<Vehicle> getVehicles() {

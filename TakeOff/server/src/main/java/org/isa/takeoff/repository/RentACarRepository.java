@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RentACarRepository extends JpaRepository<RentACar, Long>
 {
-
+	RentACar findByName( String name );
 }
