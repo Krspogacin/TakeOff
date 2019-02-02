@@ -19,6 +19,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
 
+import org.isa.takeoff.dto.AirCompanyDTO;
+
 @Entity
 public class AirCompany {
 
@@ -49,6 +51,10 @@ public class AirCompany {
 	private Long version;
 
 	public AirCompany() {
+	}
+	
+	public AirCompany(AirCompanyDTO airCompanyDTO) {
+		this(airCompanyDTO.getName(), airCompanyDTO.getAddress(), airCompanyDTO.getDescription());
 	}
 
 	public AirCompany(String name, String address, String description) {

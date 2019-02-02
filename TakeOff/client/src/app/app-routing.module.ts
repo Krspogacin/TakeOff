@@ -15,12 +15,16 @@ import { HomepageComponent } from './components/homepage/homepage.component';
 import { AirCompanyDialogComponent } from './components/air-company-dialog/air-company-dialog.component';
 import { FlightDialogComponent } from './components/flight-dialog/flight-dialog.component';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
+import { HotelProfileComponent } from './components/hotel-profile/hotel-profile.component';
+import { SysAdminDialogComponent } from './components/sys-admin-dialog/sys-admin-dialog.component';
+import { HotelDialogComponent } from './components/hotel-dialog/hotel-dialog.component';
+import { RoomDialogComponent } from './components/room-dialog/room-dialog.component';
 
 const routes: Routes = [
   { path: '', component: HomepageComponent },
   { path: 'companies/:id', component: AirCompanyComponent },
   { path: 'flights/:id', component: FlightComponent },
-  { path: 'hotels', component: HotelComponent },
+  { path: 'hotels/:id', component: HotelProfileComponent },
   { path: 'users/registration', component: RegistrationComponent },
   { path: 'users/successful_registration', component: SuccessfulRegistrationComponent },
   { path: 'users/register/verify', component: VerifyUserComponent },
@@ -48,4 +52,8 @@ export const RoutingComponents = [AirCompanyComponent,
   HomepageComponent,
   AirCompanyDialogComponent,
   FlightDialogComponent,
-  UserProfileComponent];
+  UserProfileComponent,
+  HotelProfileComponent,
+  SysAdminDialogComponent,
+  HotelDialogComponent,
+  RoomDialogComponent];

@@ -2,41 +2,36 @@ package org.isa.takeoff.model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class RoomReservation implements Serializable{
-	
+public class RoomReservation implements Serializable {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Id
-	@ManyToOne
-	@JoinColumn(name="room_id", referencedColumnName="id")
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Room room;
 	
-	@Id
-	@ManyToOne
-	@JoinColumn(name="user_id", referencedColumnName="id")
+	@ManyToOne(fetch = FetchType.EAGER)
 	private User user;
-	
-	@Column(name = "rating", nullable = true)
-	private Double rating;
 	
 	@Column(name = "reservationStartDate", nullable = false)
 	private LocalDate reservationStartDate;
 	
 	@Column(name = "reservationEndDate", nullable = false)
 	private LocalDate reservationEndDate;
+	
+	@Column(name = "reservationPrice", nullable = false)
+	private Double reservationPrice;
 
 	public Long getId() {
 		return id;
@@ -45,7 +40,7 @@ public class RoomReservation implements Serializable{
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
 	public Room getRoom() {
 		return room;
 	}
@@ -62,15 +57,7 @@ public class RoomReservation implements Serializable{
 		this.user = user;
 	}
 
-	public Double getRating() {
-		return rating;
-	}
-
-	public void setRating(Double rating) {
-		this.rating = rating;
-	}
-	
-    public LocalDate getReservationStartDate() {
+	public LocalDate getReservationStartDate() {
 		return reservationStartDate;
 	}
 
@@ -86,21 +73,11 @@ public class RoomReservation implements Serializable{
 		this.reservationEndDate = reservationEndDate;
 	}
 
-	@Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
- 
-        if (o == null || getClass() != o.getClass()) 
-            return false;
- 
-        RoomReservation that = (RoomReservation) o;
-        return Objects.equals(room, that.room) &&
-        		Objects.equals(user, that.user);
-    }
- 
-    @Override
-    public int hashCode() {
-        return Objects.hash(room, user);
-    }
+	public Double getPrice() {
+		return reservationPrice;
+	}
 
+	public void setPrice(Double price) {
+		this.reservationPrice = price;
+	}
 }

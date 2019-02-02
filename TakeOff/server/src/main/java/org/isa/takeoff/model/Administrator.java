@@ -33,7 +33,7 @@ public class Administrator implements UserDetails {
 	@Column(name="password", nullable=false)
 	private String password;
 	
-	@Column(name="email", unique = true, nullable=false)
+	@Column(name="email", nullable=false)
 	private String email;
 	
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

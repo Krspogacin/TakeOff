@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.isa.takeoff.dto.HotelDTO;
+import org.isa.takeoff.dto.RoomDTO;
 import org.isa.takeoff.model.Hotel;
+import org.isa.takeoff.model.Room;
 import org.isa.takeoff.service.HotelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -89,5 +91,21 @@ public class HotelController {
 		
 		hotelService.delete(hotelDTO.getId());
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/rooms", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<RoomDTO>> getRooms(@PathVariable Long id){
+		try{
+			Hotel hotel = hotelService.findOne(id);
+			List<Room> rooms = hotel.getRooms();
+			
+			List<RoomDTO> roomsDTO = new ArrayList<>();
+			for (Room room : rooms){
+				roomsDTO.add(new RoomDTO(room));
+			}
+			return new ResponseEntity<>(roomsDTO, HttpStatus.OK);
+		}catch(Exception e){
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 }

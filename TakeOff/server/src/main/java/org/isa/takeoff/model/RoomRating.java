@@ -6,21 +6,26 @@ import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
-public class HotelRating implements Serializable{
-	
+public class RoomRating implements Serializable{
+		
 	@EmbeddedId
-	private HotelRatingId id;
+	private RoomRatingId id;
 	
-	@Column(name = "rating", nullable = false)
+	@Column(name = "rating", nullable = true)
 	private Double rating;
-
-	public HotelRatingId getId() {
+	
+	public RoomRatingId getId() {
 		return id;
 	}
 
-	public void setId(HotelRatingId id) {
+	public void setId(RoomRatingId id) {
 		this.id = id;
 	}
 
@@ -31,15 +36,15 @@ public class HotelRating implements Serializable{
 	public void setRating(Double rating) {
 		this.rating = rating;
 	}
-	
-    @Override
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
  
         if (o == null || getClass() != o.getClass()) 
             return false;
  
-        HotelRating that = (HotelRating) o;
+        RoomRating that = (RoomRating) o;
         return Objects.equals(id, that.id);
     }
  

@@ -13,7 +13,11 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.OneToMany;
+
+import org.isa.takeoff.dto.HotelDTO;
 
 @Entity
 public class Hotel {
@@ -22,7 +26,7 @@ public class Hotel {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "name", unique = true, nullable = false)
+	@Column(name = "name", nullable = false)
 	private String name;
 
 	@Column(name = "address", nullable = false)
@@ -35,10 +39,22 @@ public class Hotel {
 	private Set<Room> rooms = new HashSet<>();
 
 	@OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<Service> services = new HashSet<>();
+	private Set<ServiceHotel> services = new HashSet<>();
 
-	@OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "id.hotel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<HotelRating> hotelRatings = new HashSet<>();
+	
+	public Hotel(){}
+	
+	public Hotel(HotelDTO hotelDTO) {
+		this(hotelDTO.getName(), hotelDTO.getAddress(), hotelDTO.getDescription());
+	}
+	
+	public Hotel(String name, String address, String description){
+		this.name = name;
+		this.address = address;
+		this.description = description;
+	}
 
 	public Long getId() {
 		return id;
@@ -80,12 +96,12 @@ public class Hotel {
 		this.rooms = rooms;
 	}
 
-	public List<Service> getServices() {
-		return new ArrayList<Service>(services);
+	public List<ServiceHotel> getServices() {
+		return new ArrayList<>(services);
 	}
 
-	public void setServices(Set<Service> services) {
-		this.services = services;
+	public void setServices(List<ServiceHotel> services) {
+		this.services = new HashSet<>(services);
 	}
 
 	public List<HotelRating> getHotelRatings() {
@@ -104,7 +120,7 @@ public class Hotel {
 		return rooms.remove(o);
 	}
 
-	public boolean addService(Service e) {
+	public boolean addService(ServiceHotel e) {
 		return services.add(e);
 	}
 

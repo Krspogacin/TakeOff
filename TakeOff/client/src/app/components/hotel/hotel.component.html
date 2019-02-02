@@ -1,9 +1,11 @@
-<!--
-<h1>{{hotel.name}}</h1>
+<h2 style="padding: 0% 0% 0% 2.5%;">Search hotels: </h2>
+<div align="center">
+    <input [(ngModel)]="nameLocation" style="height:40px; width:20%; border: 2px solid orange;" type="text" placeholder="Hotel name or location">
+    <input style="height:40px; width:20%; border: 2px solid orange;" type="text" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="Check in date">
+    <input style="height:40px; width:20%; border: 2px solid orange;" type="text" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="Check out date">&nbsp;&nbsp;
+    <button mat-raised-button style="background-color: orange; color: white;" (click)="search()">Search</button>
+</div>
 
-<p>Address: {{hotel.address}}</p>
-<p>Description: {{hotel.description}}</p>
--->
 <h2 style="padding: 0% 0% 0% 2.5%;">List of hotels:</h2>
 <div style="display:flex; flex-wrap: wrap" *ngIf="hotels">
 <mat-card *ngFor="let h of hotels.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)" class="example-card">
@@ -17,17 +19,19 @@
         <b>Description</b> : {{h.description}}
         </p> 
     </mat-card-content>
-    <mat-card-actions>
-        <button mat-button>RESERVE</button>
+    <mat-card-actions style="float:right;"> 
+        <button mat-raised-button color="primary">RESERVE</button>
+        <button mat-raised-button color="primary" [routerLink]="'/hotels/' + h.id">View more</button>
     </mat-card-actions>
 </mat-card>
 </div>
 <mat-paginator [length] = hotels.length
-              [pageSize] = "10"
+              [pageSize] = pageSize
               [pageSizeOptions] = "[5, 10, 20]"
               [showFirstLastButtons]="true"
               (page)="pageFunction($event)">
 </mat-paginator>
 
-
-<button mat-button (click)="openDialog()">Create hotel</button>
+<div *ngIf="userRole && userRole === 'ROLE_SYS_ADMIN'">
+    <button mat-button (click)="openDialog()">Create hotel</button>
+</div>
