@@ -1,0 +1,38 @@
+<h1 mat-dialog-title align="center">Add system admin</h1>
+<mat-dialog-content>
+    <form [formGroup]="adminForm">
+        <mat-form-field>
+        <input matInput type="text" formControlName="username" placeholder="Username">
+        <mat-error *ngIf="adminForm.get('username').invalid && (adminForm.get('username').dirty || adminForm.get('username').touched)">
+            <div *ngIf="adminForm.get('username').errors.required"> Username is required.</div>
+            <div *ngIf="!adminForm.get('username').errors.required &&
+                        (adminForm.get('username').errors.minlength || adminForm.get('username').errors.maxlength)">
+                        Invalid username length!
+            </div>
+            <div *ngIf="adminForm.get('username').errors.usernameExists"> User with username <i>{{adminForm.value.username}}</i> already exists.</div>
+        </mat-error>
+        <mat-hint>
+                Username length must be between {{usernameMinLength}} and {{usernameMaxLength}}. <br>
+        </mat-hint>
+        </mat-form-field>
+        <br/>
+        <mat-form-field>
+            <input matInput type="password" formControlName="password" placeholder="Password">
+            <mat-error *ngIf="adminForm.get('password').invalid && (adminForm.get('password').dirty || adminForm.get('password').touched)">
+                <div *ngIf="adminForm.get('password').errors.required"> Password is required.</div>
+                <div *ngIf="!adminForm.get('password').errors.required &&
+                            (adminForm.get('password').errors.minlength || adminForm.get('password').errors.maxlength)">
+                            Invalid password length!
+                </div>
+            </mat-error>
+            <mat-hint>
+                    Password length must be between {{passwordMinLength}} and {{passwordMaxLength}}.
+            </mat-hint>
+        </mat-form-field>
+        <br/><br/>
+    </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-raised-button background-color="primary" type="submit" (click)="addAdmin()" [disabled]="adminForm.invalid">Confirm</button>
+    <button mat-raised-button [mat-dialog-close]>Cancel</button>
+</mat-dialog-actions>

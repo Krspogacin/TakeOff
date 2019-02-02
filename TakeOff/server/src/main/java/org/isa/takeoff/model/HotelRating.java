@@ -4,41 +4,24 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 
 @Entity
 public class HotelRating implements Serializable{
 	
-	@Id
-	@ManyToOne
-	@JoinColumn(name="hotel_id", referencedColumnName="id")
-	private Hotel hotel;
-	
-	@Id
-	@ManyToOne
-	@JoinColumn(name="user_id", referencedColumnName="id")
-	private User user;
+	@EmbeddedId
+	private HotelRatingId id;
 	
 	@Column(name = "rating", nullable = false)
 	private Double rating;
 
-	public Hotel getHotel() {
-		return hotel;
+	public HotelRatingId getId() {
+		return id;
 	}
 
-	public void setHotel(Hotel hotel) {
-		this.hotel = hotel;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
+	public void setId(HotelRatingId id) {
+		this.id = id;
 	}
 
 	public Double getRating() {
@@ -57,13 +40,12 @@ public class HotelRating implements Serializable{
             return false;
  
         HotelRating that = (HotelRating) o;
-        return Objects.equals(hotel, that.hotel) &&
-        		Objects.equals(user, that.user);
+        return Objects.equals(id, that.id);
     }
  
     @Override
     public int hashCode() {
-        return Objects.hash(hotel, user);
+        return Objects.hash(id);
     }
 
 }

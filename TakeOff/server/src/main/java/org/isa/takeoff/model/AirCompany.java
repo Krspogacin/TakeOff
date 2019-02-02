@@ -19,6 +19,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
 
+import org.isa.takeoff.dto.AirCompanyDTO;
+
 @Entity
 public class AirCompany {
 
@@ -37,7 +39,7 @@ public class AirCompany {
 
 	@ManyToMany
 	@JoinTable(name = "air_company_destination", joinColumns = @JoinColumn(name = "company_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "dest_id", referencedColumnName = "id"))
-	private Set<Destination> destinations = new HashSet<>();
+	private Set<Location> destinations = new HashSet<>();
 
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Flight> flights = new HashSet<>();
@@ -49,6 +51,10 @@ public class AirCompany {
 	private Long version;
 
 	public AirCompany() {
+	}
+	
+	public AirCompany(AirCompanyDTO airCompanyDTO) {
+		this(airCompanyDTO.getName(), airCompanyDTO.getAddress(), airCompanyDTO.getDescription());
 	}
 
 	public AirCompany(String name, String address, String description) {
@@ -89,11 +95,11 @@ public class AirCompany {
 		this.description = description;
 	}
 
-	public List<Destination> getDestinations() {
+	public List<Location> getDestinations() {
 		return new ArrayList<>(destinations);
 	}
 
-	public void setDestinations(List<Destination> destinations) {
+	public void setDestinations(List<Location> destinations) {
 		this.destinations = new HashSet<>(destinations);
 	}
 

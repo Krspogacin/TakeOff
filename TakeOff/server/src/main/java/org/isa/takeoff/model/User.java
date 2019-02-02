@@ -83,17 +83,23 @@ public class User implements UserDetails {
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<FlightReservation> flightRatings = new HashSet<>();
 
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "id.user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<HotelRating> hotelRatings = new HashSet<>();
 
+	@OneToMany(mappedBy = "id.user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<RoomRating> roomRatings = new HashSet<>();
+	
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<RoomReservation> roomRatings = new HashSet<>();
+	private Set<RoomReservation> roomReservations = new HashSet<>();
 
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "id.user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<RentACarRating> rentACarRatings = new HashSet<>();
 
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<VehicleReservation> vehicleRatings = new HashSet<>();
+	private Set<VehicleReservation> vehicleReservations = new HashSet<>();
+	
+	@OneToMany(mappedBy = "id.user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<VehicleRating> vehicleRatings = new HashSet<>();
 
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Authority authority;
@@ -278,12 +284,20 @@ public class User implements UserDetails {
 		this.hotelRatings = new HashSet<>(hotelRatings);
 	}
 
-	public List<RoomReservation> getRoomRatings() {
+	public List<RoomRating> getRoomRatings() {
 		return new ArrayList<>(roomRatings);
 	}
 
-	public void setRoomRatings(List<RoomReservation> roomRatings) {
+	public void setRoomRatings(List<RoomRating> roomRatings) {
 		this.roomRatings = new HashSet<>(roomRatings);
+	}
+
+	public List<RoomReservation> getRoomReservations() {
+		return new ArrayList<>(roomReservations);
+	}
+
+	public void setRoomReservations(List<RoomReservation> roomReservations) {
+		this.roomReservations = new HashSet<>(roomReservations);
 	}
 
 	public List<RentACarRating> getRentACarRatings() {
@@ -294,11 +308,19 @@ public class User implements UserDetails {
 		this.rentACarRatings = new HashSet<>(rentACarRatings);
 	}
 
-	public List<VehicleReservation> getVehicleRatings() {
+	public List<VehicleReservation> getVehicleReservation() {
+		return new ArrayList<>(vehicleReservations);
+	}
+
+	public void setVehicleReservation(List<VehicleReservation> vehicleReservations) {
+		this.vehicleReservations = new HashSet<>(vehicleReservations);
+	}
+	
+	public List<VehicleRating> getVehicleRatings() {
 		return new ArrayList<>(vehicleRatings);
 	}
 
-	public void setVehicleRatings(List<VehicleReservation> vehicleRatings) {
+	public void setVehicleRatings(List<VehicleRating> vehicleRatings) {
 		this.vehicleRatings = new HashSet<>(vehicleRatings);
 	}
 

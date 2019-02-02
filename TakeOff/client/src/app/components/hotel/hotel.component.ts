@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { HotelService } from 'src/app/services/hotel/hotel.service';
 import { AddHotelModalComponent } from 'src/app/components/add-hotel-modal/add-hotel-modal.component';
 import { MatDialog, PageEvent } from '@angular/material';
+import { AuthenticationService } from 'src/app/services/authentication/authentication.service'
 
 @Component({
   selector: 'app-hotel',
@@ -13,47 +14,50 @@ export class HotelComponent implements OnInit {
 
   hotel = {};
   hotels = [];
+  filteredHotels = [];
   pageSize = 10;
   pageIndex = 0;
+  nameLocation = "";
+  length = this.hotels.length;
   id = 0;
+  userRole: string = null;
 
-  constructor(private HotelService: HotelService, private route: ActivatedRoute,public dialog: MatDialog) { }
+  constructor(private HotelService: HotelService, private authService: AuthenticationService, private route: ActivatedRoute,public dialog: MatDialog) { }
 
   ngOnInit() {
-    //this.id = parseInt(this.route.snapshot.paramMap.get('id'), 10);
-    //console.log('id: ' + this.id);
-    //if (!isNaN(this.id)){
-    //  this.HotelService.getHotelById(this.id).subscribe(
-    //    (data) => {
-    //      this.hotel = data;
-    //    },
-    //    error => {
-          // handle not found error
-    //    });
-        
-    //  }
       this.HotelService.getHotels().subscribe(
       (data:any) => {  
         this.hotels = data;
       });
+      this.userRole = this.authService.getAuthority();
   }
 
-  openDialog(): void {
-    const dialogRef = this.dialog.open(AddHotelModalComponent, { disableClose: true });
+  openDialog(){
+    const dialogRef = this.dialog.open(AddHotelModalComponent,
+      {
+      disableClose: true,
+    });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('Hotel:', result);
-      this.HotelService.addHotel(result).subscribe(
-        (data:{}) => {
-          this.hotels.push(data);
-        }
-      )
+      if (result) {
+        console.log('Hotel:', result);
+        this.hotels.push(result);
+      }
     });
   }
 
   pageFunction(event : PageEvent) {
     this.pageSize = event.pageSize;
     this.pageIndex = event.pageIndex;
+  }
+
+  search(){
+    this.hotels.forEach(hotel => {
+      if (hotel.name.indexOf(this.nameLocation) != -1){
+        this.filteredHotels.push(hotel);
+      }
+    });
+    this.hotels = this.filteredHotels;
   }
 
 }

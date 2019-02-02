@@ -23,4 +23,8 @@ export class RegistrationService {
   verifyUser(token: string) {
     return this.http.get('/users/register/verify?token=' + token);
   }
+
+  addAdmin(admin: any){
+    return this.http.post('/users/addAdmin',admin);
+  }
 }

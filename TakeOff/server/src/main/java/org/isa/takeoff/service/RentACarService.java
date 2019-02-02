@@ -33,4 +33,8 @@ public class RentACarService
 	public void delete(Long id) {
 		rentACarRepository.deleteById(id);
 	}
+	
+	public RentACar findByName(String name) {
+		return rentACarRepository.findByName(name);
+	}
 }

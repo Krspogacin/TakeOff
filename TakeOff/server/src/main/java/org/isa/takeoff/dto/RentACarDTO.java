@@ -6,7 +6,7 @@ public class RentACarDTO
 {
 	private Long id;
 	private String name;
-	private String address;
+	private LocationDTO location;
 	private String description;
 	private Long version;
 	
@@ -14,14 +14,14 @@ public class RentACarDTO
 	
 	public RentACarDTO(RentACar rentACar)
 	{
-		this(rentACar.getId(), rentACar.getName(), rentACar.getAddress(), rentACar.getDescription(), rentACar.getVersion());
+		this(rentACar.getId(), rentACar.getName(), new LocationDTO(rentACar.getLocation()), rentACar.getDescription(), rentACar.getVersion());
 	}
 	
-	public RentACarDTO(Long id, String name, String address, String description, Long version) 
+	public RentACarDTO(Long id, String name, LocationDTO location, String description, Long version) 
 	{
 		this.id = id;
 		this.name = name;
-		this.address = address;
+		this.location = location;
 		this.description = description;
 		this.version = version;
 	}
@@ -42,12 +42,12 @@ public class RentACarDTO
 		this.name = name;
 	}
 
-	public String getAddress() {
-		return address;
+	public LocationDTO getLocation() {
+		return location;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
+	public void setLocation(LocationDTO location) {
+		this.location = location;
 	}
 
 	public String getDescription() {

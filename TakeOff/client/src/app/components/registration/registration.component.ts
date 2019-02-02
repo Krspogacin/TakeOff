@@ -3,15 +3,36 @@ import { MatDialog } from '@angular/material';
 import { RegistrationDialogComponent } from 'src/app/components/registration-dialog/registration-dialog.component';
 import { RegistrationService } from 'src/app/services/registration/registration.service';
 import { Router } from '@angular/router';
+import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 
 @Component({
   selector: 'app-registration',
   templateUrl: './registration.component.html',
   styleUrls: ['./registration.component.css']
 })
-export class RegistrationComponent {
+export class RegistrationComponent implements OnInit {
 
-  constructor(private registrationService: RegistrationService, public dialog: MatDialog, private router: Router) { }
+  thereIsLoggedInUser: boolean;
+
+  constructor(private authenticationService: AuthenticationService,
+              private registrationService: RegistrationService,
+              public dialog: MatDialog,
+              private router: Router) { }
+
+  ngOnInit() {
+    this.authenticationService.onSubject.subscribe(
+      (data) => {
+        if (data.value) {
+          this.thereIsLoggedInUser = true;
+        } else {
+          this.thereIsLoggedInUser = false;
+        }
+      }
+    );
+    if (this.authenticationService.getAccessToken()) {
+      this.thereIsLoggedInUser = true;
+    }
+  }
 
   openRegistrationDialog() {
     const dialogRef = this.dialog.open(RegistrationDialogComponent,

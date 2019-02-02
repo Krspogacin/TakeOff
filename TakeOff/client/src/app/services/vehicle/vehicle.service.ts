@@ -23,4 +23,20 @@ export class VehicleService {
   deleteVehicle(id: number) {
     return this.http.delete('/vehicles/' + id);
   }
+
+  addVehiclePrices(vehiclePrices: []) {
+    return this.http.post('/vehicles/prices/', vehiclePrices);
+  }
+
+  updateVehiclePrices(vehiclePrices: []) {
+    return this.http.put('/vehicles/prices/', vehiclePrices);
+  }
+
+  getFuelTypes() {
+    return this.http.get('/vehicles/fuelTypes');
+  }
+
+  getTransmissionTypes() {
+    return this.http.get('/vehicles/transmissionTypes');
+  }
 }

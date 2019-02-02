@@ -1,6 +1,5 @@
 package org.isa.takeoff.model;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -10,6 +9,8 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -17,28 +18,24 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import org.isa.takeoff.dto.RoomDTO;
+
 @Entity
 public class Room {
 
 	public enum RoomType {
-		APARTMAN, STUDIO, DUPLEX
+		APARTMENT, STUDIO, DUPLEX, FAMILY, SUITE
 	};
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "price", nullable = false)
-	private Double price;
-
-	@Column(name = "startingDate", nullable = false)
-	private LocalDate startingDate;
-
-	@Column(name = "endingDate", nullable = false)
-	private LocalDate endingDate;
-
 	@Column(name = "discount")
 	private Double discount;
+	
+	@Column(name = "defaultPrice", nullable = false)
+	private Double defaultPrice;
 
 	@Column(name = "isReserved", nullable = false)
 	private boolean isReserved;
@@ -49,34 +46,51 @@ public class Room {
 	@Column(name = "numberOfBeds", nullable = false)
 	private Integer numberOfBeds;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "type", nullable = false)
 	private RoomType type;
-
-	@Column(name = "hasBalcony")
+	
+	@Column(name = "hasBalcony", nullable = false)
 	private boolean hasBalcony;
-
-	@Column(name = "hasAirCondition")
+	
+	@Column(name = "hasAirCondition", nullable = false)
 	private boolean hasAirCondition;
+	
+	@Column(name = "numberOfRooms", nullable = false)
+	private Integer numberOfRooms;
+	
+	@OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<RoomPrice> roomPrices = new HashSet<>();
 
+	@OneToMany(mappedBy = "id.room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<RoomRating> roomRatings = new HashSet<>();
+	
 	@OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<RoomReservation> roomReservations = new HashSet<>();
 
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Hotel hotel;
 
 	public Room() {
 
 	}
+	
+	public Room(RoomDTO roomDTO){
+		this(roomDTO.getDefaultPrice(), roomDTO.getDiscount(), roomDTO.isReserved(), roomDTO.getFloor(),
+			roomDTO.getNumberOfBeds(), roomDTO.getType(), roomDTO.isHasBalcony(), roomDTO.isHasAirCondition(), roomDTO.getNumberOfRooms());
+	}
 
-	public Room(Double price, LocalDate startingDate, LocalDate endingDate, Integer floor, Integer numberOfBeds,
-			RoomType type) {
-		super();
-		this.price = price;
-		this.startingDate = startingDate;
-		this.endingDate = endingDate;
+	public Room(Double defaultPrice, Double discount, boolean isReserved, Integer floor, Integer numberOfBeds,
+			RoomType type, boolean hasBalcony, boolean hasAirCondition, Integer numberOfRooms) {
+		this.defaultPrice = defaultPrice;
+		this.discount = discount;
+		this.isReserved = isReserved;
 		this.floor = floor;
 		this.numberOfBeds = numberOfBeds;
 		this.type = type;
+		this.hasBalcony = hasBalcony;
+		this.hasAirCondition = hasAirCondition;
+		this.numberOfRooms = numberOfRooms;
 	}
 
 	public Long getId() {
@@ -85,30 +99,6 @@ public class Room {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public Double getPrice() {
-		return price;
-	}
-
-	public void setPrice(Double price) {
-		this.price = price;
-	}
-
-	public LocalDate getStartingDate() {
-		return startingDate;
-	}
-
-	public void setStartingDate(LocalDate startingDate) {
-		this.startingDate = startingDate;
-	}
-
-	public LocalDate getEndingDate() {
-		return endingDate;
-	}
-
-	public void setEndingDate(LocalDate endingDate) {
-		this.endingDate = endingDate;
 	}
 
 	public Double getDiscount() {
@@ -151,28 +141,44 @@ public class Room {
 		this.type = type;
 	}
 
-	public Boolean getHasBalcony() {
+	public boolean isHasBalcony() {
 		return hasBalcony;
 	}
 
-	public void setHasBalcony(Boolean hasBalcony) {
+	public void setHasBalcony(boolean hasBalcony) {
 		this.hasBalcony = hasBalcony;
 	}
 
-	public Boolean getHasAirCondition() {
+	public boolean isHasAirCondition() {
 		return hasAirCondition;
 	}
 
-	public void setHasAirCondition(Boolean hasAirCondition) {
+	public void setHasAirCondition(boolean hasAirCondition) {
 		this.hasAirCondition = hasAirCondition;
 	}
 
-	public boolean addRoomRating(RoomReservation e) {
-		return roomReservations.add(e);
+	public Integer getNumberOfRooms() {
+		return numberOfRooms;
+	}
+
+	public void setNumberOfRooms(Integer numberOfRooms) {
+		this.numberOfRooms = numberOfRooms;
+	}
+
+	public Double getDefaultPrice() {
+		return defaultPrice;
+	}
+
+	public void setDefaultPrice(Double defaultPrice) {
+		this.defaultPrice = defaultPrice;
+	}
+
+	public boolean addRoomRating(RoomRating e) {
+		return roomRatings.add(e);
 	}
 
 	public boolean removeRoomRating(Object o) {
-		return roomReservations.remove(o);
+		return roomRatings.remove(o);
 	}
 
 	public Hotel getHotel() {
@@ -183,12 +189,44 @@ public class Room {
 		this.hotel = hotel;
 	}
 
-	public ArrayList<RoomReservation> getRoomRatings() {
-		return new ArrayList<RoomReservation>(roomReservations);
+	public List<RoomRating> getRoomRatings() {
+		return new ArrayList<>(roomRatings);
 	}
 
-	public void setRoomRatings(Set<RoomReservation> roomRatings) {
-		this.roomReservations = roomRatings;
+	public void setRoomRatings(List<RoomRating> roomRatings) {
+		this.roomRatings = new HashSet<>(roomRatings);
+	}
+	
+	public boolean addRoomReservation(RoomReservation e) {
+		return roomReservations.add(e);
+	}
+
+	public boolean removeRoomReservation(Object o) {
+		return roomReservations.remove(o);
+	}
+	
+	public List<RoomReservation> getRoomReservations() {
+		return new ArrayList<>(roomReservations);
+	}
+
+	public void setRoomReservations(List<RoomReservation> roomReservations) {
+		this.roomReservations = new HashSet<>(roomReservations);
+	}
+	
+	public boolean addRoomPrice(RoomPrice e) {
+		return roomPrices.add(e);
+	}
+
+	public boolean removeRoomPrice(Object o) {
+		return roomPrices.remove(o);
+	}
+	
+	public List<RoomPrice> getRoomPrices() {
+		return new ArrayList<>(roomPrices);
+	}
+
+	public void setRoomPrices(List<RoomPrice> roomPrices) {
+		this.roomPrices = new HashSet<>(roomPrices);
 	}
 
 	@Override

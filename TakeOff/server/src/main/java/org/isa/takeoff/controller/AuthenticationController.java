@@ -11,7 +11,6 @@ import org.isa.takeoff.model.User;
 import org.isa.takeoff.model.UserState;
 import org.isa.takeoff.security.AuthenticationRequest;
 import org.isa.takeoff.security.TokenUtils;
-import org.isa.takeoff.service.AdministratorService;
 import org.isa.takeoff.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,16 +37,13 @@ public class AuthenticationController
 	private UserService userService;
 	
 	@Autowired
-	private AdministratorService administratorService;
-	
-	@Autowired
 	private AuthenticationManager authenticationManager;
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserState> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws AuthenticationException, IOException
 	{
 		UserState userState = new UserState();
-		User user = this.userService.findByUsername(authenticationRequest.getUsername());
+		User user = this.userService.findByUsernameUser(authenticationRequest.getUsername());
 		boolean notUser = false;
 		if (user == null || !user.isEnabled())
 		{
@@ -56,20 +52,22 @@ public class AuthenticationController
 		else
 		{
 			String token = tokenUtils.generateToken(user.getUsername());
-			userState = new UserState(token, user.getUsername(), user.isEnabled(), ((Authority)((ArrayList<? extends GrantedAuthority>)user.getAuthorities()).get(0)).getName());
+			userState = new UserState(token, user.getUsername(), user.isEnabled(), 
+					((Authority)((ArrayList<? extends GrantedAuthority>)user.getAuthorities()).get(0)).getName(), 
+					user.getImage() == null ? null : new String(user.getImage()));
 		}
 		
 		if (notUser)
 		{
-			Administrator admin = this.administratorService.findByUsername(authenticationRequest.getUsername());
+			Administrator admin = this.userService.findByUsernameAdmin(authenticationRequest.getUsername());
 			if (admin == null)
 			{
 				return new ResponseEntity<UserState>(HttpStatus.NOT_FOUND);
 			}			
 			else
 			{
-				String token = tokenUtils.generateToken(user.getUsername());
-				userState = new UserState(token, admin.getUsername(), admin.isEnabled(), ((Authority)((ArrayList<? extends GrantedAuthority>)admin.getAuthorities()).get(0)).getName());
+				String token = tokenUtils.generateToken(admin.getUsername());
+				userState = new UserState(token, admin.getUsername(), admin.isEnabled(), ((Authority)((ArrayList<? extends GrantedAuthority>)admin.getAuthorities()).get(0)).getName(), null);
 			}
 		}
 		

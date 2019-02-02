@@ -1,0 +1,142 @@
+<div *ngIf="!loadingHotel && !loadingRooms && !loadingPrices">
+    <div *ngIf="hotelExists" style="width: 100%; overflow: hidden;">
+        <h1 style="text-align: center">{{hotel.name}}</h1>
+        <button mat-raised-button color="primary" style="float: right;margin: 5px;" (click)="openAddRoomDialog()"><mat-icon>add</mat-icon> Add room</button>
+        <button mat-raised-button color="primary" style="float: right;margin: 5px;" (click)="openUpdateDialog()"><mat-icon>edit</mat-icon> Update hotel</button>
+        <p><font size="5"><b>Address:</b> {{hotel.address}}</font></p>
+        <p><font size="5"><b>Description:</b> {{hotel.description}}</font></p>
+        <div class="mat-elevation-z8" *ngIf="rooms">
+        <table style="width:100%" mat-table matSort [dataSource]="rooms.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)">
+            
+<!--             <ng-container matColumnDef="position">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> No. </th>
+                <td mat-cell *matCellDef="let room"> {{room.id}} </td>
+            </ng-container> -->
+
+            <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef> Type </th>
+                <td mat-cell *matCellDef="let room"> {{room.type}} </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="numberOfBeds">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Number of beds </th>
+                <td style="padding-left:2%" mat-cell *matCellDef="let room"> {{room.numberOfBeds}} </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="floor">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Floor </th>
+                <td style="padding-left:0.5%" mat-cell *matCellDef="let room"> {{room.floor}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="discount">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Discount </th>
+                <td mat-cell *matCellDef="let room">
+                    <div *ngIf="room.discount != null && room.discount != 0"> {{room.discount}} %</div>
+                    <div *ngIf="room.discount == null || room.discount == 0"> No discount </div>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="hasBalcony">
+                <th mat-header-cell *matHeaderCellDef> Has balcony </th>
+                <td style="padding-left:2%" mat-cell *matCellDef="let room">
+                    <div *ngIf="room.hasBalcony"> ✓ </div>
+                    <div *ngIf="!room.hasBalcony"> ✗ </div>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="hasAirCondition">
+                <th mat-header-cell *matHeaderCellDef> Has air condition </th>
+                <td style="padding-left:2%" mat-cell *matCellDef="let room">
+                    <div *ngIf="room.hasAirCondition"> ✓ </div>
+                    <div *ngIf="!room.hasAirCondition"> ✗ </div>
+                </td>
+            </ng-container>
+
+<!--             <ng-container matColumnDef="isReserved">
+                <th mat-header-cell *matHeaderCellDef> Is reserved </th>
+                <td mat-cell *matCellDef="let room">
+                    <div *ngIf="room.isReserved"> ✓ </div>
+                    <div *ngIf="!room.isReserved"> ✗ </div>
+                </td>
+            </ng-container> -->
+
+            <ng-container matColumnDef="numberOfRooms">
+                <th mat-header-cell *matHeaderCellDef> Number of rooms </th>
+                <td style="padding-left:2%" mat-cell *matCellDef="let room"> {{room.numberOfRooms}} </td>
+            </ng-container>
+ 
+            <ng-container matColumnDef="priceFor5Days">
+                <th mat-header-cell *matHeaderCellDef> Price for 5 days </th>
+                <td style="padding-left:2%" mat-cell *matCellDef="let room">
+                    <div *ngFor="let prices of roomPrices">
+                        <div *ngIf="prices.room.id == room.id && prices.period == '5'"> {{prices.price}} </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="priceFor10Days">
+                <th mat-header-cell *matHeaderCellDef> Price for 10 days </th>
+                <td style="padding-left:2%" mat-cell *matCellDef="let room">
+                    <div *ngFor="let prices of roomPrices">
+                        <div *ngIf="prices.room.id == room.id && prices.period == '10'"> {{prices.price}} </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="priceFor20Days">
+                <th mat-header-cell *matHeaderCellDef> Price for 20 days </th>
+                <td style="padding-left:2%" mat-cell *matCellDef="let room">
+                    <div *ngFor="let prices of roomPrices">
+                        <div *ngIf="prices.room.id == room.id && prices.period == '20'"> {{prices.price}} </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="priceForMoreDays">
+                <th mat-header-cell *matHeaderCellDef> Price for more than 20 days </th>
+                <td style="padding-left:2%" mat-cell *matCellDef="let room">
+                    <div *ngFor="let prices of roomPrices">
+                        <div *ngIf="prices.room.id == room.id && prices.period == 'MoreThan20'"> {{prices.price}} </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="update">
+                <th mat-header-cell *matHeaderCellDef> Update </th>
+                <td mat-cell *matCellDef="let room">
+                    <span matTooltip="Cannot be updated because it is reserved!" [matTooltipDisabled]="!room.reserved">
+                        <button mat-button color="primary" (click)="openUpdateRoomDialog(room)" [disabled]="room.reserved"><mat-icon>edit</mat-icon></button>
+                    </span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="delete">
+                <th mat-header-cell *matHeaderCellDef> Delete </th>
+                <td mat-cell *matCellDef="let room">
+                    <span matTooltip="Cannot be deleted because it is reserved!" [matTooltipDisabled]="!room.reserved">
+                        <button mat-button color="primary" (click)="deleteRoom(room.id)" [disabled]="room.reserved"><mat-icon>delete</mat-icon></button>
+                    </span>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+        <mat-paginator *ngIf="rooms"
+            [length]="rooms.length"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageOptions"
+            [showFirstLastButtons]="true"
+            (page)="pageFunction($event)">
+        </mat-paginator>
+        </div>
+        <div *ngIf="!rooms || rooms.length == 0">
+                <h4>This hotel does not have any rooms yet!</h4>
+        </div>
+    </div>
+    <div *ngIf="!hotelExists">
+        <p>
+            Hotel not found!
+        </p>
+    </div>
+</div>

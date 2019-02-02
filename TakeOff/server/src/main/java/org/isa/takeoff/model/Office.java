@@ -2,7 +2,6 @@ package org.isa.takeoff.model;
 
 import java.util.Objects;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,21 +9,23 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Version;
 
-import org.isa.takeoff.dto.OfficeDTO;
-
 @Entity
-public class Office {
-
+public class Office
+{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(name="address", unique = true, nullable = false)
-	private String address;
+	@Column(name="name", nullable = false)
+	private String name;
 	
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToOne(fetch = FetchType.EAGER)
+	private Location location;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
 	private RentACar rentACar;
 
 	@Version
@@ -32,14 +33,9 @@ public class Office {
 
 	public Office() { }
 	
-	public Office(String address) 
+	public Office(String name) 
 	{
-		this.address = address;
-	}
-
-	public Office(OfficeDTO officeDTO)
-	{
-		this(officeDTO.getAddress());
+		this.name = name;
 	}
 
 	public Long getId() {
@@ -49,13 +45,21 @@ public class Office {
 	public void setId(Long id) {
 		this.id = id;
 	}
-
-	public String getAddress() {
-		return address;
+	
+	public String getName() {
+		return name;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Location getLocation() {
+		return location;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
 	public RentACar getRentACar() {
@@ -93,5 +97,4 @@ public class Office {
 	public int hashCode() {
 		return Objects.hashCode(id);
 	}
-	
 }

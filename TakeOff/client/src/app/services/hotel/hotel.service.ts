@@ -20,5 +20,17 @@ export class HotelService {
     return this.http.post('/hotels',hotel);
   }
 
+  updateHotel(hotel: {}){
+    return this.http.put('/hotels',hotel);
+  }
+
+  deleteHotel(hotel: {}){
+    return this.http.delete('/hotels',hotel);
+  }
+
+  getRooms(id: number){
+    return this.http.get('/hotels/' + id + '/rooms');
+  }
+
 
 }

@@ -1,48 +1,114 @@
-<div *ngIf="!loadingRentACar && !loadingVehicles" class="strech">
+<div *ngIf="!loadingRentACar && !loadingVehicles && !loadingMainServices" class="strech">
   <div *ngIf="rentACarExists" class="stretch">
     <h1 class="header">{{rentACar.name}}</h1>
-    <div *ngIf="!userRole || userRole === 'ROLE_USER'">
-      <button mat-raised-button color="primary" class="button-right" (click)="openAddVehicleDialog()"><mat-icon>add</mat-icon> Add vehicle</button>
-      <button mat-raised-button color="primary" class="button-right" (click)="openUpdateDialog()"><mat-icon>edit</mat-icon> Update</button>
-    </div>
-    <p><b>Address:</b> {{rentACar.address}}</p>
-    <p><b>Description:</b> {{(!rentACar.description) ? '✗' : rentACar.description}}</p>
-    <div class="div-mat-card" *ngIf="vehicles">
-      <mat-card *ngFor="let vehicle of vehicles.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)" class="vehicle-card">
-        <mat-card-header>
-          <mat-card-title>{{vehicle.brand}}</mat-card-title>
-        </mat-card-header>
-        <img mat-card-image src="{{vehicle.image}}" alt="Vehicle photo">
-        <mat-card-content>
-          <p><b>Model:</b> {{vehicle.model}}</p>
-          <p><b>Year:</b> {{vehicle.year}}</p>
-          <p *ngIf="vehicle.reserved"><b>Reserved: ✓</b></p>
-          <p *ngIf="!vehicle.reserved"><b>Reserved: ✗</b></p>
-        </mat-card-content>
-        <mat-card-actions *ngIf="!userRoles || userRoles.includes('ROLE_USER')">
-          <button mat-button color="primary" (click)="openUpdateVehicleDialog(vehicle)"><mat-icon>edit</mat-icon></button>
-          <span matTooltip="Cannot be deleted because it is reserved!" [matTooltipDisabled]="!vehicle.reserved">
-            <button mat-button color="primary" (click)="deleteVehicle(vehicle.id)" [disabled]="vehicle.reserved"><mat-icon>delete</mat-icon></button>
+    <mat-tab-group>
+      <mat-tab label="Basic info">
+        <button mat-raised-button *ngIf="userRole && userRole === 'ROLE_USER'" color="primary" class="button-right" (click)="openUpdateDialog()"><mat-icon>edit</mat-icon> Update</button>
+        <p><b>Description:</b> {{(!rentACar.description) ? '✗' : rentACar.description}}</p>
+        <b>Rating: </b>
+        <span style="display: flex; flex-direction: row">
+            <div class="star-ratings-css">
+              <div class="star-ratings-css-top" [ngStyle]="{'width': ((rating * 100) / 5) + '%'}"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+              <div class="star-ratings-css-bottom"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+            </div>
+            <p style="padding-left: 20px;">{{rating}}/5</p>
           </span>
-        </mat-card-actions>
-      </mat-card>
-    </div>
-    <mat-paginator
-      [length]="vehicles.length"
-      [pageSize]="pageSize"
-      [pageSizeOptions]="pageOptions"
-      [showFirstLastButtons]="true"
-      (page)="switchPage($event)">
-    </mat-paginator>
-    <div *ngIf="!vehicles || vehicles.length == 0">
-      <h4>This rent a car service does not have any vehicle yet!</h4>
-    </div>
-    <br><br>
+        <p><b>Address:</b> {{rentACar.location.address}}
+        <div>
+          <iframe width="600" height="500" [src]='url' 
+                  frameborder="0" scrolling="no" marginheight="0" marginwidth="0">
+          </iframe>
+        </div>
+      </mat-tab>
+      <mat-tab label="Services">
+        <span matTooltip="Cannot add more than 10 services!" [matTooltipDisabled]="mainServices.length <= 10" class="button-right">
+          <button mat-raised-button color="primary" class="button-right" 
+                  (click)="openAddMainServiceDialog()" 
+                  *ngIf="userRole && userRole === 'ROLE_USER'"
+                  [disabled]="mainServices.length > 10">
+                  <mat-icon>add</mat-icon> Add service
+          </button>
+        </span>
+        <div *ngIf="vehicles && vehicles.length > 0 && mainServices && mainServices.length > 0" style="padding-left: 3%; padding-top: 5%;">
+          <h2>Pricelist:</h2>
+          <div class="mat-elevation-z8">
+            <mat-table #table mat-table [dataSource]="dataSource" style="padding-right: 5%;">
+              <ng-container *ngFor="let column of columns; let i = index" [matColumnDef]="column.columnDef">
+                <mat-header-cell *matHeaderCellDef>{{ column.header }} 
+                  <div style="margin-left: 1%;" *ngIf="i > 1">
+                    <button mat-icon-button [matMenuTriggerFor]="menu" [ngClass]="{'wiggle-button': !menuOpened}" color="primary" (menuOpened)="menuOpened = true" (menuClosed)="menuOpened = false">
+                      <mat-icon>settings</mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                      <button mat-button color="primary" (click)="openUpdateMainServiceDialog(column.id)"><mat-icon>edit</mat-icon> Edit</button><br>
+                      <button mat-button color="primary" (click)="deleteMainService(column.id)"><mat-icon>close</mat-icon> Delete</button>
+                    </mat-menu>   
+                  </div>
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ column.cell(row) }}</mat-cell>
+              </ng-container>
+              <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+            </mat-table>
+            <mat-paginator #paginator [pageSize]="pageSize" [pageSizeOptions]="pageOptions" [showFirstLastButtons]="true" style="padding-right: 5%;"></mat-paginator>
+          </div>
+        </div>
+        <div *ngIf="!vehicles || vehicles.length == 0 || !mainServices || mainServices.length == 0" style="padding-top: 5%;">
+          <h4 style="font-size: 150%; text-align: center;">This rent a car service does not have any services yet!</h4>
+        </div>
+      </mat-tab>
+      <mat-tab label="Vehicles">
+        <button mat-raised-button color="primary" class="button-right" (click)="openAddVehicleDialog()" *ngIf="userRole && userRole === 'ROLE_USER'"><mat-icon>add</mat-icon> Add vehicle</button>
+        <div class="div-mat-card" *ngIf="vehicles && vehicles.length > 0">
+          <mat-card *ngFor="let vehicle of vehicles.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)" class="vehicle-card mat-elevation-z8" >
+            <mat-card-header>
+              <mat-card-title>{{vehicle.brand}}</mat-card-title>
+            </mat-card-header>
+            <img mat-card-image src="{{vehicle.image}}" alt="Vehicle photo" class="card-image">
+            <mat-card-content>
+              <p><b>Model:</b> {{vehicle.model}}</p>
+              <p><b>Year:</b> {{vehicle.year}}</p>
+              <p><b>Fuel type:</b> {{vehicle.fuel}}</p>
+              <p><b>Number of seats:</b> {{vehicle.numOfSeats}}</p>
+              <p><b>Transmission:</b> {{vehicle.transmission}}</p>
+              <p *ngIf="vehicle.reserved"><b>Reserved: ✓</b></p>
+              <p *ngIf="!vehicle.reserved"><b>Reserved: ✗</b></p>
+              <b>Rating: </b>
+              <span style="display: flex; flex-direction: row">
+                  <div class="star-ratings-css">
+                      <div class="star-ratings-css-top" [ngStyle]="{'width': ((vehicle.rating * 100) / 5) + '%'}"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+                      <div class="star-ratings-css-bottom"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+                  </div>
+                  <p style="padding-left: 20px;">{{vehicle.rating}}/5</p>
+              </span>
+            </mat-card-content>
+            <mat-card-actions *ngIf="userRole && userRole === 'ROLE_USER'" style="float: right;">
+              <span matTooltip="Cannot be updated because it is reserved!" [matTooltipDisabled]="!vehicle.reserved">
+                <button mat-button color="primary" (click)="openUpdateVehicleDialog(vehicle)" [disabled]="vehicle.reserved"><mat-icon>edit</mat-icon></button>
+              </span>
+              <span matTooltip="Cannot be deleted because it is reserved!" [matTooltipDisabled]="!vehicle.reserved">
+                <button mat-button color="primary" (click)="deleteVehicle(vehicle.id)" [disabled]="vehicle.reserved"><mat-icon>delete</mat-icon></button>
+              </span>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+        <div *ngIf="!vehicles || vehicles.length == 0" style="padding-top: 5%;">
+          <h4 style="font-size: 150%; text-align: center;">This rent a car service does not have any vehicle yet!</h4>
+        </div>
+        <mat-paginator #vehiclePaginator *ngIf="vehicles && vehicles.length > 0"
+          [length]="vehicles.length"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageOptions"
+          [showFirstLastButtons]="true"
+          (page)="switchPage($event)">
+        </mat-paginator>
+      </mat-tab>      
+    </mat-tab-group>
   </div>
+  <br><br>
   <div *ngIf="!rentACarExists">
     <p>
       Rent a car not found!
     </p>
   </div>
 </div>
-

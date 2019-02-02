@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.isa.takeoff.dto.AirCompanyDTO;
-import org.isa.takeoff.dto.DestinationDTO;
+import org.isa.takeoff.dto.LocationDTO;
 import org.isa.takeoff.dto.FlightDTO;
 import org.isa.takeoff.model.AirCompany;
-import org.isa.takeoff.model.Destination;
+import org.isa.takeoff.model.Location;
 import org.isa.takeoff.model.Flight;
 import org.isa.takeoff.service.AirCompanyService;
-import org.isa.takeoff.service.DestinationService;
+import org.isa.takeoff.service.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,7 +29,7 @@ public class AirCompanyController {
 	private AirCompanyService airCompanyService;
 
 	@Autowired
-	private DestinationService destinationService;
+	private LocationService destinationService;
 
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<AirCompanyDTO>> getCompanies() {
@@ -107,15 +107,15 @@ public class AirCompanyController {
 	}
 
 	@RequestMapping(value = "/{id}/destinations", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<DestinationDTO>> getCompanyDestinations(@PathVariable Long id) {
+	public ResponseEntity<List<LocationDTO>> getCompanyDestinations(@PathVariable Long id) {
 
 		try {
 			AirCompany company = airCompanyService.findOne(id);
-			List<Destination> destinations = company.getDestinations();
+			List<Location> destinations = company.getDestinations();
 
-			List<DestinationDTO> destinationsDTO = new ArrayList<>();
-			for (Destination d : destinations) {
-				destinationsDTO.add(new DestinationDTO(d));
+			List<LocationDTO> destinationsDTO = new ArrayList<>();
+			for (Location d : destinations) {
+				destinationsDTO.add(new LocationDTO(d));
 			}
 
 			return new ResponseEntity<>(destinationsDTO, HttpStatus.OK);
@@ -126,14 +126,14 @@ public class AirCompanyController {
 	}
 
 	@RequestMapping(value = "/{id}/destinations", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<DestinationDTO>> setCompanyDestinations(@PathVariable Long id,
-			@RequestBody List<DestinationDTO> destinationsDTO) {
+	public ResponseEntity<List<LocationDTO>> setCompanyDestinations(@PathVariable Long id,
+			@RequestBody List<LocationDTO> destinationsDTO) {
 
 		try {
 			AirCompany company = airCompanyService.findOne(id);
 
-			List<Destination> destinations = new ArrayList<>();
-			for (DestinationDTO d : destinationsDTO) { 
+			List<Location> destinations = new ArrayList<>();
+			for (LocationDTO d : destinationsDTO) { 
 				destinations.add(destinationService.findOne(d.getId()));
 			}
 			
@@ -148,14 +148,14 @@ public class AirCompanyController {
 	}
 
 	@RequestMapping(value = "/destinations", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<DestinationDTO>> getAllDestinations() {
+	public ResponseEntity<List<LocationDTO>> getAllDestinations() {
 
 		try {
-			List<Destination> destinations = destinationService.findAll();
+			List<Location> destinations = destinationService.findAll();
 
-			List<DestinationDTO> destinationsDTO = new ArrayList<>();
-			for (Destination d : destinations) {
-				destinationsDTO.add(new DestinationDTO(d));
+			List<LocationDTO> destinationsDTO = new ArrayList<>();
+			for (Location d : destinations) {
+				destinationsDTO.add(new LocationDTO(d));
 			}
 
 			return new ResponseEntity<>(destinationsDTO, HttpStatus.OK);

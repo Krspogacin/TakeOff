@@ -27,9 +27,6 @@ public class Service {
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Hotel hotel;
 	
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private RentACar rentACar;
-	
 	public Service() { }
 
 	public Service(String name, Double price) {
@@ -68,14 +65,6 @@ public class Service {
 
 	public void setHotel(Hotel hotel) {
 		this.hotel = hotel;
-	}
-
-	public RentACar getRentACar() {
-		return rentACar;
-	}
-
-	public void setRentACar(RentACar rentACar) {
-		this.rentACar = rentACar;
 	}
 	
 	@Override

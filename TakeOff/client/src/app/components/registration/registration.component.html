@@ -1,1 +1,1 @@
-<button mat-button (click)="openRegistrationDialog()"><mat-icon>person_add</mat-icon> Sign up</button>
+<button mat-raised-button style="background-color: orange; color: white;" *ngIf="!thereIsLoggedInUser" (click)="openRegistrationDialog()"><mat-icon>person_add</mat-icon> Sign up</button>

@@ -3,6 +3,7 @@ import { AuthenticationService } from 'src/app/services/authentication/authentic
 import { LoginDialogComponent } from '../login-dialog/login-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-login',
@@ -13,13 +14,23 @@ export class LoginComponent implements OnInit {
 
   thereIsLoggedInUser: boolean;
 
-  constructor(private authenticationService: AuthenticationService, public dialog: MatDialog, private router: Router) { }
+  constructor(private authenticationService: AuthenticationService,
+              public dialog: MatDialog,
+              private router: Router,
+              private appComponent: AppComponent) { }
 
   ngOnInit(): void {
+    this.authenticationService.onSubject.subscribe(
+      (data) => {
+        if (data.value) {
+          this.thereIsLoggedInUser = true;
+        } else {
+          this.thereIsLoggedInUser = false;
+        }
+      }
+    );
     if (this.authenticationService.getAccessToken()) {
       this.thereIsLoggedInUser = true;
-    } else {
-      this.thereIsLoggedInUser = false;
     }
   }
 
@@ -35,21 +46,9 @@ export class LoginComponent implements OnInit {
       (data) => {
         if (data) {
           this.authenticationService.setUserState(data);
-          this.thereIsLoggedInUser = true;
-          // this.router.navigate(['/']);
+          this.router.navigate(['/']);
+          this.appComponent.showSnackBar('Logged in successfully!');
         }
-      }
-    );
-  }
-
-  logout() {
-    this.authenticationService.logout().subscribe(
-      () => {
-        this.authenticationService.removeUserState();
-        this.thereIsLoggedInUser = false;
-        this.router.navigate(['/']);
-      },
-      (error) => {
       }
     );
   }

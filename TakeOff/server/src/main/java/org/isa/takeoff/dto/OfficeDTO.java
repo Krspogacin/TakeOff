@@ -5,7 +5,8 @@ import org.isa.takeoff.model.Office;
 public class OfficeDTO 
 {
 	private Long id;
-	private String address;
+	private String name;
+	private LocationDTO location;
 	private RentACarDTO rentACar;
 	private Long version;
 	
@@ -13,13 +14,14 @@ public class OfficeDTO
 	
 	public OfficeDTO(Office office)
 	{
-		this(office.getId(), office.getAddress(), new RentACarDTO(office.getRentACar()), office.getVersion());
+		this(office.getId(), office.getName(), new LocationDTO(office.getLocation()), new RentACarDTO(office.getRentACar()), office.getVersion());
 	}
 	
-	public OfficeDTO(Long id, String address, RentACarDTO rentACar, Long version)
+	public OfficeDTO(Long id, String name, LocationDTO location, RentACarDTO rentACar, Long version)
 	{
 		this.id = id;
-		this.address = address;
+		this.name = name;
+		this.location = location;
 		this.rentACar = rentACar;
 		this.version = version;
 	}
@@ -32,12 +34,20 @@ public class OfficeDTO
 		this.id = id;
 	}
 
-	public String getAddress() {
-		return address;
+	public String getName() {
+		return name;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public LocationDTO getLocation() {
+		return location;
+	}
+
+	public void setLocation(LocationDTO location) {
+		this.location = location;
 	}
 
 	public RentACarDTO getRentACar() {
