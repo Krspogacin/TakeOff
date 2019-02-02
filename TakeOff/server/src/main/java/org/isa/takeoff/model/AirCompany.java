@@ -44,7 +44,7 @@ public class AirCompany {
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Flight> flights = new HashSet<>();
 
-	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "id.company", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<AirCompanyRating> companyRatings = new HashSet<>();
 
 	@Version

@@ -8,31 +8,32 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Embeddable
-public class RoomRatingId implements Serializable {
+public class AirCompanyRatingId implements Serializable {
 
 	@ManyToOne
-	@JoinColumn(name = "room_id", referencedColumnName = "id")
-	private Room room;
+	@JoinColumn(name = "company_id", referencedColumnName = "id")
+	private AirCompany company;
 
 	@ManyToOne
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
 	private User user;
 	
-	public RoomRatingId() {
-	
+	public AirCompanyRatingId() {
+
 	}
 
-	public RoomRatingId(Room room, User user) {
-		this.room = room;
+	public AirCompanyRatingId(AirCompany company, User user) {
+		super();
+		this.company = company;
 		this.user = user;
 	}
 
-	public Room getRoom() {
-		return room;
+	public AirCompany getCompany() {
+		return company;
 	}
 
-	public void setRoom(Room room) {
-		this.room = room;
+	public void setCompany(AirCompany company) {
+		this.company = company;
 	}
 
 	public User getUser() {
@@ -51,13 +52,12 @@ public class RoomRatingId implements Serializable {
 		if (obj == null || getClass() != obj.getClass()) {
 			return false;
 		}
-		RoomRatingId that = (RoomRatingId) obj;
-		return Objects.equals(room, that.room) && Objects.equals(user, that.user);
+		AirCompanyRatingId that = (AirCompanyRatingId) obj;
+		return Objects.equals(company, that.company) && Objects.equals(user, that.user);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(room, user);
+		return Objects.hash(company, user);
 	}
-
 }

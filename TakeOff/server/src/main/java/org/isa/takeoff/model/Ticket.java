@@ -2,7 +2,6 @@ package org.isa.takeoff.model;
 
 import java.util.Objects;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -34,7 +33,7 @@ public class Ticket {
 	@Column(name = "isReserved", nullable = false)
 	private boolean isReserved;
 
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Flight flight;
 
 	@Version

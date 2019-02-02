@@ -15,6 +15,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -65,7 +66,7 @@ public class Room {
 	@OneToMany(mappedBy = "id.room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<RoomRating> roomRatings = new HashSet<>();
 	
-	@OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToMany(mappedBy = "rooms", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<RoomReservation> roomReservations = new HashSet<>();
 
 	@ManyToOne(fetch = FetchType.EAGER)

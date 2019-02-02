@@ -3,29 +3,29 @@ package org.isa.takeoff.model;
 import java.io.Serializable;
 import java.util.Objects;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-@Entity
-public class FlightReservation implements Serializable {
+@Embeddable
+public class FlightRatingId implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-
-	@Id
 	@ManyToOne
 	@JoinColumn(name = "flight_id", referencedColumnName = "id")
 	private Flight flight;
 
-	@Id
 	@ManyToOne
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
 	private User user;
+	
+	public FlightRatingId() {
 
-	@Column(name = "rating", nullable = false)
-	private Double rating;
+	}
+
+	public FlightRatingId(Flight flight, User user) {
+		this.flight = flight;
+		this.user = user;
+	}
 
 	public Flight getFlight() {
 		return flight;
@@ -43,23 +43,15 @@ public class FlightReservation implements Serializable {
 		this.user = user;
 	}
 
-	public Double getRating() {
-		return rating;
-	}
-
-	public void setRating(Double rating) {
-		this.rating = rating;
-	}
-
 	@Override
-	public boolean equals(Object o) {
-		if (this == o)
+	public boolean equals(Object obj) {
+		if (this == obj) {
 			return true;
-
-		if (o == null || getClass() != o.getClass())
+		}
+		if (obj == null || getClass() != obj.getClass()) {
 			return false;
-
-		FlightReservation that = (FlightReservation) o;
+		}
+		FlightRatingId that = (FlightRatingId) obj;
 		return Objects.equals(flight, that.flight) && Objects.equals(user, that.user);
 	}
 

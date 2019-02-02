@@ -18,6 +18,10 @@ public class HotelRatingId implements Serializable {
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
 	private User user;
 	
+	public HotelRatingId() {
+	
+	}
+	
 	public HotelRatingId(Hotel hotel, User user) {
 		this.hotel = hotel;
 		this.user = user;

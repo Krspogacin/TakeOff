@@ -8,19 +8,19 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 
 @Entity
-public class AirCompanyRating implements Serializable {
+public class FlightRating implements Serializable {
 
 	@EmbeddedId
-	private AirCompanyRatingId id;
+	private FlightRatingId id;
 
 	@Column(name = "rating", nullable = false)
 	private Double rating;
 
-	public AirCompanyRatingId getId() {
+	public FlightRatingId getId() {
 		return id;
 	}
 
-	public void setId(AirCompanyRatingId id) {
+	public void setId(FlightRatingId id) {
 		this.id = id;
 	}
 
@@ -40,7 +40,7 @@ public class AirCompanyRating implements Serializable {
 		if (o == null || getClass() != o.getClass())
 			return false;
 
-		AirCompanyRating that = (AirCompanyRating) o;
+		FlightRating that = (FlightRating) o;
 		return Objects.equals(id, that.id);
 	}
 

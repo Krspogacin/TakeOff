@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -18,13 +19,9 @@ public class VehicleReservation {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="vehicle_id", referencedColumnName="id")
 	private Vehicle vehicle;
-	
-	@ManyToOne
-	@JoinColumn(name="user_id", referencedColumnName="id")
-	private User user;
 	
 	@Column(name = "reservationStartDate", nullable = false)
 	private LocalDate reservationStartDate;
@@ -46,14 +43,6 @@ public class VehicleReservation {
 
 	public void setVehicle(Vehicle vehicle) {
 		this.vehicle = vehicle;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
 	}
 	
     public LocalDate getReservationStartDate() {
@@ -80,13 +69,12 @@ public class VehicleReservation {
             return false;
  
         VehicleReservation that = (VehicleReservation) o;
-        return Objects.equals(vehicle, that.vehicle) &&
-        		Objects.equals(user, that.user);
+        return Objects.equals(id, that.id);
     }
  
     @Override
     public int hashCode() {
-        return Objects.hash(vehicle, user);
+        return Objects.hash(id);
     }
 	
 }

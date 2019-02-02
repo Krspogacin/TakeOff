@@ -49,7 +49,10 @@ public class Flight {
 	private Double ticketPrice;
 
 	@OneToMany(mappedBy = "flight", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<FlightReservation> flightReservations = new HashSet<>();
+	private Set<Reservation> flightReservations = new HashSet<>();
+	
+	@OneToMany(mappedBy = "id.flight", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<FlightRating> flightRatings = new HashSet<>();
 
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private AirCompany company;
@@ -126,11 +129,11 @@ public class Flight {
 		this.ticketPrice = ticketPrice;
 	}
 
-	public List<FlightReservation> getFlightReservations() {
+	public List<Reservation> getFlightReservations() {
 		return new ArrayList<>(flightReservations);
 	}
 
-	public void setFlightReservations(List<FlightReservation> flightReservations) {
+	public void setFlightReservations(List<Reservation> flightReservations) {
 		this.flightReservations = new HashSet<>(flightReservations);
 	}
 
