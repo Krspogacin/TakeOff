@@ -64,6 +64,11 @@ export class RegistrationDialogComponent implements OnInit {
   submitForm() {
     const element = document.getElementById('scrollId');
     element.scrollTo(0, 0);
+    // const date1 = new Date();
+    // const date2 = new Date(this.registrationForm.value.dateOfBirth);
+    // const timeDiff = Math.abs(date2.getTime() - date1.getTime());
+    // const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    // console.log(diffDays);
     this.validateByUsername();
   }
 

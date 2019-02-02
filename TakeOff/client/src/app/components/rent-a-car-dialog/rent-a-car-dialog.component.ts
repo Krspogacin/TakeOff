@@ -1,6 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { RentACarService } from 'src/app/services/rent-a-car/rent-a-car.service';
 
 @Component({
   selector: 'app-rent-a-car-dialog',
@@ -9,23 +10,39 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 })
 export class RentACarDialogComponent implements OnInit {
 
-  rentACarUpdateForm: FormGroup;
+  rentACarForm: FormGroup;
+  update = true;
 
-  constructor(private dialogRef: MatDialogRef<RentACarDialogComponent>,
+  constructor(private rentACarService: RentACarService,
+              private dialogRef: MatDialogRef<RentACarDialogComponent>,
               private formBuilder: FormBuilder,
-              @Inject(MAT_DIALOG_DATA) public data: any) { }
+              @Inject(MAT_DIALOG_DATA) public rentACar: any) { }
 
     ngOnInit(): void {
-      this.rentACarUpdateForm = this.formBuilder.group({
-         name: [this.data.name],
-         address: [this.data.address],
-         description: [this.data.description]
+      if (!this.rentACar) {
+        this.rentACar = {'name': '', 'address': '', 'description': ''};
+        this.update = false;
+      }
+      this.rentACarForm = this.formBuilder.group({
+         name: [this.rentACar.name, Validators.required],
+         address: [this.rentACar.address, Validators.required],
+         description: [this.rentACar.description]
       });
     }
 
     submitForm() {
-      const updatedRentACar = this.rentACarUpdateForm.value;
-      updatedRentACar.id = this.data.id;
-      this.dialogRef.close(updatedRentACar);
+      const nameControl: AbstractControl = this.rentACarForm.get('name');
+      this.rentACarService.checkName(nameControl.value).subscribe(
+        () => {
+          const updatedRentACar = this.rentACarForm.value;
+          updatedRentACar.id = this.rentACar.id;
+          this.dialogRef.close(updatedRentACar);
+        },
+        () => {
+          nameControl.setErrors({ nameExists: true });
+          const element = document.getElementById('scrollId');
+          element.scrollTo(0, 0);
+        }
+      );
     }
 }

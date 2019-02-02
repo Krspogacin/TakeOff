@@ -35,7 +35,10 @@ public class RentACar {
 	private String description;
 	
 	@OneToMany(mappedBy = "rentACar", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<Service> services = new HashSet<>();
+	private Set<RentACarMainService> rentACarMainServices = new HashSet<>();
+	
+	@OneToMany(mappedBy = "rentACar", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<RentACarAdditionalService> rentACarAdditionalServices = new HashSet<>();
 	
 	@OneToMany(mappedBy ="rentACar", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Vehicle> vehicles = new HashSet<>();
@@ -43,7 +46,7 @@ public class RentACar {
 	@OneToMany(mappedBy = "rentACar", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Office> offices = new HashSet<>();
 	
-	@OneToMany(mappedBy = "rentACar", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "id.rentACar", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<RentACarRating> rentACarRatings = new HashSet<>();
 	
 	@Version
@@ -95,12 +98,20 @@ public class RentACar {
 		this.description = description;
 	}
 		
-	public List<Service> getServices() {
-		return new ArrayList<>(services);
+	public List<RentACarMainService> getMainServicesRentACar() {
+		return new ArrayList<>(rentACarMainServices);
 	}
 
-	public void setServices(List<Service> services) {
-		this.services = new HashSet<>(services);
+	public void setMainServicesRentACar(List<RentACarMainService> rentACarMainServices) {
+		this.rentACarMainServices = new HashSet<>(rentACarMainServices);
+	}
+	
+	public List<RentACarAdditionalService> getAdditionalServicesRentACar() {
+		return new ArrayList<>(rentACarAdditionalServices);
+	}
+
+	public void setAdditionalServicesRentACar(List<RentACarAdditionalService> rentACarAdditionalServices) {
+		this.rentACarAdditionalServices = new HashSet<>(rentACarAdditionalServices);
 	}
 
 	public List<Vehicle> getVehicles() {

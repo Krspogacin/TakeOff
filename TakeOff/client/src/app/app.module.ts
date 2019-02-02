@@ -19,6 +19,10 @@ import { VerifyUserComponent } from './components/verify-user/verify-user.compon
 import { RentACarComponent } from './components/rent-a-car/rent-a-car.component';
 import { RentACarDialogComponent } from './components/rent-a-car-dialog/rent-a-car-dialog.component';
 import { VehicleDialogComponent } from './components/vehicle-dialog/vehicle-dialog.component';
+import { LogoutComponent } from './components/logout/logout.component';
+import { RentACarsComponent } from './components/rent-a-cars/rent-a-cars.component';
+import { NameFilterPipe } from './pipes/name-filter.pipe';
+import { RentACarMainServiceDialogComponent } from './components/rent-a-car-main-service-dialog/rent-a-car-main-service-dialog.component';
 
 @NgModule({
     declarations: [
@@ -33,6 +37,10 @@ import { VehicleDialogComponent } from './components/vehicle-dialog/vehicle-dial
         RentACarDialogComponent,
         VehicleDialogComponent,
         AddHotelModalComponent,
+        LogoutComponent,
+        RentACarsComponent,
+        NameFilterPipe,
+        RentACarMainServiceDialogComponent,
     ],
     entryComponents: [
         RoutingComponents,
@@ -41,6 +49,7 @@ import { VehicleDialogComponent } from './components/vehicle-dialog/vehicle-dial
         RentACarDialogComponent,
         VehicleDialogComponent,
         AddHotelModalComponent,
+        RentACarMainServiceDialogComponent
     ],
     imports: [
         BrowserModule,
@@ -49,7 +58,7 @@ import { VehicleDialogComponent } from './components/vehicle-dialog/vehicle-dial
         FormsModule,
         BrowserAnimationsModule,
         MaterialModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
     ],
     providers: [{ provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
     bootstrap: [AppComponent]

@@ -1,5 +1,9 @@
 <mat-tab-group>
         <mat-tab label="Air-companies"></mat-tab>
         <mat-tab label="Hotels"><app-hotel></app-hotel></mat-tab>
-        <mat-tab label="Rent-a-car services"></mat-tab>
+        <mat-tab label="Rent a car services"><app-rent-a-cars></app-rent-a-cars></mat-tab>
+        <div *ngIf="userRole && userRole === 'ROLE_USER'">
+                <mat-tab label="Reservations"></mat-tab>
+                <mat-tab label="Friends"></mat-tab>
+        </div>
 </mat-tab-group>

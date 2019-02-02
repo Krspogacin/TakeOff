@@ -56,7 +56,9 @@ public class AuthenticationController
 		else
 		{
 			String token = tokenUtils.generateToken(user.getUsername());
-			userState = new UserState(token, user.getUsername(), user.isEnabled(), ((Authority)((ArrayList<? extends GrantedAuthority>)user.getAuthorities()).get(0)).getName());
+			userState = new UserState(token, user.getUsername(), user.isEnabled(), 
+					((Authority)((ArrayList<? extends GrantedAuthority>)user.getAuthorities()).get(0)).getName(), 
+					user.getImage() == null ? null : new String(user.getImage()));
 		}
 		
 		if (notUser)
@@ -69,7 +71,7 @@ public class AuthenticationController
 			else
 			{
 				String token = tokenUtils.generateToken(user.getUsername());
-				userState = new UserState(token, admin.getUsername(), admin.isEnabled(), ((Authority)((ArrayList<? extends GrantedAuthority>)admin.getAuthorities()).get(0)).getName());
+				userState = new UserState(token, admin.getUsername(), admin.isEnabled(), ((Authority)((ArrayList<? extends GrantedAuthority>)admin.getAuthorities()).get(0)).getName(), null);
 			}
 		}
 		

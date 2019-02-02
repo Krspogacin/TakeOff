@@ -4,7 +4,6 @@ import { AirCompanyComponent } from './components/air-company/air-company.compon
 import { NotFoundComponent } from './components/not-found/not-found.component';
 
 import { HotelComponent } from './components/hotel/hotel.component';
-import { AddHotelModalComponent } from './components/add-hotel-modal/add-hotel-modal.component';
 import { FlightComponent } from './components/flight/flight.component';
 import { RegistrationComponent } from './components/registration/registration.component';
 import { SuccessfulRegistrationComponent } from './components/successful-registration/successful-registration.component';
@@ -15,6 +14,7 @@ import { HomepageComponent } from './components/homepage/homepage.component';
 import { AirCompanyDialogComponent } from './components/air-company-dialog/air-company-dialog.component';
 import { FlightDialogComponent } from './components/flight-dialog/flight-dialog.component';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
+import { RentACarsComponent } from './components/rent-a-cars/rent-a-cars.component';
 
 const routes: Routes = [
   { path: '', component: HomepageComponent },
@@ -26,6 +26,7 @@ const routes: Routes = [
   { path: 'users/register/verify', component: VerifyUserComponent },
   { path: 'users/login', component: LoginComponent },
   { path: 'users/profile', component: UserProfileComponent },
+  { path: 'rent-a-cars', component: RentACarsComponent },
   { path: 'rent-a-cars/:id', component: RentACarComponent },
   { path: '**', component: NotFoundComponent }
 ];
@@ -44,6 +45,7 @@ export const RoutingComponents = [AirCompanyComponent,
   SuccessfulRegistrationComponent,
   VerifyUserComponent,
   LoginComponent,
+  RentACarsComponent,
   RentACarComponent,
   HomepageComponent,
   AirCompanyDialogComponent,

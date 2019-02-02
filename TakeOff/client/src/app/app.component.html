@@ -4,10 +4,22 @@
             
                 <span class="fill"></span>
 
-                <button mat-raised-button style="background-color: orange; color: white;">Login</button>&nbsp;&nbsp;
-                <button mat-raised-button style="background-color: orange; color: white;">Registration</button>
+                <div *ngIf="username">
+                        <button mat-button [matMenuTriggerFor]="menu">
+                                <mat-icon *ngIf="!profileImage" style="margin-right: 5%;">person</mat-icon>
+                                <img mat-card-avatar src={{profileImage}} *ngIf="profileImage" height="0" width="0" style="margin-right: 10%;"> 
+                                {{username}}
+                        </button>
+                        <mat-menu #menu="matMenu">
+                                <a mat-menu-item style="color: orange" [routerLink]="[ '/users/profile' ]">My profile</a>
+                                <mat-divider></mat-divider>
+                                <app-logout></app-logout>
+                        </mat-menu>   
+                </div>&nbsp;&nbsp;
+                <app-login></app-login>&nbsp;&nbsp;
+                <app-registration></app-registration>
         </mat-toolbar-row>
 </mat-toolbar>
-<div style="padding-top: 50px;">
+<div style="padding-top: 80px; padding-left: 10px;">
         <router-outlet></router-outlet>
 </div>
