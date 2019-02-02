@@ -7,7 +7,7 @@
                 <div *ngIf="username">
                         <button mat-button [matMenuTriggerFor]="menu">
                                 <mat-icon *ngIf="!profileImage" style="margin-right: 5%;">person</mat-icon>
-                                <img mat-card-avatar src={{profileImage}} *ngIf="profileImage" height="0" width="0" style="margin-right: 10%;"> 
+                                <img class="mat-card-avatar-custom" src={{profileImage}} *ngIf="profileImage"> 
                                 {{username}}
                         </button>
                         <mat-menu #menu="matMenu">

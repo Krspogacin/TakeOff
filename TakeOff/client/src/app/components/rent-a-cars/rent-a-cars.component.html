@@ -24,7 +24,7 @@
       </mat-card-header>
       <img mat-card-image src="http://www.rentacarmms.rs/slike/iznajmljivanje-automobila.jpg" alt="No photo" class="card-image">
       <mat-card-content>
-        <p><b>Address</b> : {{rentACar.address}}</p>
+        <p><b>Address</b> : {{rentACar.location.address}}</p>
         <p><b>Description:</b> {{(!rentACar.description) ? '✗' : rentACar.description}}</p> 
         <b>Rating: </b>
         <span style="display: flex; flex-direction: row">
@@ -54,7 +54,8 @@
       </mat-card-actions>
   </mat-card>
 </div>
-<mat-paginator [length] = rentACars.length
+<mat-paginator *ngIf="rentACars && rentACars.length > 0" 
+              [length] = rentACars.length
               [pageSize] = "pageSize"
               [pageSizeOptions] = "[5, 10, 25, 100]"
               [showFirstLastButtons]="true"

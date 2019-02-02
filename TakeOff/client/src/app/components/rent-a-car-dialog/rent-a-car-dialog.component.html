@@ -13,8 +13,7 @@
     </mat-form-field>
     <br>
     <mat-form-field>
-        <mat-icon matSuffix color="primary">location_on</mat-icon>
-        <input matInput type="text" formControlName="address" placeholder="Address" required>
+        <input matInput type="search" id="address-input" formControlName="address" placeholder="Address" required>
         <mat-error *ngIf="rentACarForm.get('address').invalid && (rentACarForm.get('address').dirty || rentACarForm.get('address').touched)">
             <div *ngIf="rentACarForm.get('address').errors.required"> Address is required.</div>
         </mat-error>

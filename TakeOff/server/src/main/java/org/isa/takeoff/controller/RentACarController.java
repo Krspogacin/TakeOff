@@ -10,12 +10,14 @@ import org.isa.takeoff.dto.RentACarDTO;
 import org.isa.takeoff.dto.RentACarMainServiceDTO;
 import org.isa.takeoff.dto.VehicleDTO;
 import org.isa.takeoff.dto.VehiclePriceDTO;
+import org.isa.takeoff.model.Location;
 import org.isa.takeoff.model.RentACar;
 import org.isa.takeoff.model.RentACarMainService;
 import org.isa.takeoff.model.RentACarRating;
 import org.isa.takeoff.model.Vehicle;
 import org.isa.takeoff.model.VehiclePrice;
 import org.isa.takeoff.model.VehicleRating;
+import org.isa.takeoff.service.LocationService;
 import org.isa.takeoff.service.RentACarMainServiceService;
 import org.isa.takeoff.service.RentACarService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,9 @@ public class RentACarController
 {
 	@Autowired
 	private RentACarService rentACarService;
+	
+	@Autowired
+	private LocationService locationService;
 	
 	@Autowired
 	private RentACarMainServiceService rentACarMainServiceService;
@@ -120,7 +125,22 @@ public class RentACarController
 	//@PreAuthorize("hasRole('SYS_ADMIN')")
 	public ResponseEntity<RentACarDTO> addRentACar(@RequestBody RentACarDTO rentACarDTO) 
 	{
+		if (rentACarDTO.getLocation() == null)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
 		RentACar rentACar = new RentACar(rentACarDTO);
+		Location location = this.locationService.findOneByLatitudeAndLongitude(rentACarDTO.getLocation().getLatitude(),
+																			   rentACarDTO.getLocation().getLongitude());
+		
+		if (location == null) 
+		{
+			location = new Location(rentACarDTO.getLocation());
+			location = this.locationService.save(location);
+		}
+		
+		rentACar.setLocation(location);
 		rentACar = rentACarService.save(rentACar);
 		return new ResponseEntity<>(new RentACarDTO(rentACar), HttpStatus.OK);
 	}
@@ -129,11 +149,30 @@ public class RentACarController
 	//@PreAuthorize("hasRole('RENTACAR_ADMIN')")
 	public ResponseEntity<RentACarDTO> updateRentACar(@RequestBody RentACarDTO rentACarDTO) 
 	{
+		if (rentACarDTO.getLocation() == null)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
 		try 
 		{
 			RentACar rentACar = rentACarService.findOne(rentACarDTO.getId());
+
+			if (rentACarDTO.getLocation().getId() == null)
+			{				
+				Location location = this.locationService.findOneByLatitudeAndLongitude(rentACarDTO.getLocation().getLatitude(),
+						   			rentACarDTO.getLocation().getLongitude());
+	
+				System.out.println(location);
+				if (location == null) 
+				{
+					location = new Location(rentACarDTO.getLocation());
+					location = this.locationService.save(location);
+				}
+				rentACar.setLocation(location);
+			}
+			
 			rentACar.setName(rentACarDTO.getName());
-			rentACar.setAddress(rentACarDTO.getAddress());
 			rentACar.setDescription(rentACarDTO.getDescription());
 			rentACar = rentACarService.save(rentACar);
 			return new ResponseEntity<>(new RentACarDTO(rentACar), HttpStatus.OK);

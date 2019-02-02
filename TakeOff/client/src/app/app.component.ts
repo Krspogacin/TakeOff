@@ -17,10 +17,10 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.authenticationService.onSubject.subscribe(
-      (data) => {
-        if (data.value) {
-          this.username = data.value.username;
-          this.profileImage = data.value.image;
+      () => {
+        if (this.authenticationService.getUsername()) {
+           this.username = this.authenticationService.getUsername();
+           this.profileImage = this.authenticationService.getProfileImage();
         } else {
           this.username = null;
         }
@@ -44,7 +44,7 @@ export class AppComponent implements OnInit {
 
   sortArray(array: any, sortBy: string, asc: boolean) {
     if (!Array.isArray(array) || array.length === 0) {
-      return;
+      return [];
     }
     array.sort((a: any, b: any) => {
       let val1 = a[sortBy];

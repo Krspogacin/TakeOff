@@ -56,7 +56,10 @@ export class RentACarComponent implements OnInit {
           this.userRole = this.authService.getAuthority();
           this.rentACarExists = true;
           this.url = this.sanitizer.bypassSecurityTrustResourceUrl(
-                    'https://maps.google.com/maps?q=' + this.rentACar.address + '&t=&z=11&ie=UTF8&iwloc=&output=embed');
+                    'https://maps.google.com/maps?q=' +
+                    this.rentACar.location.latitude + ', ' +
+                    this.rentACar.location.longitude +
+                    '&t=&z=11&ie=UTF8&iwloc=&output=embed');
           this.rentACarService.getRentACarRating(id).subscribe(
             (rating: number) => {
               this.rating = rating;
