@@ -71,11 +71,6 @@ public class UserService implements UserDetailsService
 		return this.administratorRepository.findByUsername(username);
 	}
 	
-	public Administrator findByEmailAdmin(String email) 
-	{
-		return this.administratorRepository.findByEmail(email);
-	}
-	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException 
 	{

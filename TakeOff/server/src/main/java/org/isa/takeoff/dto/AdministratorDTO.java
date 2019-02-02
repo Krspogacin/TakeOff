@@ -7,23 +7,21 @@ public class AdministratorDTO
 	private Long id;
 	private String username;
 	private String password;
-	private String email;
 	private AirCompanyDTO airCompanyDTO;
 	private HotelDTO hotelDTO;
 	private RentACarDTO rentACarDTO;
 	
 	public AdministratorDTO() { }
 	
-	public AdministratorDTO(Long id, String username, String password, String email) {
+	public AdministratorDTO(Long id, String username, String password) {
 		this.id = id;
 		this.username = username;
 		this.password = password;
-		this.email = email;
 	}
 	
 	public AdministratorDTO(Administrator admin)
 	{
-		this(admin.getId(), admin.getUsername(), admin.getPassword(), admin.getEmail());
+		this(admin.getId(), admin.getUsername(), admin.getPassword());
 	}
 
 	public Long getId() {
@@ -48,14 +46,6 @@ public class AdministratorDTO
 
 	public void setPassword(String password) {
 		this.password = password;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
 	}
 
 	public AirCompanyDTO getAirCompanyDTO() {

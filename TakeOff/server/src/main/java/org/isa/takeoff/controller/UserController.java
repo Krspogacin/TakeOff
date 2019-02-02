@@ -46,11 +46,9 @@ public class UserController {
 	private UserService userService;
 
 	@Autowired
-	private AdministratorService administratorService;
-
-	@Autowired
 	private AuthorityService authorityService;
 
+	@Autowired
 	private AirCompanyService airCompanyService;
 	
 	@Autowired
@@ -58,9 +56,6 @@ public class UserController {
 	
 	@Autowired
 	private RentACarService rentACarService;
-
-	@Autowired
-	private AuthorityService authorityService;
 
 	@Autowired
 	private EmailService emailService;
@@ -122,12 +117,7 @@ public class UserController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
-		Administrator admin = this.userService.findByEmailAdmin(email);
-		if (admin != null) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		} else {
-			return new ResponseEntity<>(HttpStatus.OK);
-		}
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@RequestMapping(method = POST, value = "/register", consumes = "application/json")
@@ -191,7 +181,7 @@ public class UserController {
 	@RequestMapping(method = RequestMethod.PUT)
 	public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userDTO) {
 
-		User user = userService.findByUsername(userDTO.getUsername());
+		User user = userService.findByUsernameUser(userDTO.getUsername());
 
 		if (user != null) {
 			user.setFirstName(userDTO.getFirstName());
@@ -213,7 +203,7 @@ public class UserController {
 	@RequestMapping(method = GET, value = "/{username}/friends")
 	public ResponseEntity<List<FriendDTO>> getUserFriends(@PathVariable String username) {
 
-		User user1 = userService.findByUsername(username);
+		User user1 = userService.findByUsernameUser(username);
 
 		if (user1 != null) {
 			List<Friend> friends = new ArrayList<>();
@@ -234,8 +224,8 @@ public class UserController {
 	@RequestMapping(method = POST, value = "/friends")
 	public ResponseEntity<FriendDTO> sendFriendRequest(@RequestBody FriendDTO friendDTO) {
 
-		User user1 = userService.findByUsername(friendDTO.getUser1().getUsername());
-		User user2 = userService.findByUsername(friendDTO.getUser2().getUsername());
+		User user1 = userService.findByUsernameUser(friendDTO.getUser1().getUsername());
+		User user2 = userService.findByUsernameUser(friendDTO.getUser2().getUsername());
 
 		if (user1 != null && user2 != null) {
 			Friend friend = new Friend(user1, user2);
@@ -252,8 +242,8 @@ public class UserController {
 	@RequestMapping(method = RequestMethod.PUT, value = "/friends")
 	public ResponseEntity<FriendDTO> acceptFriendRequest(@RequestBody FriendDTO friendDTO) {
 
-		User user1 = userService.findByUsername(friendDTO.getUser1().getUsername());
-		User user2 = userService.findByUsername(friendDTO.getUser2().getUsername());
+		User user1 = userService.findByUsernameUser(friendDTO.getUser1().getUsername());
+		User user2 = userService.findByUsernameUser(friendDTO.getUser2().getUsername());
 
 		if (user1 != null && user2 != null) {
 			List<Friend> friends = user1.getFriends();
@@ -276,8 +266,8 @@ public class UserController {
 	@RequestMapping(method = RequestMethod.PUT, value = "/friends/delete")
 	public ResponseEntity<FriendDTO> deleteFriendRequest(@RequestBody FriendDTO friendDTO) {
 
-		User user1 = userService.findByUsername(friendDTO.getUser1().getUsername());
-		User user2 = userService.findByUsername(friendDTO.getUser2().getUsername());
+		User user1 = userService.findByUsernameUser(friendDTO.getUser1().getUsername());
+		User user2 = userService.findByUsernameUser(friendDTO.getUser2().getUsername());
 
 		if (user1 != null && user2 != null) {
 			List<Friend> friends = user1.getFriends();
@@ -300,7 +290,6 @@ public class UserController {
 		Administrator admin = new Administrator();
 		admin.setUsername(adminDTO.getUsername());
 		admin.setPassword(passwordEncoder.encode(adminDTO.getPassword()));
-		admin.setEmail("random@gmail.com");
 		if (this.userService.findByUsernameAdmin(admin.getUsername()) != null) {
 			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		}

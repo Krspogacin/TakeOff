@@ -6,8 +6,6 @@
                 <div *ngIf="userRole && userRole === 'ROLE_SYS_ADMIN'">
                 <button mat-button (click)="open()">Create new system admin</button>&nbsp;&nbsp;
                 </div>
-                <button mat-raised-button style="background-color: orange; color: white;">Login</button>&nbsp;&nbsp;
-                <button mat-raised-button style="background-color: orange; color: white;">Registration</button>
 
                 <div *ngIf="username">
                         <button mat-button [matMenuTriggerFor]="menu">

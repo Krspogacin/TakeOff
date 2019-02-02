@@ -3,3 +3,5 @@ INSERT INTO AUTHORITY (id, name) VALUES (2, 'ROLE_SYS_ADMIN');
 INSERT INTO AUTHORITY (id, name) VALUES (3, 'ROLE_AIRCOMPANY_ADMIN');
 INSERT INTO AUTHORITY (id, name) VALUES (4, 'ROLE_HOTEL_ADMIN');
 INSERT INTO AUTHORITY (id, name) VALUES (5, 'ROLE_RENTACAR_ADMIN');
+
+INSERT INTO `takeoff`.`administrator`(`password`,`username`,`authority_id`) VALUES ('$2a$10$W07Myhd5tmmRA1ohf92vce0Vae8Xtgjtk9M.1md/dHf2AUR1zzNXm','sys_admin', 2);

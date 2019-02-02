@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthenticationService } from './services/authentication/authentication.service';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar, MatDialog } from '@angular/material';
+import { SysAdminDialogComponent } from './components/sys-admin-dialog/sys-admin-dialog.component';
 
 @Component({
   selector: 'app-root',
@@ -11,16 +12,18 @@ export class AppComponent implements OnInit {
   title = 'AngularTakeOff';
   username: string;
   profileImage: string;
+  userRole: string;
 
   constructor(private authenticationService: AuthenticationService,
-              public snackBar: MatSnackBar) { }
+    public snackBar: MatSnackBar, public dialog: MatDialog) { }
 
   ngOnInit() {
     this.authenticationService.onSubject.subscribe(
       () => {
         if (this.authenticationService.getUsername()) {
-           this.username = this.authenticationService.getUsername();
-           this.profileImage = this.authenticationService.getProfileImage();
+          this.username = this.authenticationService.getUsername();
+          this.profileImage = this.authenticationService.getProfileImage();
+          this.userRole = this.authenticationService.getAuthority();
         } else {
           this.username = null;
         }
@@ -28,6 +31,11 @@ export class AppComponent implements OnInit {
     );
     this.username = this.authenticationService.getUsername();
     this.profileImage = this.authenticationService.getProfileImage();
+    this.userRole = this.authenticationService.getAuthority();
+  }
+
+  open() {
+    const dialogRef = this.dialog.open(SysAdminDialogComponent, { disableClose: true });
   }
 
   showSnackBar(message: string) {
