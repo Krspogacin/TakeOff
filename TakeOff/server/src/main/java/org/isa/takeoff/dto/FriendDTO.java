@@ -13,7 +13,7 @@ public class FriendDTO {
 	}
 
 	public FriendDTO(Friend friend) {
-		this(new UserDTO(friend.getUser1()), new UserDTO(friend.getUser2()), friend.isAccepted());
+		this(new UserDTO(friend.getId().getUser1()), new UserDTO(friend.getId().getUser2()), friend.isAccepted());
 	}
 
 	public FriendDTO(UserDTO user1, UserDTO user2, boolean accepted) {

@@ -73,8 +73,8 @@ export class FlightDialogComponent implements OnInit {
 
   filterDestinations(value: string): Destination[] {
     const filterValue = value.toLowerCase();
-    return this.allDestinations.filter(dest => dest.city.toLowerCase().includes(filterValue) ||
-      dest.country.toLowerCase().includes(filterValue));
+    return this.allDestinations.filter(dest => dest.city.toLowerCase().indexOf(filterValue) === 0 ||
+      dest.country.toLowerCase().indexOf(filterValue) === 0);
   }
 
   removeDestination(destination: Destination): void {

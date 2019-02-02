@@ -4,6 +4,7 @@ import { FlightService } from 'src/app/services/flight/flight.service';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { FlightDialogComponent } from '../flight-dialog/flight-dialog.component';
+import { FlightReservationComponent } from '../flight-reservation/flight-reservation.component';
 
 declare let SeatchartJS: any;
 
@@ -163,10 +164,40 @@ export class FlightComponent implements OnInit {
   }
 
   bookFlight() {
-    this.message = 'Work in progress';
-    this.showSnackBar();
 
-    // show stepper ...
+    let seats = 0;
+    if (!this.sc) {
+      return;
+
+    } else {
+      // check if cart is empty
+      const cart = this.sc.getShoppingCart();
+      console.log(cart);
+
+      for (let i = 0; i < this.types.length; i++) {
+        seats += cart[this.types[i]['type']].length;
+      }
+
+      if (seats === 0) {
+        this.message = 'Please first select one or more seats.';
+        this.showSnackBar();
+        return;
+      }
+    }
+
+    const dialogRef = this.dialog.open(FlightReservationComponent,
+      {
+        data: seats,
+        disableClose: true,
+        autoFocus: true,
+        width: '60%'
+      });
+
+    dialogRef.afterClosed().subscribe(
+      (data) => {
+        // ........
+      }
+    );
   }
 
   showSnackBar() {

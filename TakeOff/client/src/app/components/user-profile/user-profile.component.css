@@ -1,5 +1,5 @@
 .profile-header {
-    padding-left: 80px;
+    padding-left: 40px;
 }
 .profile-img {
     width: 250px;
@@ -34,4 +34,9 @@
     padding-left: 30px;
     float: none;
     width: 630px;
+}
+
+#submit {
+    width: 120px;
+    /* float: right; */
 }

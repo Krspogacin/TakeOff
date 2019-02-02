@@ -32,7 +32,7 @@ import { VehicleDialogComponent } from './components/vehicle-dialog/vehicle-dial
         RentACarComponent,
         RentACarDialogComponent,
         VehicleDialogComponent,
-        AddHotelModalComponent,
+        AddHotelModalComponent
     ],
     entryComponents: [
         RoutingComponents,

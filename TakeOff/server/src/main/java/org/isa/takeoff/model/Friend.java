@@ -4,43 +4,39 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.Version;
 
 @Entity
-public class Friend implements Serializable{
+public class Friend implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@ManyToOne
-	@JoinColumn(name = "user_1_id", referencedColumnName = "id")
-	private User user1;
-
-	@Id
-	@ManyToOne
-	@JoinColumn(name = "user_2_id", referencedColumnName = "id")
-	private User user2;
+	@EmbeddedId
+	private FriendId id;
 
 	@Column(name = "accepted")
 	private boolean accepted;
 
-	public User getUser1() {
-		return user1;
+	@Version
+	private Long version;
+
+	public Friend() {
+
 	}
 
-	public void setUser1(User user1) {
-		this.user1 = user1;
+	public Friend(User user1, User user2) {
+		this.id = new FriendId(user1, user2);
+		this.accepted = false;
 	}
 
-	public User getUser2() {
-		return user2;
+	public FriendId getId() {
+		return id;
 	}
 
-	public void setUser2(User user2) {
-		this.user2 = user2;
+	public void setId(FriendId id) {
+		this.id = id;
 	}
 
 	public boolean isAccepted() {
@@ -49,6 +45,14 @@ public class Friend implements Serializable{
 
 	public void setAccepted(boolean accepted) {
 		this.accepted = accepted;
+	}
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 
 	@Override
@@ -60,12 +64,12 @@ public class Friend implements Serializable{
 			return false;
 
 		Friend that = (Friend) o;
-		return Objects.equals(user1, that.user1) && Objects.equals(user2, that.user2);
+		return Objects.equals(getId(), that.getId());
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(user1, user2);
+		return Objects.hash(getId());
 	}
 
 }

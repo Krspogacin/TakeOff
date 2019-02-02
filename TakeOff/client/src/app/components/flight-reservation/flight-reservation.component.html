@@ -1,0 +1,54 @@
+<div *ngIf="!loading">
+  <h1 mat-dialog-title>Flight reservation</h1>
+  <mat-dialog-content [formGroup]="">
+    <mat-horizontal-stepper linear labelPosition="bottom">
+      <mat-step label="Step 1" state="phone" *ngIf="seats.length > 1">
+        <div class="step">
+          <h3>Invite friends with you</h3>
+          <mat-hint>{{seats.length-friendList.selectedOptions.selected.length-1}} free seat(s)</mat-hint>
+          <mat-selection-list #friendList (selectionChange)="selectionChange($event.option)">
+            <mat-list-option *ngFor="let friend of friends" [value]="friend.user2.id">
+              <img matListAvatar src="{{friend.user1.id === user.id ? friend.user2.image : friend.user1.image}}" alt="">
+              <h3 matLine> {{friend.user1.id === user.id ? friend.user2.firstName : friend.user1.firstName}}
+                {{friend.user1.id === user.id ? friend.user2.lastName : friend.user1.lastName}}</h3>
+            </mat-list-option>
+          </mat-selection-list>
+        </div>
+        <br>
+        <div>
+          <button mat-raised-button [mat-dialog-close] type="button">Cancel</button>
+          <button mat-raised-button color="primary" matStepperNext type="button">Next</button>
+        </div>
+      </mat-step>
+
+      <mat-step label="Step 2" state="chat">
+        <div class="step">
+          <p>Second content</p>
+          <div style="height: 400px;"></div>
+        </div>
+        <div>
+          <button mat-button matStepperPrevious *ngIf="seats.length > 1">Back</button>
+          <button mat-raised-button color="primary" matStepperNext type="button">Next</button>
+        </div>
+      </mat-step>
+      <mat-step label="Step 3">
+        <div class="step">
+          <p>Third content</p>
+        </div>
+        <div>
+          <button mat-button matStepperPrevious>Back</button>
+          <button mat-raised-button color="primary" [mat-dialog-close] type="button">Finish</button>
+        </div>
+      </mat-step>
+
+      <!-- Icon overrides. -->
+      <ng-template matStepperIcon="phone">
+        <mat-icon>call_end</mat-icon>
+      </ng-template>
+      <ng-template matStepperIcon="chat">
+        <mat-icon>forum</mat-icon>
+      </ng-template>
+
+    </mat-horizontal-stepper>
+  </mat-dialog-content>
+</div>

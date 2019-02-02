@@ -383,7 +383,8 @@ function SeatchartJS(seatMap, seatTypes) { // eslint-disable-line no-unused-vars
     * @returns {Object.<string, Array.<int>>} An object containing all seats added to the shopping cart, mapped by seat type.
     */
     this.getShoppingCart = function getShoppingCart() {
-        return shoppingCart;
+        // return shoppingCart;
+        return shoppingCartDict;
     };
 
     /**

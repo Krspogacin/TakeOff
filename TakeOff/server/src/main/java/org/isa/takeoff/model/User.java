@@ -71,10 +71,10 @@ public class User implements UserDetails {
 	@Column(name = "enabled", nullable = false)
 	private boolean enabled;
 
-	@OneToMany(mappedBy = "user1", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "id.user1", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Friend> friends = new HashSet<>();
-	
-	@OneToMany(mappedBy = "user2", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+
+	@OneToMany(mappedBy = "id.user2", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Friend> friendsOf = new HashSet<>();
 
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -220,6 +220,22 @@ public class User implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 		return enabled;
+	}
+
+	public void addFriend(Friend friend) {
+		this.friends.add(friend);
+	}
+
+	public void removeFriend(Friend friend) {
+		this.friends.remove(friend);
+	}
+
+	public void addFriendOf(Friend friend) {
+		this.friendsOf.add(friend);
+	}
+
+	public void removeFriendOf(Friend friend) {
+		this.friendsOf.remove(friend);
 	}
 
 	public List<Friend> getFriends() {

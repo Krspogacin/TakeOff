@@ -15,6 +15,8 @@ import { HomepageComponent } from './components/homepage/homepage.component';
 import { AirCompanyDialogComponent } from './components/air-company-dialog/air-company-dialog.component';
 import { FlightDialogComponent } from './components/flight-dialog/flight-dialog.component';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
+import { AirCompaniesComponent } from './components/air-companies/air-companies.component';
+import { FlightReservationComponent } from './components/flight-reservation/flight-reservation.component';
 
 const routes: Routes = [
   { path: '', component: HomepageComponent },
@@ -36,7 +38,8 @@ const routes: Routes = [
 })
 export class AppRoutingModule { }
 
-export const RoutingComponents = [AirCompanyComponent,
+export const RoutingComponents = [
+  AirCompanyComponent,
   NotFoundComponent,
   RegistrationComponent,
   FlightComponent,
@@ -48,4 +51,6 @@ export const RoutingComponents = [AirCompanyComponent,
   HomepageComponent,
   AirCompanyDialogComponent,
   FlightDialogComponent,
-  UserProfileComponent];
+  UserProfileComponent,
+  AirCompaniesComponent,
+  FlightReservationComponent];
