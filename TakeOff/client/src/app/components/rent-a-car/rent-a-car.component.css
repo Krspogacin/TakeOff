@@ -12,12 +12,6 @@
     margin: 5px;
 }
 
-.vehicle-card {
-    width: 25%;
-    height: 100%;
-    margin: 2%;
-}
-
 .wiggle-button {
     animation: wiggle 2s linear infinite;
 }

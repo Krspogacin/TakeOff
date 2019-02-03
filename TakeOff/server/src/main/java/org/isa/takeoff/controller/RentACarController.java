@@ -6,11 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.isa.takeoff.dto.OfficeDTO;
 import org.isa.takeoff.dto.RentACarDTO;
 import org.isa.takeoff.dto.RentACarMainServiceDTO;
 import org.isa.takeoff.dto.VehicleDTO;
 import org.isa.takeoff.dto.VehiclePriceDTO;
 import org.isa.takeoff.model.Location;
+import org.isa.takeoff.model.Office;
 import org.isa.takeoff.model.RentACar;
 import org.isa.takeoff.model.RentACarMainService;
 import org.isa.takeoff.model.RentACarRating;
@@ -18,6 +20,7 @@ import org.isa.takeoff.model.Vehicle;
 import org.isa.takeoff.model.VehiclePrice;
 import org.isa.takeoff.model.VehicleRating;
 import org.isa.takeoff.service.LocationService;
+import org.isa.takeoff.service.OfficeService;
 import org.isa.takeoff.service.RentACarMainServiceService;
 import org.isa.takeoff.service.RentACarService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,32 +46,25 @@ public class RentACarController
 	@Autowired
 	private RentACarMainServiceService rentACarMainServiceService;
 	
-	@RequestMapping(method = GET, value = "/checkName/{name}")
-	public ResponseEntity<?> checkName(@PathVariable String name)
-	{
-		RentACar rentACar = this.rentACarService.findByName(name);
-		if (rentACar != null)
-		{
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		else
-		{
-			return new ResponseEntity<>(HttpStatus.OK);
-		}
-	}
+	@Autowired
+	private OfficeService officeService;
 	
-	@RequestMapping(method = GET, value = "/checkMainServiceName/{name}")
-	public ResponseEntity<?> checkMainServiceName(@PathVariable String name)
+	@RequestMapping(method = GET, value = "/checkMainServiceName/{id}/{name}")
+	public ResponseEntity<?> checkMainServiceName(@PathVariable("id") Long id, @PathVariable("name") String name)
 	{
 		RentACarMainService rentACarMainService = this.rentACarMainServiceService.findByName(name);
 		if (rentACarMainService != null)
 		{
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			if (id != null && rentACarMainService.getId().equals(id)) 
+			{
+				return new ResponseEntity<>(HttpStatus.OK);
+			}
+			else
+			{
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
 		}
-		else
-		{
-			return new ResponseEntity<>(HttpStatus.OK);
-		}
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -163,7 +159,6 @@ public class RentACarController
 				Location location = this.locationService.findOneByLatitudeAndLongitude(rentACarDTO.getLocation().getLatitude(),
 						   			rentACarDTO.getLocation().getLongitude());
 	
-				System.out.println(location);
 				if (location == null) 
 				{
 					location = new Location(rentACarDTO.getLocation());
@@ -363,6 +358,109 @@ public class RentACarController
 			return new ResponseEntity<>(HttpStatus.OK);
 		}
 		catch (Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value = "/offices", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<OfficeDTO> addOffice(@RequestBody OfficeDTO officeDTO) 
+	{
+		if (officeDTO.getRentACar() == null || officeDTO.getLocation() == null)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+		try 
+		{
+			RentACar rentACar = this.rentACarService.findOne(officeDTO.getRentACar().getId());
+			Location location = this.locationService.findOneByLatitudeAndLongitude(officeDTO.getLocation().getLatitude(),
+																				   officeDTO.getLocation().getLongitude());
+			if (location == null) 
+			{
+				location = new Location(officeDTO.getLocation());
+				location = this.locationService.save(location);
+			}
+			
+			Office office = new Office(officeDTO.getName());
+			office.setRentACar(rentACar);
+			office.setLocation(location);
+			office = this.officeService.save(office); 
+			return new ResponseEntity<>(new OfficeDTO(office), HttpStatus.OK);
+		}
+		catch (Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value = "/offices", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<OfficeDTO> updateOffice(@RequestBody OfficeDTO officeDTO) 
+	{
+		if (officeDTO.getRentACar() == null || officeDTO.getLocation() == null)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+		try 
+		{
+			Office office = this.officeService.findOne(officeDTO.getId());
+			
+			if (officeDTO.getLocation().getId() == null)
+			{				
+				Location location = this.locationService.findOneByLatitudeAndLongitude(officeDTO.getLocation().getLatitude(),
+																					   officeDTO.getLocation().getLongitude());
+	
+				if (location == null) 
+				{
+					location = new Location(officeDTO.getLocation());
+					location = this.locationService.save(location);
+				}
+				office.setLocation(location);
+			}
+			
+			office.setName(officeDTO.getName());
+			office = this.officeService.save(office);
+			return new ResponseEntity<>(new OfficeDTO(office), HttpStatus.OK);
+		}
+		catch (Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	
+	
+	@RequestMapping(value = "/offices/{id}", method = RequestMethod.DELETE)
+	public ResponseEntity<?> deleteOffice(@PathVariable Long id) 
+	{
+		try 
+		{
+			this.officeService.delete(id);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		catch (Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value = "/{id}/offices", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<OfficeDTO>> getOffices(@PathVariable Long id) 
+	{
+		try 
+		{
+			RentACar rentACar = rentACarService.findOne(id);
+			List<Office> offices = rentACar.getOffices();
+			
+			List<OfficeDTO> officeDTO = new ArrayList<>();
+			for (Office office : offices)
+			{
+				officeDTO.add(new OfficeDTO(office));
+			}
+			return new ResponseEntity<>(officeDTO, HttpStatus.OK);
+		}
+		catch (Exception e) 
 		{
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}

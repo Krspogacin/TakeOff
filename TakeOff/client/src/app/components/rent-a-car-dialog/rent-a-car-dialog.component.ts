@@ -16,21 +16,21 @@ export class RentACarDialogComponent implements OnInit {
   update = true;
   location: any = {};
 
-  constructor(private rentACarService: RentACarService,
-              private dialogRef: MatDialogRef<RentACarDialogComponent>,
+  constructor(private dialogRef: MatDialogRef<RentACarDialogComponent>,
               private formBuilder: FormBuilder,
               @Inject(MAT_DIALOG_DATA) public rentACar: any) { }
 
     ngOnInit(): void {
       if (!this.rentACar) {
-        this.rentACar = {'name': '', 'location': {'value' : ''}, 'description': ''};
+        this.rentACar = {'name': '', 'location': {'address' : ''}, 'description': ''};
         this.update = false;
       } else {
-        this.location = this.rentACar.location;
+        this.location = JSON.parse(JSON.stringify(this.rentACar.location));
       }
+
       this.rentACarForm = this.formBuilder.group({
          name: [this.rentACar.name, Validators.required],
-         address: [this.rentACar.location.value, Validators.required],
+         address: [this.rentACar.location.address, Validators.required],
          description: [this.rentACar.description]
       });
 
@@ -57,20 +57,12 @@ export class RentACarDialogComponent implements OnInit {
     }
 
     submitForm() {
-      const nameControl: AbstractControl = this.rentACarForm.get('name');
-      this.rentACarService.checkName(nameControl.value).subscribe(
-        () => {
-          const rentACar = this.rentACarForm.value;
-          delete rentACar['address'];
-          rentACar.location = this.location;
-          rentACar.id = this.rentACar.id;
-          this.dialogRef.close(rentACar);
-        },
-        () => {
-          nameControl.setErrors({ nameExists: true });
-          const element = document.getElementById('scrollId');
-          element.scrollTo(0, 0);
-        }
-      );
+      if (this.rentACarForm.valid) {
+        const rentACar = this.rentACarForm.value;
+        delete rentACar['address'];
+        rentACar.location = this.location;
+        rentACar.id = this.rentACar.id;
+        this.dialogRef.close(rentACar);
+      }
     }
 }

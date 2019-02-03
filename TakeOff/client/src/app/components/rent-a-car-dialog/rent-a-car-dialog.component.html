@@ -5,11 +5,7 @@
         <input matInput type="text" formControlName="name" placeholder="Name" required>
         <mat-error *ngIf="rentACarForm.get('name').invalid && (rentACarForm.get('name').dirty || rentACarForm.get('name').touched)">
             <div *ngIf="rentACarForm.get('name').errors.required"> Name is required.</div>
-            <div *ngIf="rentACarForm.get('name').errors.nameExists"> Rent A Car with name <i>{{rentACarForm.value.name}}</i> already exists.<br></div>
         </mat-error>
-        <mat-hint>
-                Rent A Car name must be unique. <br>
-        </mat-hint>
     </mat-form-field>
     <br>
     <mat-form-field>

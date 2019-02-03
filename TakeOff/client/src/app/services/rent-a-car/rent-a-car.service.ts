@@ -8,12 +8,11 @@ export class RentACarService {
 
   constructor(private http: HttpClient) { }
 
-  checkName(name: string) {
-    return this.http.get('/rent-a-cars/checkName/' + name);
-  }
-
-  checkMainServiceName(name: string) {
-    return this.http.get('/rent-a-cars/checkMainServiceName/' + name);
+  checkMainServiceName(id: number, name: string) {
+    if (isNaN(id)) {
+      id = null;
+    }
+    return this.http.get('/rent-a-cars/checkMainServiceName/' + + id + '/' + name);
   }
 
   getRentACarById(id: number) {
@@ -63,7 +62,24 @@ export class RentACarService {
   getMainServices(id: number) {
     return this.http.get('rent-a-cars/' + id + '/mainServices');
   }
+
   getMainServicesPrices(id: number) {
     return this.http.get('rent-a-cars/' + id + '/mainServicesPrices');
+  }
+
+  addOffice(office: any) {
+    return this.http.post('/rent-a-cars/offices', office);
+  }
+
+  updateOffice(office: any) {
+    return this.http.put('/rent-a-cars/offices', office);
+  }
+
+  deleteOffice(id: number) {
+    return this.http.delete('/rent-a-cars/offices/' + id);
+  }
+
+  getOffices(id: number) {
+    return this.http.get('rent-a-cars/' + id + '/offices');
   }
 }

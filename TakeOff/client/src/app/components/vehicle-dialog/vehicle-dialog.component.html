@@ -64,6 +64,11 @@
             </mat-error>
         </mat-form-field>
         <br>
+        <mat-hint>
+            Define discount in range 0 - 100%:
+        </mat-hint>
+        <mat-slider thumbLabel [displayWith]="formatLabel" formControlName="discount" min="{{minDiscount}}" max="{{maxDiscount}}"></mat-slider>
+        <br>
         <h3>Enter prices for this vehicle: </h3>
         <div class="box">
             <mat-list>

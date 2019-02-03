@@ -54,6 +54,9 @@ public class Vehicle
 	@Column(name="reserved", nullable = false)
 	private boolean reserved;
 	
+	@Column(name="discount", nullable = true)
+	private Double discount;
+	
 	@OneToMany(mappedBy = "vehicle", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<VehicleReservation> vehicleReservations = new HashSet<>();
 	
@@ -77,7 +80,7 @@ public class Vehicle
 	public Vehicle() { }
 
 	public Vehicle(String brand, String model, Integer year, FuelType fuel, Integer numOfSeats, 
-				   TransmissionType transmission, boolean reserved, byte[] image) {
+				   TransmissionType transmission, boolean reserved, Double discount, byte[] image) {
 		this.brand = brand;
 		this.model = model;
 		this.year = year;
@@ -85,13 +88,15 @@ public class Vehicle
 		this.numOfSeats = numOfSeats;
 		this.transmission = transmission;
 		this.reserved = reserved;
+		this.discount = discount;
 		this.image = image;
 	}
 	
 	public Vehicle(VehicleDTO vehicleDTO)
 	{
 		this(vehicleDTO.getBrand(), vehicleDTO.getModel(), vehicleDTO.getYear(), vehicleDTO.getFuel(), vehicleDTO.getNumOfSeats(),
-			 vehicleDTO.getTransmission(), vehicleDTO.isReserved(), (vehicleDTO.getImage() == null) ? null : vehicleDTO.getImage().getBytes(StandardCharsets.UTF_8));
+			 vehicleDTO.getTransmission(), vehicleDTO.isReserved(), vehicleDTO.getDiscount(),
+			 (vehicleDTO.getImage() == null) ? null : vehicleDTO.getImage().getBytes(StandardCharsets.UTF_8));
 	}
 
 	public Long getId() {
@@ -156,6 +161,14 @@ public class Vehicle
 
 	public void setReserved(boolean reserved) {
 		this.reserved = reserved;
+	}
+
+	public Double getDiscount() {
+		return discount;
+	}
+
+	public void setDiscount(Double discount) {
+		this.discount = discount;
 	}
 
 	public List<VehicleReservation> getVehicleReservations() {

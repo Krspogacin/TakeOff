@@ -23,6 +23,7 @@ import { LogoutComponent } from './components/logout/logout.component';
 import { RentACarsComponent } from './components/rent-a-cars/rent-a-cars.component';
 import { NameFilterPipe } from './pipes/name-filter.pipe';
 import { RentACarMainServiceDialogComponent } from './components/rent-a-car-main-service-dialog/rent-a-car-main-service-dialog.component';
+import { OfficeDialogComponent } from './components/office-dialog/office-dialog.component';
 
 @NgModule({
     declarations: [
@@ -41,6 +42,7 @@ import { RentACarMainServiceDialogComponent } from './components/rent-a-car-main
         RentACarsComponent,
         NameFilterPipe,
         RentACarMainServiceDialogComponent,
+        OfficeDialogComponent,
     ],
     entryComponents: [
         RoutingComponents,
@@ -49,7 +51,8 @@ import { RentACarMainServiceDialogComponent } from './components/rent-a-car-main
         RentACarDialogComponent,
         VehicleDialogComponent,
         AddHotelModalComponent,
-        RentACarMainServiceDialogComponent
+        RentACarMainServiceDialogComponent,
+        OfficeDialogComponent
     ],
     imports: [
         BrowserModule,

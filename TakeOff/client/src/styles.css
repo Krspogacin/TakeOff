@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import "~bootstrap/dist/css/bootstrap.css";
 
 .fields-container {
     display: flex;
@@ -69,14 +70,20 @@ body{
 .star-ratings-css {
     unicode-bidi: bidi-override;
     color: #c5c5c5;
-    font-size: 30px;
-    position: relative;
+    font-size: 25px;
     text-shadow: 0px 1px 0 #a2a2a2;
+    display: inline-block;
+    word-wrap: normal;
 }
 .star-ratings-css-top {
     color: #e7711b;
     position: absolute;
     z-index: 1;
+    overflow: hidden;
+}
+
+.star-ratings-css-top > span {
+    display: inline-block;
     overflow: hidden;
 }
 

@@ -1,0 +1,21 @@
+<h1 mat-dialog-title *ngIf="!update">Add office</h1>
+<h1 mat-dialog-title *ngIf="update">Update office</h1>
+<mat-dialog-content [formGroup]="officeForm" class="fields-container" id="scrollId">
+    <mat-form-field>
+        <input matInput type="text" formControlName="name" placeholder="Name" required>
+        <mat-error *ngIf="officeForm.get('name').invalid && (officeForm.get('name').dirty || officeForm.get('name').touched)">
+            <div *ngIf="officeForm.get('name').errors.required"> Name is required.</div>
+        </mat-error>
+    </mat-form-field>
+    <br>
+    <mat-form-field>
+        <input matInput type="search" id="address-input" formControlName="address" placeholder="Address" required>
+        <mat-error *ngIf="officeForm.get('address').invalid && (officeForm.get('address').dirty || officeForm.get('address').touched)">
+            <div *ngIf="officeForm.get('address').errors.required"> Address is required.</div>
+        </mat-error>
+    </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-raised-button color="primary" type="submit" (click)="submitForm()" [disabled]="officeForm.invalid">Confirm</button>
+  <button mat-raised-button [mat-dialog-close]>Cancel</button>
+</mat-dialog-actions>
