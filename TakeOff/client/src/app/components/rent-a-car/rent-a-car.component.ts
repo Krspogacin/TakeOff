@@ -10,6 +10,7 @@ import { AppComponent } from 'src/app/app.component';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
 import { RentACarMainServiceDialogComponent } from '../rent-a-car-main-service-dialog/rent-a-car-main-service-dialog.component';
+import { OfficeDialogComponent } from '../office-dialog/office-dialog.component';
 
 @Component({
   selector: 'app-rent-a-car',
@@ -30,7 +31,7 @@ export class RentACarComponent implements OnInit {
   pageIndex = 0;
   pageOptions = [5, 10, 25];
   rating: number;
-  url: SafeResourceUrl;
+  mapUrl: SafeResourceUrl;
   mainServicesDataSource = [];
   columns = [];
   displayedColumns = [];
@@ -38,6 +39,9 @@ export class RentACarComponent implements OnInit {
   mainServices: [[]];
   dataSource = new MatTableDataSource<Element[]>();
   @ViewChild(MatPaginator) paginator: MatPaginator;
+  offices: any = null;
+  officeMapUrl: SafeResourceUrl;
+  officeLocation: string;
 
   constructor(private rentACarService: RentACarService,
               private authService: AuthenticationService,
@@ -55,7 +59,7 @@ export class RentACarComponent implements OnInit {
           this.rentACar = data;
           this.userRole = this.authService.getAuthority();
           this.rentACarExists = true;
-          this.url = this.sanitizer.bypassSecurityTrustResourceUrl(
+          this.mapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
                     'https://maps.google.com/maps?q=' +
                     this.rentACar.location.latitude + ', ' +
                     this.rentACar.location.longitude +
@@ -88,6 +92,16 @@ export class RentACarComponent implements OnInit {
         },
         () => {
           this.loadingVehicles = false;
+        }
+      );
+
+      this.rentACarService.getOffices(id).subscribe(
+        (offices) => {
+          this.offices = offices;
+          if (this.offices.length > 0) {
+            this.officeLocation = this.offices[0].location.latitude + ', ' + this.offices[0].location.longitude;
+            this.updateOfficeLocationMap();
+            }
         }
       );
 
@@ -457,5 +471,105 @@ export class RentACarComponent implements OnInit {
         this.mainServicesLoaderSubject.next({key: 'loadedMainServices', value: true});
       }
     );
+  }
+
+  openAddOfficeDialog() {
+    const dialogRef = this.dialog.open(OfficeDialogComponent,
+    {
+      data: null,
+      disableClose: true,
+      autoFocus: true,
+      width: '40%'
+    });
+    dialogRef.afterClosed().subscribe(
+      (data) => {
+        if (data) {
+          const newOffice = data;
+          newOffice.rentACar = this.rentACar;
+          this.rentACarService.addOffice(newOffice).subscribe(
+            (office) => {
+              this.offices.push(office);
+              this.message = 'Added office successfully!';
+            },
+            () => {
+              this.message = 'Error! Office could not be added!';
+            },
+            () => {
+              this.appComponent.showSnackBar(this.message);
+            }
+          );
+        }
+      }
+    );
+  }
+
+  openUpdateOfficeDialog(officeToUpdate: any) {
+    const dialogRef = this.dialog.open(OfficeDialogComponent,
+    {
+      data: officeToUpdate,
+      disableClose: true,
+      autoFocus: true,
+      width: '40%'
+    });
+    dialogRef.afterClosed().subscribe(
+      (data) => {
+        if (data) {
+          const updatedOffice = data;
+          updatedOffice.rentACar = this.rentACar;
+          this.rentACarService.updateOffice(updatedOffice).subscribe(
+            (office: any) => {
+              this.offices.forEach((element, index) => {
+                if (element.id === office.id) {
+                  this.offices.splice(index, 1, updatedOffice);
+                  return;
+                }
+              });
+              this.message = 'Updated office successfully!';
+            },
+            () => {
+              this.message = 'Error! Office could not be updated!';
+            },
+            () => {
+              this.appComponent.showSnackBar(this.message);
+            }
+          );
+        }
+      }
+    );
+  }
+
+  deleteOffice(id: number) {
+    if (!isNaN(id)) {
+      this.rentACarService.deleteOffice(id).subscribe(
+        () => {
+          this.offices.forEach((element, index) => {
+            if (element.id === id) {
+              this.offices.splice(index, 1);
+              return;
+            }
+          });
+          this.message = 'Deleted office successfully!';
+        },
+        () => {
+          this.message = 'Error! Office could not be deleted!';
+        },
+        () => {
+          this.appComponent.showSnackBar(this.message);
+        }
+      );
+    } else {
+      this.appComponent.showSnackBar('Error! Office could not be deleted!');
+    }
+  }
+
+  officeLocationChanged(office) {
+    this.officeLocation = office.location.latitude + ', ' + office.location.longitude;
+    this.updateOfficeLocationMap();
+  }
+
+  updateOfficeLocationMap() {
+    this.officeMapUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://maps.google.com/maps?q=' +
+                                                                              this.officeLocation +
+                                                                              '&t=&z=11&ie=UTF8&iwloc=&output=embed');
   }
 }

@@ -29,13 +29,13 @@
         <b>Rating: </b>
         <span style="display: flex; flex-direction: row">
             <div class="star-ratings-css">
-                <div class="star-ratings-css-top" [ngStyle]="{'width': ((rentACar.rating * 100) / 5) + '%'}">
+                <div class="star-ratings-css-top">
                     <!-- <span (mouseover)="hoverRating(i, 1)">★</span>
                     <span (mouseover)="hoverRating(i, 2)">★</span>
                     <span (mouseover)="hoverRating(i, 3)">★</span>
                     <span (mouseover)="hoverRating(i, 4)">★</span>
                     <span (mouseover)="hoverRating(i, 5)">★</span> -->
-                    ★★★★★
+                    <span [ngStyle]="{'width': ((rentACar.rating * 100) / 5) + '%'}">★★★★★</span>
                 </div>
                 <div>
                     <!-- <span (mouseover)="hoverRating(i, 1)">★</span>

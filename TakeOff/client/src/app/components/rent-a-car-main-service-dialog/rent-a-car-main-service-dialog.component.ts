@@ -42,7 +42,7 @@ export class RentACarMainServiceDialogComponent implements OnInit {
 
     submitForm() {
       const nameControl: AbstractControl = this.rentACarMainServicesForm.get('name');
-      this.rentACarService.checkMainServiceName(nameControl.value).subscribe(
+      this.rentACarService.checkMainServiceName(this.rentACarMainService.id, nameControl.value).subscribe(
         () => {
           const rentACarMainService = this.rentACarMainServicesForm.value;
           rentACarMainService.id = this.rentACarMainService.id;

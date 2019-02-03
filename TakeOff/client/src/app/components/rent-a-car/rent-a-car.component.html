@@ -4,21 +4,23 @@
     <mat-tab-group>
       <mat-tab label="Basic info">
         <button mat-raised-button *ngIf="userRole && userRole === 'ROLE_USER'" color="primary" class="button-right" (click)="openUpdateDialog()"><mat-icon>edit</mat-icon> Update</button>
-        <p><b>Description:</b> {{(!rentACar.description) ? '✗' : rentACar.description}}</p>
-        <b>Rating: </b>
-        <span style="display: flex; flex-direction: row">
-            <div class="star-ratings-css">
-              <div class="star-ratings-css-top" [ngStyle]="{'width': ((rating * 100) / 5) + '%'}"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-              <div class="star-ratings-css-bottom"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <div class="p-3">
+          <p><b>Description:</b> {{(!rentACar.description) ? '✗' : rentACar.description}}</p>
+          <b>Rating: </b>
+            <div class="star-ratings-css mx-2">
+              <div class="star-ratings-css-top">
+                <span [ngStyle]="{'width': ((rating * 100) / 5) + '%'}">★★★★★</span>
+              </div>
+              <div><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
             </div>
-            <p style="padding-left: 20px;">{{rating}}/5</p>
-          </span>
-        <p><b>Address:</b> {{rentACar.location.address}}
-        <div>
-          <iframe width="600" height="500" [src]='url' 
-                  frameborder="0" scrolling="no" marginheight="0" marginwidth="0">
-          </iframe>
-        </div>
+            <span class="badge badge-pill badge-info align-middle">{{rating}}/5</span>  
+            <p><b>Address:</b> {{rentACar.location.address}}
+            <div>
+              <iframe width="600" height="500" [src]='mapUrl' 
+              frameborder="0" scrolling="no" marginheight="0" marginwidth="0">
+              </iframe>
+            </div>
+          </div>
       </mat-tab>
       <mat-tab label="Services">
         <span matTooltip="Cannot add more than 10 services!" [matTooltipDisabled]="mainServices.length <= 10" class="button-right">
@@ -29,13 +31,13 @@
                   <mat-icon>add</mat-icon> Add service
           </button>
         </span>
-        <div *ngIf="vehicles && vehicles.length > 0 && mainServices && mainServices.length > 0" style="padding-left: 3%; padding-top: 5%;">
+        <div *ngIf="vehicles && vehicles.length > 0 && mainServices && mainServices.length > 0" class="p-5">
           <h2>Pricelist:</h2>
-          <div class="mat-elevation-z8">
-            <mat-table #table mat-table [dataSource]="dataSource" style="padding-right: 5%;">
+          <div class="border border-primary">
+            <mat-table #table mat-table [dataSource]="dataSource">
               <ng-container *ngFor="let column of columns; let i = index" [matColumnDef]="column.columnDef">
                 <mat-header-cell *matHeaderCellDef>{{ column.header }} 
-                  <div style="margin-left: 1%;" *ngIf="i > 1">
+                  <div class="ml-1" *ngIf="i > 1">
                     <button mat-icon-button [matMenuTriggerFor]="menu" [ngClass]="{'wiggle-button': !menuOpened}" color="primary" (menuOpened)="menuOpened = true" (menuClosed)="menuOpened = false">
                       <mat-icon>settings</mat-icon>
                     </button>
@@ -59,38 +61,48 @@
       </mat-tab>
       <mat-tab label="Vehicles">
         <button mat-raised-button color="primary" class="button-right" (click)="openAddVehicleDialog()" *ngIf="userRole && userRole === 'ROLE_USER'"><mat-icon>add</mat-icon> Add vehicle</button>
-        <div class="div-mat-card" *ngIf="vehicles && vehicles.length > 0">
-          <mat-card *ngFor="let vehicle of vehicles.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)" class="vehicle-card mat-elevation-z8" >
-            <mat-card-header>
-              <mat-card-title>{{vehicle.brand}}</mat-card-title>
-            </mat-card-header>
-            <img mat-card-image src="{{vehicle.image}}" alt="Vehicle photo" class="card-image">
-            <mat-card-content>
-              <p><b>Model:</b> {{vehicle.model}}</p>
-              <p><b>Year:</b> {{vehicle.year}}</p>
-              <p><b>Fuel type:</b> {{vehicle.fuel}}</p>
-              <p><b>Number of seats:</b> {{vehicle.numOfSeats}}</p>
-              <p><b>Transmission:</b> {{vehicle.transmission}}</p>
-              <p *ngIf="vehicle.reserved"><b>Reserved: ✓</b></p>
-              <p *ngIf="!vehicle.reserved"><b>Reserved: ✗</b></p>
-              <b>Rating: </b>
-              <span style="display: flex; flex-direction: row">
+        <div class="container d-flex justify-content-center m-5" *ngFor="let vehicle of vehicles.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)">
+          <div class="card w-75 p-4 mat-elevation-z12" style="border-radius: 5%;">
+            <div class="row">
+              <div class="col-md-8">
+                <img src="{{vehicle.image}}" alt="Vehicle photo" class="w-100 mat-elevation-z12" style="border-radius: 10%;">
+              </div>
+              <div class="col-md-4 px-3">
+                <div class="card-body px-3 text-info">
+                  <h4>
+                    <span class="badge badge-success" style="float: right;" *ngIf="vehicle.discount && vehicle.discount > 0">
+                      -{{vehicle.discount}}%
+                    </span>
+                  </h4>
+                  <h4 class="card-title">{{vehicle.brand}} {{vehicle.model}}</h4>
+                  <p class="card-text"><b>Year:</b> {{vehicle.year}}</p>
+                  <p class="card-text"><b>Fuel type:</b> {{vehicle.fuel}}</p>
+                  <p class="card-text"><b>Number of seats:</b> {{vehicle.numOfSeats}}</p>
+                  <p class="card-text"><b>Transmission:</b> {{vehicle.transmission}}</p>
+                  <p class="card-text" *ngIf="vehicle.reserved"><b>Reserved: ✓</b></p>
+                  <p class="card-text" *ngIf="!vehicle.reserved"><b>Reserved: ✗</b></p>
+                  <b>Rating: </b>
                   <div class="star-ratings-css">
-                      <div class="star-ratings-css-top" [ngStyle]="{'width': ((vehicle.rating * 100) / 5) + '%'}"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-                      <div class="star-ratings-css-bottom"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+                      <div class="star-ratings-css-top">
+                        <span [ngStyle]="{'width': ((vehicle.rating * 100) / 5) + '%'}">
+                          ★★★★★
+                        </span>
+                      </div>
+                      <div>★★★★★</div>
                   </div>
-                  <p style="padding-left: 20px;">{{vehicle.rating}}/5</p>
-              </span>
-            </mat-card-content>
-            <mat-card-actions *ngIf="userRole && userRole === 'ROLE_USER'" style="float: right;">
-              <span matTooltip="Cannot be updated because it is reserved!" [matTooltipDisabled]="!vehicle.reserved">
-                <button mat-button color="primary" (click)="openUpdateVehicleDialog(vehicle)" [disabled]="vehicle.reserved"><mat-icon>edit</mat-icon></button>
-              </span>
-              <span matTooltip="Cannot be deleted because it is reserved!" [matTooltipDisabled]="!vehicle.reserved">
-                <button mat-button color="primary" (click)="deleteVehicle(vehicle.id)" [disabled]="vehicle.reserved"><mat-icon>delete</mat-icon></button>
-              </span>
-            </mat-card-actions>
-          </mat-card>
+                  <span class="badge badge-pill badge-info align-middle">{{rating}}/5</span> 
+                  <div *ngIf="userRole && userRole === 'ROLE_USER'" style="float: right;">
+                    <span matTooltip="Cannot be updated because it is reserved!" [matTooltipDisabled]="!vehicle.reserved">
+                      <button mat-button color="primary" (click)="openUpdateVehicleDialog(vehicle)" [disabled]="vehicle.reserved"><mat-icon>edit</mat-icon></button>
+                    </span>
+                    <span matTooltip="Cannot be deleted because it is reserved!" [matTooltipDisabled]="!vehicle.reserved">
+                      <button mat-button color="primary" (click)="deleteVehicle(vehicle.id)" [disabled]="vehicle.reserved"><mat-icon>delete</mat-icon></button>
+                    </span>
+                  </div>         
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div *ngIf="!vehicles || vehicles.length == 0" style="padding-top: 5%;">
           <h4 style="font-size: 150%; text-align: center;">This rent a car service does not have any vehicle yet!</h4>
@@ -102,6 +114,44 @@
           [showFirstLastButtons]="true"
           (page)="switchPage($event)">
         </mat-paginator>
+      </mat-tab>
+      <mat-tab label="Offices">
+        <div *ngIf="offices && offices.length > 0">
+          <button mat-raised-button color="primary" class="button-right" 
+                  (click)="openAddOfficeDialog()" 
+                  *ngIf="userRole && userRole === 'ROLE_USER'">
+          <mat-icon>add</mat-icon> Add office
+          </button>
+          <div class="container mt-5">
+              <div class="row">
+                <div class="col-md-5">
+                    <div class="list-group" style="overflow: auto; height: 400px;">
+                      <button class="list-group-item list-group-item-info list-group-item-action flex-column align-items-stretch"
+                              *ngFor="let office of offices" (click)="officeLocationChanged(office)">
+                        <h5 class="mb-1">{{office.name}}</h5>
+                        <p class="mb-1">{{office.location.address}} </p>
+                        <div *ngIf="userRole && userRole === 'ROLE_USER'">
+                          <button mat-button color="primary" (click)="openUpdateOfficeDialog(office)">
+                            <mat-icon>edit</mat-icon>
+                          </button>
+                          <button mat-button color="primary" (click)="deleteOffice(office.id)">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                        </div>      
+                      </button>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <iframe [src]='officeMapUrl' height="400px" class="w-100"
+                            frameborder="0" scrolling="no" marginheight="0" marginwidth="0">
+                    </iframe>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div *ngIf="!offices || offices.length == 0" style="padding-top: 5%;">
+          <h4 style="font-size: 150%; text-align: center;">This rent a car service does not have any office yet!</h4>
+        </div>
       </mat-tab>      
     </mat-tab-group>
   </div>

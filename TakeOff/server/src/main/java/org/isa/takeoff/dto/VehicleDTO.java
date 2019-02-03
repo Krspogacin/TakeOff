@@ -14,6 +14,7 @@ public class VehicleDTO
 	private Integer numOfSeats;
 	private TransmissionType transmission;
 	private boolean reserved;
+	private Double discount;
 	private RentACarDTO rentACar;
 	private String image;
 	private Long version;
@@ -22,12 +23,13 @@ public class VehicleDTO
 
 	public VehicleDTO(Vehicle vehicle)
 	{
-		this(vehicle.getId(), vehicle.getBrand(), vehicle.getModel(), vehicle.getYear(), vehicle.getFuel(), vehicle.getNumOfSeats(), vehicle.getTransmission(),
-			 vehicle.isReserved(), new RentACarDTO(vehicle.getRentACar()), vehicle.getImage() == null ? null : new String(vehicle.getImage()), vehicle.getVersion());
+		this(vehicle.getId(), vehicle.getBrand(), vehicle.getModel(), vehicle.getYear(), vehicle.getFuel(), 
+			 vehicle.getNumOfSeats(), vehicle.getTransmission(), vehicle.isReserved(), vehicle.getDiscount(),
+			 new RentACarDTO(vehicle.getRentACar()), vehicle.getImage() == null ? null : new String(vehicle.getImage()), vehicle.getVersion());
 	}
 	
 	public VehicleDTO(Long id, String brand, String model, Integer year, FuelType fuel, Integer numOfSeats, 
-			   		  TransmissionType transmission, boolean reserved, RentACarDTO rentACar, String image, Long version) 
+			   		  TransmissionType transmission, boolean reserved, Double discount, RentACarDTO rentACar, String image, Long version) 
 	{
 		this.id = id;
 		this.brand = brand;
@@ -36,10 +38,11 @@ public class VehicleDTO
 		this.fuel = fuel;
 		this.numOfSeats = numOfSeats;
 		this.transmission = transmission;
-		this.rentACar = rentACar;
-		this.version = version;
 		this.reserved = reserved;
+		this.discount = discount;
+		this.rentACar = rentACar;
 		this.image = image;
+		this.version = version;
 	}
 
 	public Long getId() {
@@ -104,6 +107,14 @@ public class VehicleDTO
 
 	public void setReserved(boolean reserved) {
 		this.reserved = reserved;
+	}
+
+	public Double getDiscount() {
+		return discount;
+	}
+
+	public void setDiscount(Double discount) {
+		this.discount = discount;
 	}
 
 	public RentACarDTO getRentACar() {

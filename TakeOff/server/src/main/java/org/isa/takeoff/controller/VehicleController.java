@@ -91,6 +91,7 @@ public class VehicleController
 			vehicle.setYear(vehicleDTO.getYear());
 			vehicle.setImage(vehicleDTO.getImage() == null ? null : vehicleDTO.getImage().getBytes());
 			vehicle.setReserved(vehicleDTO.isReserved());
+			vehicle.setDiscount(vehicleDTO.getDiscount());
 			vehicle = vehicleService.save(vehicle);
 			return new ResponseEntity<>(new VehicleDTO(vehicle), HttpStatus.OK);
 		}

@@ -16,6 +16,8 @@ export class VehicleDialogComponent implements OnInit {
   minYear = 1800;
   minSeats = 1;
   maxSeats = 7;
+  minDiscount = 0;
+  maxDiscount = 100;
   selectedFile: File;
   imgSrc: string;
   update = false;
@@ -38,7 +40,8 @@ export class VehicleDialogComponent implements OnInit {
     this.currentYear = new Date().getFullYear();
 
     if (!this.vehicle) {
-      this.vehicle = {'brand': '', 'model': '', 'year': '', 'fuel': '', 'numOfSeats': '', 'transmission': '', 'reserved': false};
+      this.vehicle = {'brand': '', 'model': '', 'year': '', 'fuel': '',
+                      'numOfSeats': '', 'transmission': '', 'reserved': false, 'discount' : ''};
     } else {
       this.update = true;
       this.imgSrc = this.vehicle.image;
@@ -61,6 +64,7 @@ export class VehicleDialogComponent implements OnInit {
       fuel: [this.vehicle.fuel, Validators.required],
       numOfSeats: [this.vehicle.numOfSeats, [Validators.required, Validators.min(this.minSeats), Validators.max(this.maxSeats)]],
       transmission: [this.vehicle.transmission, Validators.required],
+      discount: [this.vehicle.discount, [Validators.min(this.minDiscount), Validators.max(this.maxDiscount)]]
     });
 
     if (!this.data.mainServices) {
@@ -104,7 +108,6 @@ export class VehicleDialogComponent implements OnInit {
                               'rentACarMainServiceDTO' : mainService};
         vehiclePrices.push(vehiclePrice);
       }
-
       this.dialogRef.close({'vehiclePrices' : vehiclePrices, 'vehicle' : newVehicle});
     }
   }
@@ -118,5 +121,13 @@ export class VehicleDialogComponent implements OnInit {
       };
       reader.readAsDataURL(this.selectedFile);
     }
+  }
+
+  formatLabel(value: number | null) {
+    if (!value) {
+      return 0 + '%';
+    }
+
+    return value + '%';
   }
 }
