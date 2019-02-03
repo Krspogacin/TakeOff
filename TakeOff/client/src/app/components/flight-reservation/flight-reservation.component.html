@@ -1,54 +1,103 @@
-<div *ngIf="!loading">
-  <h1 mat-dialog-title>Flight reservation</h1>
-  <mat-dialog-content [formGroup]="">
-    <mat-horizontal-stepper linear labelPosition="bottom">
-      <mat-step label="Step 1" state="phone" *ngIf="seats.length > 1">
+<h5 mat-dialog-title>Flight reservation</h5>
+<h5><b>Total: </b>{{total}}{{currency}}</h5>
+<mat-dialog-content [formGroup]="">
+  <mat-horizontal-stepper linear labelPosition="bottom">
+    <mat-step label="Friends invitation" state="phone">
+      <div class="step" *ngIf="seats.length > 1">
+        <mat-hint>{{seats.length-friendList.selectedOptions.selected.length-1}} free seat(s)</mat-hint>
+        <mat-selection-list #friendList (selectionChange)="selectionChange($event.option)">
+          <mat-list-option *ngFor="let friend of friends; let i = index" [value]="i">
+            <img matListAvatar src="{{friend.image}}" alt="">
+            <h3 matLine> {{friend.firstName}} {{friend.lastName}}</h3>
+          </mat-list-option>
+        </mat-selection-list>
+      </div>
+      <h5 *ngIf="seats.length === 1"> No seats left free.</h5>
+      <br>
+      <mat-divider></mat-divider>
+      <br>
+      <div>
+        <button mat-raised-button [mat-dialog-close] type="button">Cancel</button>
+        <button mat-raised-button color="primary" matStepperNext type="button">Next</button>
+      </div>
+    </mat-step>
+
+    <mat-step label="Passenger details" state="short_text" [stepControl]="passengerForm">
+      <form [formGroup]="passengerForm">
         <div class="step">
-          <h3>Invite friends with you</h3>
-          <mat-hint>{{seats.length-friendList.selectedOptions.selected.length-1}} free seat(s)</mat-hint>
-          <mat-selection-list #friendList (selectionChange)="selectionChange($event.option)">
-            <mat-list-option *ngFor="let friend of friends" [value]="friend.user2.id">
-              <img matListAvatar src="{{friend.user1.id === user.id ? friend.user2.image : friend.user1.image}}" alt="">
-              <h3 matLine> {{friend.user1.id === user.id ? friend.user2.firstName : friend.user1.firstName}}
-                {{friend.user1.id === user.id ? friend.user2.lastName : friend.user1.lastName}}</h3>
-            </mat-list-option>
-          </mat-selection-list>
+          <div *ngFor="let seat of seats; let i = index;">
+            <h5>Passenger {{i+1}} out of {{seats.length}}</h5>
+            <div class="row">
+              <div class="col">
+                <mat-form-field appearance="outline">
+                  <mat-label>First name</mat-label>
+                  <input type="text" matInput required formControlName="{{seat}}-0">
+                  <mat-error *ngIf="passengerForm.get(seat + '-0').invalid">
+                    <div *ngIf="passengerForm.get(seat + '-0').errors.required"> First name is required.</div>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col">
+                <mat-form-field appearance="outline">
+                  <mat-label>Last name</mat-label>
+                  <input type="text" matInput required formControlName="{{seat}}-1">
+                  <mat-error *ngIf="passengerForm.get(seat + '-1').invalid">
+                    <div *ngIf="passengerForm.get(seat + '-1').errors.required"> Last name is required.</div>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <br>
+            <div class="row">
+              <div class="col">
+                <mat-form-field appearance="outline">
+                  <mat-label>Date of birth</mat-label>
+                  <input matInput [matDatepicker]="picker" formControlName="{{seat}}-2" required>
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker disabled="false"></mat-datepicker>
+                </mat-form-field>
+              </div>
+              <div class="col">
+                <mat-form-field appearance="outline">
+                  <mat-label>Phone number</mat-label>
+                  <input type="text" matInput required formControlName="{{seat}}-3">
+                  <mat-hint>
+                    Example: 123-456
+                  </mat-hint>
+                  <mat-error *ngIf="passengerForm.get(seat + '-3').invalid">
+                    <div *ngIf="passengerForm.get(seat + '-3').errors.required"> Phone number is required.</div>
+                    <div *ngIf="passengerForm.get(seat + '-3').errors.pattern"> Invalid phone number format!</div>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <mat-divider></mat-divider>
+            <br>
+          </div>
         </div>
-        <br>
         <div>
-          <button mat-raised-button [mat-dialog-close] type="button">Cancel</button>
+          <button mat-raised-button matStepperPrevious>Back</button>
           <button mat-raised-button color="primary" matStepperNext type="button">Next</button>
         </div>
-      </mat-step>
-
-      <mat-step label="Step 2" state="chat">
-        <div class="step">
-          <p>Second content</p>
-          <div style="height: 400px;"></div>
-        </div>
-        <div>
-          <button mat-button matStepperPrevious *ngIf="seats.length > 1">Back</button>
-          <button mat-raised-button color="primary" matStepperNext type="button">Next</button>
-        </div>
-      </mat-step>
-      <mat-step label="Step 3">
-        <div class="step">
-          <p>Third content</p>
-        </div>
-        <div>
-          <button mat-button matStepperPrevious>Back</button>
-          <button mat-raised-button color="primary" [mat-dialog-close] type="button">Finish</button>
-        </div>
-      </mat-step>
-
-      <!-- Icon overrides. -->
-      <ng-template matStepperIcon="phone">
-        <mat-icon>call_end</mat-icon>
-      </ng-template>
-      <ng-template matStepperIcon="chat">
-        <mat-icon>forum</mat-icon>
-      </ng-template>
-
-    </mat-horizontal-stepper>
-  </mat-dialog-content>
-</div>
+      </form>
+    </mat-step>
+    <mat-step label="Hotel reservations" state="hotel">
+      <div class="step">
+        <p>List of rooms on discount...</p>
+      </div>
+      <div>
+        <button mat-raised-button matStepperPrevious>Back</button>
+        <button mat-raised-button color="primary" matStepperNext type="button">Next</button>
+      </div>
+    </mat-step>
+    <mat-step label="Rent-a-car reservations" state="directions_car">
+      <div class="step">
+        <p>List of vehicles on discount...</p>
+      </div>
+      <div>
+        <button mat-raised-button matStepperPrevious>Back</button>
+        <button mat-raised-button color="primary" type="button" (click)="finishReservation()">Finish</button>
+      </div>
+    </mat-step>
+  </mat-horizontal-stepper>
+</mat-dialog-content>

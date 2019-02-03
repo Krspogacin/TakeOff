@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { FlightService } from 'src/app/services/flight/flight.service';
-import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { MatDialog, MatSnackBar } from '@angular/material';
+import { ActivatedRoute } from '@angular/router';
+import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
+import { FlightService } from 'src/app/services/flight/flight.service';
+import { ReservationService } from 'src/app/services/reservation/reservation.service';
 import { FlightDialogComponent } from '../flight-dialog/flight-dialog.component';
 import { FlightReservationComponent } from '../flight-reservation/flight-reservation.component';
+import { AppComponent } from 'src/app/app.component';
 
 declare let SeatchartJS: any;
 
@@ -42,7 +44,7 @@ export class FlightComponent implements OnInit {
 
   constructor(private flightService: FlightService, private route: ActivatedRoute,
     private authService: AuthenticationService, private dialog: MatDialog,
-    private snackBar: MatSnackBar) { }
+    private reservationService: ReservationService, private appComponent: AppComponent) { }
 
   ngOnInit() {
     const id = parseInt(this.route.snapshot.paramMap.get('id'), 10);
@@ -113,6 +115,7 @@ export class FlightComponent implements OnInit {
   getCart() {
     if (this.sc) {
       console.log(this.sc.getShoppingCart());
+      console.log(this.sc.getTotal());
     }
   }
 
@@ -155,7 +158,7 @@ export class FlightComponent implements OnInit {
               this.message = 'Error updating flight!';
             },
             () => {
-              this.showSnackBar();
+              this.appComponent.showSnackBar(this.message);
             }
           );
         }
@@ -170,47 +173,64 @@ export class FlightComponent implements OnInit {
       return;
 
     } else {
-      // check if cart is empty
       const cart = this.sc.getShoppingCart();
-      console.log(cart);
+      // check if cart is empty
 
       for (let i = 0; i < this.types.length; i++) {
         seats += cart[this.types[i]['type']].length;
       }
 
       if (seats === 0) {
-        this.message = 'Please first select one or more seats.';
-        this.showSnackBar();
+        this.message = 'Please first select one or more seats from the diagram.';
+        this.appComponent.showSnackBar(this.message);
         return;
       }
     }
 
+    const total = this.sc.getTotal();
     const dialogRef = this.dialog.open(FlightReservationComponent,
       {
-        data: seats,
+        data: {
+          'seats': seats,
+          'total': total
+        },
         disableClose: true,
         autoFocus: true,
-        width: '60%'
+        height: '90%',
+        width: '60%',
       });
 
     dialogRef.afterClosed().subscribe(
-      (data) => {
-        // ........
+      (friends) => {
+        const cart = this.sc.getShoppingCart();
+        const reservations = [];
+        let friendIndex = 0;
+        for (const key of Object.keys(cart)) {
+          for (const n of cart[key]) {
+            const ticket = this.tickets.find(t => {
+              return t.number === n;
+            });
+            ticket['reserved'] = true; // optional
+            ticket['type'] = key; // seat class
+            const user = friends[friendIndex];
+            reservations.push({ 'user': user, 'ticket': ticket });
+            friendIndex++;
+          }
+        }
+        console.log(reservations);
+        this.reservationService.createReservations(reservations).subscribe(
+          () => {
+            this.appComponent.showSnackBar('Reservation successfull!');
+          },
+          () => {
+            this.appComponent.showSnackBar('Reservation failed. Please try again.');
+          },
+          () => {
+            setTimeout(function () { location.reload(); }, 3000);
+          }
+        );
       }
     );
   }
-
-  showSnackBar() {
-    if (!this.message) {
-      return;
-    }
-    const snackBarRef = this.snackBar.open(this.message, 'Dismiss', { duration: 3000 });
-    snackBarRef.onAction().subscribe(
-      () => {
-        snackBarRef.dismiss();
-      }
-    );
-  }
-
 
 }

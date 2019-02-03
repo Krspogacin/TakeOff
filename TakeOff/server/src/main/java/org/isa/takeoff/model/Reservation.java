@@ -1,6 +1,10 @@
 package org.isa.takeoff.model;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -8,8 +12,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 @Entity
@@ -19,19 +22,14 @@ public class Reservation {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "flight_id", referencedColumnName = "id")
-	private Flight flight;
+	@OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<FlightReservation> flightReservations = new HashSet<>();
 
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private RoomReservation roomReservation;
 
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private VehicleReservation vehicleReservation;
-
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "user_id", referencedColumnName = "id")
-	private User user;
 
 	public Long getId() {
 		return id;
@@ -41,12 +39,12 @@ public class Reservation {
 		this.id = id;
 	}
 
-	public Flight getFlight() {
-		return flight;
+	public List<FlightReservation> getFlightReservations() {
+		return new ArrayList<>(flightReservations);
 	}
 
-	public void setFlight(Flight flight) {
-		this.flight = flight;
+	public void setFlightReservations(List<FlightReservation> flightReservations) {
+		this.flightReservations = new HashSet<>(flightReservations);
 	}
 
 	public RoomReservation getRoomReservation() {
@@ -63,14 +61,6 @@ public class Reservation {
 
 	public void setVehicleReservation(VehicleReservation vehicleReservation) {
 		this.vehicleReservation = vehicleReservation;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
 	}
 
 	@Override
