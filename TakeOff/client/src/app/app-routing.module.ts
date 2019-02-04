@@ -22,6 +22,7 @@ import { RentACarsComponent } from './components/rent-a-cars/rent-a-cars.compone
 import { AirCompaniesComponent } from './components/air-companies/air-companies.component';
 import { FlightReservationComponent } from './components/flight-reservation/flight-reservation.component';
 import { FriendsComponent } from './components/friends/friends.component';
+import { FriendsDialogComponent } from './components/friends-dialog/friends-dialog.component';
 
 const routes: Routes = [
   { path: '', component: HomepageComponent },
@@ -65,4 +66,5 @@ export const RoutingComponents = [
   RoomDialogComponent,
   AirCompaniesComponent,
   FlightReservationComponent,
-  FriendsComponent];
+  FriendsComponent,
+  FriendsDialogComponent];

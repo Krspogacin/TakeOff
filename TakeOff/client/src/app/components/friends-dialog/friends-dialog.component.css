@@ -1,0 +1,8 @@
+.friend-dialog {
+    overflow-y: auto;
+    height: 300px;
+}
+
+.search-field {
+    width: 100%;
+}

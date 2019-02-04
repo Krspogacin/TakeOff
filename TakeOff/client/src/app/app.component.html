@@ -1,6 +1,6 @@
 <mat-toolbar color="primary" style="overflow: hidden; position: fixed; z-index: 999;">
         <mat-toolbar-row>
-                <a style="text-decoration: none; color: white" href="">TakeOff</a>
+                <a style="text-decoration: none; color: white" [routerLink]="[ '/' ]">TakeOff</a>
             
                 <span class="fill"></span>
                 <div *ngIf="userRole && userRole === 'ROLE_SYS_ADMIN'">

@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material';
-import { UserService } from 'src/app/services/user/user.service';
-import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
+import { MatDialog } from '@angular/material';
 import { Router } from '@angular/router';
 import { AppComponent } from 'src/app/app.component';
+import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
+import { UserService } from 'src/app/services/user/user.service';
+import { FriendsDialogComponent } from '../friends-dialog/friends-dialog.component';
 
 @Component({
   selector: 'app-friends',
@@ -13,51 +14,45 @@ import { AppComponent } from 'src/app/app.component';
 export class FriendsComponent implements OnInit {
 
   user: any;
-  allUsers = [];
-  acceptedfriends = [];
-  pendingFriends = [];
+  allFriends = [];
+  acceptedRequests = [];
+  sentRequests = [];
+  receivedRequests = [];
   pageSize = 5;
   pageIndex = 0;
   loading = true;
-  hasFriends = false;
 
   constructor(private userService: UserService, private authService: AuthenticationService,
-    private snackBar: MatSnackBar, private router: Router, private appComponent: AppComponent) { }
+    private router: Router, private appComponent: AppComponent, private dialog: MatDialog) { }
 
   ngOnInit() {
     const username = this.authService.getUsername();
     if (username) {
-
-      this.userService.getAllUsers().subscribe(
-        (data: []) => {
-          this.allUsers = data;
-        }
-      );
-
       this.userService.getUser(username).subscribe(
         (data: any) => {
           this.user = data;
 
           this.userService.getFriends(username).subscribe(
             (friendData: []) => {
+              this.allFriends = friendData;
               // extracting only friend objects
-              const friends = [];
               friendData.forEach((element: any) => {
-                const f = {
-                  'friend': null,
-                  'accepted': element.accepted
-                };
                 if (element.user1.id === this.user.id) {
-                  f.friend = element.user2;
+                  // if he was a sender
+                  if (element.accepted) {
+                    this.acceptedRequests.push(element.user2);
+                  } else {
+                    this.sentRequests.push(element.user2);
+                  }
                 } else {
-                  f.friend = element.user1;
+                  // if he got a request
+                  if (element.accepted) {
+                    this.acceptedRequests.push(element.user1);
+                  } else {
+                    this.receivedRequests.push(element.user1);
+                  }
                 }
-                friends.push(f);
               });
-
-              this.acceptedfriends = friends.filter((x: any) => x.accepted);
-              this.pendingFriends = friends.filter((x: any) => !x.accepted);
-              this.hasFriends = this.acceptedfriends.length > 0 ? true : false;
               this.loading = false;
             }
           );
@@ -72,29 +67,17 @@ export class FriendsComponent implements OnInit {
     }
   }
 
-
-  sendFriendRequest(user2: any) {
-    const friend = {
-      'user1': this.user,
-      'user2': user2,
-      'accepted': false
-    };
-    this.userService.sendFriendRequest(friend).subscribe(
-      (data) => {
-        this.acceptedfriends.push({ 'friend': data, 'accepted': false });
-        this.appComponent.showSnackBar('Request successfully sent!');
-      },
-      () => {
-        this.appComponent.showSnackBar('Error while sending request!');
-      }
-    );
-  }
-
   acceptRequest(friend: any) {
-    this.userService.acceptFriendRequest(friend).subscribe(
+    const dto = {
+      'user1': friend,
+      'user2': this.user
+    };
+
+    this.userService.acceptFriendRequest(dto).subscribe(
       () => {
-        friend.accepted = true;
-        this.appComponent.showSnackBar('You are now friends with \'' + friend.user1.firstName + ' ' + friend.user1.lastName + '\'!');
+        this.receivedRequests.splice(this.receivedRequests.indexOf(friend), 1);
+        this.acceptedRequests.push(friend);
+        this.appComponent.showSnackBar('You are now friends with \'' + friend.firstName + ' ' + friend.lastName + '\'!');
       },
       () => {
         this.appComponent.showSnackBar('Error while accepting request!');
@@ -102,27 +85,54 @@ export class FriendsComponent implements OnInit {
     );
   }
 
-  deleteRequest(friend: any) {
-    this.userService.deleteFriendRequest(friend).subscribe(
-      () => {
-        const sender = this.user.id === friend.user1.id;
-        const name = sender ? friend.user2.firstName + ' ' + friend.user2.lastName
-          : friend.user1.firstName + ' ' + friend.user1.lastName;
+  deleteRequest(friend: any, type: number) {
+    const dto = {
+      'user1': null,
+      'user2': null
+    };
 
+    // check who is sender and who is receiver of the request
+    for (const f of this.allFriends) {
+      if ((f.user1.id === this.user.id && f.user2.id === friend.id)) {
+        dto.user1 = this.user;
+        dto.user2 = friend;
+        break;
+      }
+
+      if (f.user2.id === this.user.id && f.user1.id === friend.id) {
+        dto.user1 = friend;
+        dto.user2 = this.user;
+        break;
+      }
+    }
+
+    this.userService.deleteFriendRequest(dto).subscribe(
+      () => {
         let message;
-        if (friend.accepted) {
-          const index = this.acceptedfriends.indexOf(friend);
+        const name = friend.firstName + ' ' + friend.lastName;
+
+        if (type === 0) {
+          const index = this.acceptedRequests.indexOf(friend);
           if (index >= 0) {
-            this.acceptedfriends.splice(index, 1);
+            this.acceptedRequests.splice(index, 1);
           }
           message = 'You are no longer friends with \'' + name + '\'!';
-        } else {
-          const index = this.pendingFriends.indexOf(friend);
+
+        } else if (type === 1) {
+          const index = this.sentRequests.indexOf(friend);
           if (index >= 0) {
-            this.pendingFriends.splice(index, 1);
+            this.sentRequests.splice(index, 1);
           }
-          message = 'Request ' + (sender ? 'to \'' : 'from \'') + name + '\' canceled!';
+          message = 'Request to \'' + name + '\' canceled!';
+
+        } else {
+          const index = this.receivedRequests.indexOf(friend);
+          if (index >= 0) {
+            this.receivedRequests.splice(index, 1);
+          }
+          message = 'Request from \'' + name + '\' canceled!';
         }
+
         this.appComponent.showSnackBar(message);
       },
       () => {
@@ -131,5 +141,38 @@ export class FriendsComponent implements OnInit {
     );
   }
 
+  openSearchDialog() {
+    const dialogRef = this.dialog.open(FriendsDialogComponent,
+      {
+        data: {
+          'user': this.user,
+          'friends': this.acceptedRequests.concat(this.sentRequests)
+        },
+        disableClose: true,
+        autoFocus: true,
+        width: '40%'
+      });
+
+    dialogRef.afterClosed().subscribe(
+      (data: []) => {
+        if (data.length) {
+          for (const user of data) {
+            const friend = {
+              'user1': this.user,
+              'user2': user,
+              'accepted': false
+            };
+            this.userService.sendFriendRequest(friend).subscribe(
+              (friendData) => {
+                this.sentRequests.push(user);
+              },
+              () => {
+
+              }
+            );
+          }
+        }
+      });
+  }
 
 }

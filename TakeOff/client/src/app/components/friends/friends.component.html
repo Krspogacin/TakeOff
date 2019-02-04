@@ -1,66 +1,93 @@
 <div *ngIf="!loading">
-  <div *ngIf="hasFriends">
-    <!-- <mat-list>
-      <h3 mat-subheader>Friends</h3>
-      <mat-list-item *ngFor="let element of acceptedfriends">
-        <img matListAvatar src="{{element.friend.image}}" alt="">
-        <h3 matLine> {{element.friend.firstName}} {{element.friend.lastName}}</h3>
-        <div matLine>
-          <button mat-button color="warn" matTooltip="Remove from friends" (click)="deleteRequest(friend)">
-            <mat-icon>block</mat-icon>
-            Remove
-          </button>
-        </div>
-      </mat-list-item>
-    </mat-list> -->
-
-    <h3>Friends</h3><br>
-    <div class="card-deck">
-      <div class="col-3" *ngFor="let element of acceptedfriends">
-        <div class="card mat-elevation-z8">
-          <div class="card-header">
-            <h4 class="card-title text-center">{{element.friend.firstName}} {{element.friend.lastName}}</h4>
-          </div>
-          <img src="{{element.friend.image}}" class="card-img-top" alt="...">
-          <div class="card-body">
-            <p class="card-text">
-              <b>About me:</b><br>
-              {{element.friend.aboutMe}}
-            </p>
-          </div>
-          <div class="card-footer">
-            <button mat-button color="warn" matTooltip="Remove from friends" (click)="deleteRequest(friend)">
-              <mat-icon>block</mat-icon>
-              Remove
-            </button>
+  <div class="container-fluid">
+    <br>
+    <button mat-raised-button color="primary" class="button-left" (click)="openSearchDialog()">
+      <mat-icon>add</mat-icon> Add friends
+    </button>
+    <br><br>
+    
+    <div *ngIf="acceptedRequests.length > 0">
+      <div class="card-deck">
+        <div class="col-3" *ngFor="let element of acceptedRequests">
+          <div class="card mat-elevation-z8">
+            <div class="card-header">
+              <h4 class="card-title text-center">{{element.firstName}} {{element.lastName}}</h4>
+            </div>
+            <img src="{{element.image}}" class="card-img-top" alt="Profile image">
+            <div class="card-body">
+              <p class="card-text">
+                <b>About me</b><br>
+                {{element.aboutMe}}
+              </p>
+            </div>
+            <div class="card-footer">
+              <button mat-button color="warn" matTooltip="Remove from friends" (click)="deleteRequest(element, 0)">
+                <mat-icon>block</mat-icon>
+                Remove
+              </button>
+            </div>
           </div>
         </div>
       </div>
+      <br>
+      <mat-divider></mat-divider>
+      <br>
     </div>
 
-    <br>
-    <mat-divider></mat-divider>
-    <br>
+    <div *ngIf="sentRequests.length > 0">
+      <h3>Pending requests</h3><br>
+      <div class="card-deck">
+        <div class="col-3" *ngFor="let element of sentRequests">
+          <div class="card mat-elevation-z8">
+            <div class="card-header">
+              <h4 class="card-title text-center">{{element.firstName}} {{element.lastName}}</h4>
+            </div>
+            <img src="{{element.image}}" class="card-img-top" alt="...">
+            <div class="card-body">
+              <p class="card-text">
+                <b>About me</b><br>
+                {{element.aboutMe}}
+              </p>
+            </div>
+            <div class="card-footer">
+              <button mat-button color="warn" matTooltip="Cancel request" (click)="deleteRequest(element, 1)">
+                <mat-icon>person_add_disabled</mat-icon>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+      <mat-divider></mat-divider>
+      <br>
+    </div>
 
-    <h3>Pending requests</h3><br>
-    <div class="card-deck">
-      <div class="col-3" *ngFor="let element of pendingFriends">
-        <div class="card mat-elevation-z8">
-          <div class="card-header">
-            <h4 class="card-title text-center">{{element.friend.firstName}} {{element.friend.lastName}}</h4>
-          </div>
-          <img src="{{element.friend.image}}" class="card-img-top" alt="...">
-          <div class="card-body">
-            <p class="card-text">
-              <b>About me:</b><br>
-              {{element.friend.aboutMe}}
-            </p>
-          </div>
-          <div class="card-footer">
-            <button mat-button color="warn" matTooltip="Cancel request" (click)="deleteRequest(friend)">
-              <mat-icon>person_add_disabled</mat-icon>
-              Cancel
-            </button>
+    <div *ngIf="receivedRequests.length > 0">
+      <h3>Received requests</h3><br>
+      <div class="card-deck">
+        <div class="col-3" *ngFor="let element of receivedRequests">
+          <div class="card mat-elevation-z8">
+            <div class="card-header">
+              <h4 class="card-title text-center">{{element.firstName}} {{element.lastName}}</h4>
+            </div>
+            <img src="{{element.image}}" class="card-img-top" alt="Profile image">
+            <div class="card-body">
+              <p class="card-text">
+                <b>About me</b><br>
+                {{element.aboutMe}}
+              </p>
+            </div>
+            <div class="card-footer">
+              <button mat-button color="primary" matTooltip="Accept request" (click)="acceptRequest(element)">
+                <mat-icon>done</mat-icon>
+                Accept
+              </button>
+              <button mat-button color="warn" matTooltip="Cancel request" (click)="deleteRequest(element, 2)">
+                <mat-icon>person_add_disabled</mat-icon>
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -68,7 +95,7 @@
 
   </div>
 
-  <div *ngIf="!hasFriends">
+  <div *ngIf="acceptedRequests.length === 0 && sentRequests.length === 0 && receivedRequests.length === 0">
     <h2>You have no friends.</h2>
   </div>
 
