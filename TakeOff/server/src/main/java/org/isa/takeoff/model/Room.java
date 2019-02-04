@@ -18,6 +18,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Version;
 
 import org.isa.takeoff.dto.RoomDTO;
 
@@ -71,6 +72,9 @@ public class Room {
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Hotel hotel;
+	
+	@Version
+	private Long version;
 
 	public Room() {
 
@@ -172,6 +176,14 @@ public class Room {
 
 	public void setDefaultPrice(Double defaultPrice) {
 		this.defaultPrice = defaultPrice;
+	}
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 
 	public boolean addRoomRating(RoomRating e) {

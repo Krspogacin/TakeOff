@@ -20,19 +20,12 @@ public class Service {
 	
 	@Column(name="name", nullable = false)
 	private String name;
-	
-	@Column(name="price", nullable = false)
-	private Double price;
-	
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private Hotel hotel;
-	
+
 	public Service() { }
 
-	public Service(String name, Double price) {
+	public Service(String name) {
 		super();
 		this.name = name;
-		this.price = price;
 	}
 	
 	public Long getId() {
@@ -49,22 +42,6 @@ public class Service {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public Double getPrice() {
-		return price;
-	}
-
-	public void setPrice(Double price) {
-		this.price = price;
-	}
-	
-	public Hotel getHotel() {
-		return hotel;
-	}
-
-	public void setHotel(Hotel hotel) {
-		this.hotel = hotel;
 	}
 	
 	@Override

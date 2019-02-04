@@ -1,26 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from 'src/app/services/user/user.service';
-import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
-import { MatSnackBar } from '@angular/material';
-import { Observable } from 'rxjs';
-import { startWith, map } from 'rxjs/operators';
-
-export interface User {
-  id: string;
-  password: string;
-  username: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  address: string;
-  dateOfBirth: string;
-  aboutMe: string;
-  image: string;
-  enabled: boolean;
-}
+import { AppComponent } from 'src/app/app.component';
+import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
+import { UserService } from 'src/app/services/user/user.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -30,8 +13,6 @@ export interface User {
 export class UserProfileComponent implements OnInit {
 
   user: any;
-  allUsers: User[] = [];
-  friends = [];
   userExists = false;
   loadingUser = true;
   profileForm: FormGroup;
@@ -42,43 +23,21 @@ export class UserProfileComponent implements OnInit {
   message: string;
 
   constructor(private userService: UserService, private authService: AuthenticationService,
-    private formBuilder: FormBuilder, private router: Router, private snackBar: MatSnackBar) { }
+    private formBuilder: FormBuilder, private router: Router, private appComponent: AppComponent) { }
 
   ngOnInit() {
     const username = this.authService.getUsername();
     if (username) {
 
-      this.userService.getAllUsers().subscribe(
-        (data: []) => {
-          this.allUsers = data;
-        }
-      );
-
       this.userService.getUser(username).subscribe(
         (data: any) => {
           this.user = data;
-          // this.allUsers.filter(x => x.id !== this.user.id);
+          this.loadingUser = false;
+          this.userExists = true;
 
-          console.log('all users:');
-          console.log(this.allUsers);
-
-          this.userService.getFriends(username).subscribe(
-            (friendData: []) => {
-              this.userExists = true;
-              this.loadingUser = false;
-              this.friends = friendData;
-
-              // for (let i = 0; i < this.friends.length; i++) {
-              //   const element = this.friends[i];
-              //   this.allUsers.filter(x => x.id !== element.user1.id && x.id !== element.user2.id);
-              // }
-
-              if (this.user.image) {
-                document.getElementById('profileImg').setAttribute('src', this.user.image);
-              }
-            }
-          );
-
+          if (this.user.image) {
+            document.getElementById('profileImg').setAttribute('src', this.user.image);
+          }
 
           this.profileForm = this.formBuilder.group({
             firstName: [this.user.firstName, Validators.required],
@@ -144,84 +103,71 @@ export class UserProfileComponent implements OnInit {
         this.initForm = this.profileForm.value;
         this.initDateOfBirth = new Date(this.user.dateOfBirth).toLocaleDateString();
         this.changedForm = false;
-        this.message = 'Changes successfully saved!';
-        this.showSnackBar();
+        this.appComponent.showSnackBar('Changes successfully saved!');
       },
       () => {
-        this.message = 'Error while saving changes!';
-        this.showSnackBar();
+        this.appComponent.showSnackBar('Error while saving changes!');
       }
     );
 
   }
 
-  sendFriendRequest(user2: any) {
-    const friend = {
-      'user1': this.user,
-      'user2': user2,
-      'accepted': false
-    };
-    this.userService.sendFriendRequest(friend).subscribe(
-      (data) => {
-        this.friends.push(data);
-        this.message = 'Request successfully sent!';
-        this.showSnackBar();
-      },
-      () => {
-        this.message = 'Error while sending request!';
-        this.showSnackBar();
-      }
-    );
-  }
+  // sendFriendRequest(user2: any) {
+  //   const friend = {
+  //     'user1': this.user,
+  //     'user2': user2,
+  //     'accepted': false
+  //   };
+  //   this.userService.sendFriendRequest(friend).subscribe(
+  //     (data) => {
+  //       this.friends.push(data);
+  //       this.message = 'Request successfully sent!';
+  //       this.showSnackBar();
+  //     },
+  //     () => {
+  //       this.message = 'Error while sending request!';
+  //       this.showSnackBar();
+  //     }
+  //   );
+  // }
 
-  acceptRequest(friend: any) {
-    this.userService.acceptFriendRequest(friend).subscribe(
-      () => {
-        friend.accepted = true;
-        this.message = 'You are now friends with \'' + friend.user1.firstName + ' ' + friend.user1.lastName + '\'!';
-        this.showSnackBar();
-      },
-      () => {
-        this.message = 'Error while accepting request!';
-        this.showSnackBar();
-      }
-    );
-  }
+  // acceptRequest(friend: any) {
+  //   this.userService.acceptFriendRequest(friend).subscribe(
+  //     () => {
+  //       friend.accepted = true;
+  //       this.message = 'You are now friends with \'' + friend.user1.firstName + ' ' + friend.user1.lastName + '\'!';
+  //       this.showSnackBar();
+  //     },
+  //     () => {
+  //       this.message = 'Error while accepting request!';
+  //       this.showSnackBar();
+  //     }
+  //   );
+  // }
 
-  deleteRequest(friend: any) {
-    this.userService.deleteFriendRequest(friend).subscribe(
-      () => {
-        const index = this.friends.indexOf(friend);
-        if (index >= 0) {
-          this.friends.splice(index, 1);
-        }
-        const sender = this.user.id === friend.user1.id;
-        const name = sender ? friend.user2.firstName + ' ' + friend.user2.lastName
-          : friend.user1.firstName + ' ' + friend.user1.lastName;
+  // deleteRequest(friend: any) {
+  //   this.userService.deleteFriendRequest(friend).subscribe(
+  //     () => {
+  //       const index = this.friends.indexOf(friend);
+  //       if (index >= 0) {
+  //         this.friends.splice(index, 1);
+  //       }
+  //       const sender = this.user.id === friend.user1.id;
+  //       const name = sender ? friend.user2.firstName + ' ' + friend.user2.lastName
+  //         : friend.user1.firstName + ' ' + friend.user1.lastName;
 
-        if (friend.accepted) {
-          this.message = 'You are no longer friends with \'' + name + '\'!';
-        } else {
-          this.message = 'Request ' + (sender ? 'to \'' : 'from \'') + name + '\' canceled!';
-        }
-        this.showSnackBar();
-      },
-      () => {
-        this.message = 'Error while canceling request!';
-        this.showSnackBar();
-      }
-    );
-  }
-
-  showSnackBar() {
-    if (this.message) {
-      const snackBarRef = this.snackBar.open(this.message, 'Dismiss', { duration: 3000 });
-      snackBarRef.onAction().subscribe(
-        () => {
-          snackBarRef.dismiss();
-        }
-      );
-    }
-  }
+  //       if (friend.accepted) {
+  //         this.message = 'You are no longer friends with \'' + name + '\'!';
+  //       } else {
+  //         this.message = 'Request ' + (sender ? 'to \'' : 'from \'') + name + '\' canceled!';
+  //       }
+  //       this.showSnackBar();
+  //     },
+  //     () => {
+  //       this.message = 'Error while canceling request!';
+  //       this.showSnackBar();
+  //     }
+  //   );
+  // }
 
 }

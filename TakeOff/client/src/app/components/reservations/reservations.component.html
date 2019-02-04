@@ -1,0 +1,17 @@
+<div *ngIf="!loading">
+  <div *ngIf="exists">
+
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item" *ngFor="let res of reservations">
+        {{res.ticket.flight.takeOffDate | date}}<br>
+        {{res.ticket.flight.distance}}km<br>
+        {{res.ticket.type}}
+      </li>
+    </ul>
+
+  </div>
+
+  <div *ngIf="!exists">
+    <h3>You don't have any reservations yet!</h3>
+  </div>
+</div>

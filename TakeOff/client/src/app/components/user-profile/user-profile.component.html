@@ -6,7 +6,7 @@
       <div id="first-container">
         <mat-form-field appearance="outline">
           <mat-label>First name</mat-label>
-          <input type="text" matInput formControlName="firstName">
+          <input type="text" matInput formControlName="firstName" required>
           <mat-error *ngIf="profileForm.get('firstName').invalid && (profileForm.get('firstName').dirty || profileForm.get('firstName').touched)">
             <div *ngIf="profileForm.get('firstName').errors.required"> First name is required.</div>
           </mat-error>
@@ -14,7 +14,7 @@
 
         <mat-form-field appearance="outline">
           <mat-label>Last name</mat-label>
-          <input type="text" matInput formControlName="lastName">
+          <input type="text" matInput formControlName="lastName" required>
           <mat-error *ngIf="profileForm.get('lastName').invalid && (profileForm.get('lastName').dirty || profileForm.get('lastName').touched)">
             <div *ngIf="profileForm.get('lastName').errors.required"> Last name is required.</div>
           </mat-error>
@@ -22,14 +22,14 @@
 
         <mat-form-field appearance="outline">
           <mat-label>Email</mat-label>
-          <input type="email" matInput formControlName="email">
+          <input type="email" matInput formControlName="email" required>
         </mat-form-field>
       </div>
 
       <div id="second-container">
         <mat-form-field appearance="outline">
           <mat-label>Phone number</mat-label>
-          <input type="text" matInput formControlName="phoneNumber">
+          <input type="text" matInput formControlName="phoneNumber" required>
           <mat-error *ngIf="profileForm.get('phoneNumber').invalid && (profileForm.get('phoneNumber').dirty || profileForm.get('phoneNumber').touched)">
             <div *ngIf="profileForm.get('phoneNumber').errors.required"> Phone number is required.</div>
             <div *ngIf="profileForm.get('phoneNumber').errors.pattern"> Invalid phone number format!.</div>
@@ -38,7 +38,7 @@
 
         <mat-form-field appearance="outline">
           <mat-label>Address</mat-label>
-          <input type="text" matInput formControlName="address">
+          <input type="text" matInput formControlName="address" required>
           <mat-error *ngIf="profileForm.get('address').invalid && (profileForm.get('address').dirty || profileForm.get('address').touched)">
             <div *ngIf="profileForm.get('address').errors.required"> Address is required.</div>
           </mat-error>
@@ -46,7 +46,7 @@
 
         <mat-form-field appearance="outline">
           <mat-label>Date of birth</mat-label>
-          <input matInput [matDatepicker]="picker" formControlName="dateOfBirth">
+          <input matInput [matDatepicker]="picker" formControlName="dateOfBirth" required>
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker disabled="false"></mat-datepicker>
           <!-- <input matInput type="date" formControlName="dateOfBirth" placeholder="Date of birth"> -->
@@ -56,12 +56,8 @@
       <div id="third-container">
         <mat-form-field appearance="outline">
           <mat-label>About me</mat-label>
-          <textarea matInput formControlName="aboutMe" rows="5"></textarea>
-          <mat-error *ngIf="profileForm.get('aboutMe').invalid && (profileForm.get('aboutMe').dirty || profileForm.get('aboutMe').touched)">
-            <div *ngIf="profileForm.get('aboutMe').errors.maxlength">
-              Maximum {{aboutMeMaxLength}} characters!
-            </div>
-          </mat-error>
+          <textarea #aboutMe matInput [attr.maxlength]="aboutMeMaxLength" formControlName="aboutMe" rows="5"></textarea>
+          <mat-hint align="end">{{aboutMe.value.length}} / {{aboutMeMaxLength}}</mat-hint>
         </mat-form-field>
 
         <button mat-raised-button id="submit" type="submit" (click)="updateUser()" color="primary" [disabled]="profileForm.invalid || !changedForm">Save
@@ -69,57 +65,6 @@
         <!-- </div> -->
 
       </div>
-    </div>
-
-    <div>
-      <mat-list>
-        <h3 mat-subheader>Friends</h3>
-        <mat-list-item *ngFor="let friend of friends">
-          <!-- ne radiii dobro :( -->
-          <!-- <ng-container> -->
-          <img matListAvatar src="{{friend.user1.id === user.id ? friend.user2.image : friend.user1.image}}" alt="">
-          <h3 matLine> {{friend.user1.id === user.id ? friend.user2.firstName : friend.user1.firstName}}
-            {{friend.user1.id === user.id ? friend.user2.lastName : friend.user1.lastName}}</h3>
-          <mat-checkbox [(ngModel)]="friend.accepted" labelPosition="before" disabled="true"></mat-checkbox>
-          <div matLine>
-            <button mat-icon-button color="primary" matTooltip="Accept request" (click)="acceptRequest(friend)" *ngIf="friend.user2.id === user.id && !friend.accepted">
-              <mat-icon>how_to_reg</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" matTooltip="Cancel request" (click)="deleteRequest(friend)" *ngIf="!friend.accepted">
-              <mat-icon>person_add_disabled</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" matTooltip="Remove from friends" (click)="deleteRequest(friend)" *ngIf="friend.accepted">
-              <mat-icon>block</mat-icon>
-            </button>
-          </div>
-          <!-- </ng-container> -->
-        </mat-list-item>
-      </mat-list>
-
-      <mat-divider></mat-divider>
-
-      <mat-list>
-        <h3 mat-subheader>All users</h3>
-        <mat-list-item *ngFor="let u of allUsers">
-          <img matListAvatar src="{{u.image}}" alt="">
-          <h3 matLine> {{u.firstName }} {{u.lastName}}</h3>
-          <div matLine>
-            <button mat-icon-button color="primary" matTooltip="Send friend request" (click)="sendFriendRequest(u)">
-              <mat-icon>person_add</mat-icon>
-            </button>
-          </div>
-        </mat-list-item>
-      </mat-list>
-
-      <!-- <mat-form-field>
-        <input matInput placeholder="Search users" [matAutocomplete]="auto" [formControl]="searchControl">
-        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-          <mat-option *ngFor="let user of filteredUsers | async" [value]="user.firstName">
-            <span>{{user.firstName}} {{user.lastName}}</span>
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field> -->
-
     </div>
 
   </div>

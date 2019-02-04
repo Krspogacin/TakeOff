@@ -22,6 +22,7 @@ import { LogoutComponent } from './components/logout/logout.component';
 import { RentACarsComponent } from './components/rent-a-cars/rent-a-cars.component';
 import { NameFilterPipe } from './pipes/name-filter.pipe';
 import { RentACarMainServiceDialogComponent } from './components/rent-a-car-main-service-dialog/rent-a-car-main-service-dialog.component';
+import { ReservationsComponent } from './components/reservations/reservations.component';
 import { OfficeDialogComponent } from './components/office-dialog/office-dialog.component';
 import { VehicleReservationDialogComponent } from './components/vehicle-reservation-dialog/vehicle-reservation-dialog.component';
 
@@ -43,6 +44,8 @@ import { VehicleReservationDialogComponent } from './components/vehicle-reservat
         RentACarMainServiceDialogComponent,
         OfficeDialogComponent,
         VehicleReservationDialogComponent,
+        ReservationsComponent,
+        OfficeDialogComponent
     ],
     entryComponents: [
         RoutingComponents,

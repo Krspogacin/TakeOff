@@ -67,6 +67,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 			.antMatchers("/users/**").permitAll()
 			.antMatchers("/rent-a-cars/**").permitAll()
 			.antMatchers("/vehicles/**").permitAll()
+			.antMatchers("/reservations/**").permitAll()
 			.anyRequest().authenticated().and()
 			.addFilterBefore(new TokenAuthenticationFilter(tokenUtils, userService), BasicAuthenticationFilter.class);
 

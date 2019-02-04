@@ -384,7 +384,19 @@ function SeatchartJS(seatMap, seatTypes) { // eslint-disable-line no-unused-vars
     */
     this.getShoppingCart = function getShoppingCart() {
         // return shoppingCart;
-        return shoppingCartDict;
+        // return shoppingCartDict;
+        const cart = {};
+        for (let key of Object.keys(shoppingCartDict)) {
+            const array = shoppingCartDict[key];
+            cart[key] = [];
+            for (let n of array) {
+                const parts = n.split('_');
+                const i = parseInt(parts[0]);
+                const j = parseInt(parts[1]);
+                cart[key].push(i* seatMap.rows + j);
+            }
+        }
+        return cart;
     };
 
     /**

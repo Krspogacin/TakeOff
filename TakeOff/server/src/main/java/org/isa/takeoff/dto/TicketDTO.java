@@ -27,6 +27,7 @@ public class TicketDTO {
 		super();
 		this.id = id;
 		this.number = number;
+		this.type = type;
 		this.discount = discount;
 		this.isOnDiscount = isOnDiscount;
 		this.isReserved = isReserved;
