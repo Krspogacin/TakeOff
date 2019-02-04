@@ -12,7 +12,6 @@ import { MaterialModule } from './material';
 import { RegistrationDialogComponent } from './components/registration-dialog/registration-dialog.component';
 import { AddHotelModalComponent } from './components/add-hotel-modal/add-hotel-modal.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { SuccessfulRegistrationComponent } from './components/successful-registration/successful-registration.component';
 import { LoginDialogComponent } from './components/login-dialog/login-dialog.component';
 import { TokenInterceptor } from './http-interceptor';
 import { VerifyUserComponent } from './components/verify-user/verify-user.component';
@@ -24,6 +23,7 @@ import { RentACarsComponent } from './components/rent-a-cars/rent-a-cars.compone
 import { NameFilterPipe } from './pipes/name-filter.pipe';
 import { RentACarMainServiceDialogComponent } from './components/rent-a-car-main-service-dialog/rent-a-car-main-service-dialog.component';
 import { OfficeDialogComponent } from './components/office-dialog/office-dialog.component';
+import { VehicleReservationDialogComponent } from './components/vehicle-reservation-dialog/vehicle-reservation-dialog.component';
 
 @NgModule({
     declarations: [
@@ -31,7 +31,6 @@ import { OfficeDialogComponent } from './components/office-dialog/office-dialog.
         RoutingComponents,
         NotFoundComponent,
         RegistrationDialogComponent,
-        SuccessfulRegistrationComponent,
         LoginDialogComponent,
         VerifyUserComponent,
         RentACarComponent,
@@ -43,6 +42,7 @@ import { OfficeDialogComponent } from './components/office-dialog/office-dialog.
         NameFilterPipe,
         RentACarMainServiceDialogComponent,
         OfficeDialogComponent,
+        VehicleReservationDialogComponent,
     ],
     entryComponents: [
         RoutingComponents,
@@ -52,7 +52,8 @@ import { OfficeDialogComponent } from './components/office-dialog/office-dialog.
         VehicleDialogComponent,
         AddHotelModalComponent,
         RentACarMainServiceDialogComponent,
-        OfficeDialogComponent
+        OfficeDialogComponent,
+        VehicleReservationDialogComponent
     ],
     imports: [
         BrowserModule,

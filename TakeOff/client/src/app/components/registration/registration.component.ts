@@ -44,9 +44,11 @@ export class RegistrationComponent implements OnInit {
       (data) => {
         if (data) {
           this.registrationService.registerUser(data).subscribe(
-            (user) => {
-              this.router.navigate(['/users/successful_registration']);
-            });
+            () => {
+              alert('You have successfully registered! Congratulations! Open the email and confirm that it is you!');
+              this.router.navigate(['/']);
+            }
+          );
         }
       }
     );

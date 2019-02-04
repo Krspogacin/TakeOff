@@ -35,6 +35,14 @@ export class RentACarService {
     return this.http.get('/rent-a-cars/' + id + '/vehicles');
   }
 
+  getVehiclesOnDiscount(id: number) {
+    return this.http.get('/rent-a-cars/' + id + '/vehiclesOnDiscount');
+  }
+
+  getAvailableVehicles(parameters: any) {
+    return this.http.get('/rent-a-cars/vehicles/availableVehicles?parametersDTO=' + encodeURI(JSON.stringify(parameters)));
+  }
+
   getRentACarRatings() {
     return this.http.get('/rent-a-cars/ratings');
   }
