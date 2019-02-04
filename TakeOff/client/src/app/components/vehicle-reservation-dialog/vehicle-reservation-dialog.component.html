@@ -1,0 +1,88 @@
+<h1 mat-dialog-title>Vehicle reservation</h1>
+<mat-dialog-content [formGroup]="">
+  <mat-horizontal-stepper #stepper linear labelPosition="bottom">
+    <mat-step [stepControl]="reservationForm" label="Enter reservation parameters" state="filter_list">
+      <form [formGroup]="reservationForm">
+          <div class="row d-flex justify-content-center">
+            <div class="col d-flex justify-content-center">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Start day </mat-label>
+                  <input matInput [matDatepicker]="startDatePicker" formControlName="startDate" required>
+                  <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+                  <mat-datepicker #startDatePicker disabled="false"></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <div class="col d-flex justify-content-center">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>End day </mat-label>
+                  <input matInput [matDatepicker]="endDatePicker" formControlName="endDate" required>
+                  <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+                  <mat-datepicker #endDatePicker disabled="false"></mat-datepicker>
+                </mat-form-field>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col d-flex justify-content-center">
+              <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Number of passengers </mat-label>
+                  <input matInput type="number" formControlName="numOfPassengers" required>
+                  <mat-error *ngIf="reservationForm.get(numOfPassengers) && reservationForm.get(numOfPassengers).invalid">
+                    <div *ngIf="reservationForm.get(numOfPassengers).errors.required"> Number of passengers is required.</div>
+                    <div *ngIf="reservationForm.get(numOfPassengers).errors.min || reservationForm.get(numOfPassengers).errors.max"> Wrong number of passengers!</div>
+                  </mat-error>
+                  <mat-hint>
+                    Number of passengers must be in range 1-7.
+                  </mat-hint>
+                </mat-form-field>
+            </div>
+            <div class="col d-flex justify-content-start">
+              <mat-form-field appearance="outline" class="w-50 mr-3">
+                <mat-label>Min price </mat-label>
+                <input #minPriceInput matInput type="number" formControlName="minPrice" min="0" max="{{maxPriceInput.value ? maxPriceInput.value : 999999999}}">
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="w-50">
+                <mat-label>Max price </mat-label>
+                <input #maxPriceInput matInput type="number" formControlName="maxPrice" min="{{minPriceInput.value ? minPriceInput.value : 0}}" max="999999999">
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col d-flex justify-content-center">
+              <mat-selection-list #fuelTypesList class="w-100">
+                  <h5 mat-subheader>Fuel types</h5>
+                  <mat-list-option *ngFor="let fuel of fuelTypes" [value]="fuel">
+                    {{fuel}}
+                  </mat-list-option>
+                </mat-selection-list>
+            </div>
+            <div class="col d-flex justify-content-center">
+              <mat-selection-list #transmissionTypesList class="w-100">
+                <h5 mat-subheader>Transmission types</h5>
+                <mat-list-option *ngFor="let transmission of transmissionTypes" [value]="transmission">
+                  {{transmission}}
+                </mat-list-option>
+              </mat-selection-list>
+            </div>
+          </div>
+      </form>
+      <div>
+        <button mat-raised-button [mat-dialog-close] class="mr-2">Cancel</button>
+        <button mat-raised-button matStepperNext color="primary" (click)="findVehicles()">Next</button>
+      </div>
+    </mat-step>
+    <mat-step label="Vehicles" state="directions_car">
+      <div>
+        <button mat-raised-button [mat-dialog-close] class="mr-2">Cancel</button>
+        <button mat-raised-button matStepperPrevious class="mr-2">Back</button>
+        <button mat-raised-button matStepperNext color="primary" [disabled]="!choosenVehicle">Next</button>
+      </div>
+    </mat-step>
+    <mat-step label="Done" state="done">
+      <div>
+        <button mat-raised-button [mat-dialog-close] class="mr-2">Cancel</button>
+        <button mat-raised-button matStepperPrevious class="mr-2">Back</button>
+        <button mat-raised-button (click)="finish()">Finish</button>
+      </div>
+    </mat-step>
+  </mat-horizontal-stepper>
+</mat-dialog-content>

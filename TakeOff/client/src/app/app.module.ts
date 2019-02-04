@@ -12,7 +12,6 @@ import { MaterialModule } from './material';
 import { RegistrationDialogComponent } from './components/registration-dialog/registration-dialog.component';
 import { AddHotelModalComponent } from './components/add-hotel-modal/add-hotel-modal.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { SuccessfulRegistrationComponent } from './components/successful-registration/successful-registration.component';
 import { LoginDialogComponent } from './components/login-dialog/login-dialog.component';
 import { TokenInterceptor } from './http-interceptor';
 import { VerifyUserComponent } from './components/verify-user/verify-user.component';
@@ -26,6 +25,7 @@ import { RentACarMainServiceDialogComponent } from './components/rent-a-car-main
 import { ReservationsComponent } from './components/reservations/reservations.component';
 import { OfficeDialogComponent } from './components/office-dialog/office-dialog.component';
 import { FriendsFilterPipe } from './pipes/friends-filter/friends-filter.pipe';
+import { VehicleReservationDialogComponent } from './components/vehicle-reservation-dialog/vehicle-reservation-dialog.component';
 
 @NgModule({
     declarations: [
@@ -33,7 +33,6 @@ import { FriendsFilterPipe } from './pipes/friends-filter/friends-filter.pipe';
         RoutingComponents,
         NotFoundComponent,
         RegistrationDialogComponent,
-        SuccessfulRegistrationComponent,
         LoginDialogComponent,
         VerifyUserComponent,
         RentACarComponent,
@@ -44,9 +43,10 @@ import { FriendsFilterPipe } from './pipes/friends-filter/friends-filter.pipe';
         RentACarsComponent,
         NameFilterPipe,
         RentACarMainServiceDialogComponent,
-        ReservationsComponent,
+        FriendsFilterPipe,
         OfficeDialogComponent,
-        FriendsFilterPipe
+        VehicleReservationDialogComponent,
+        ReservationsComponent,
     ],
     entryComponents: [
         RoutingComponents,
@@ -56,7 +56,8 @@ import { FriendsFilterPipe } from './pipes/friends-filter/friends-filter.pipe';
         VehicleDialogComponent,
         AddHotelModalComponent,
         RentACarMainServiceDialogComponent,
-        OfficeDialogComponent
+        OfficeDialogComponent,
+        VehicleReservationDialogComponent
     ],
     imports: [
         BrowserModule,

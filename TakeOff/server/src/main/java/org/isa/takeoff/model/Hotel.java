@@ -14,6 +14,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Version;
 
 import org.isa.takeoff.dto.HotelDTO;
 
@@ -27,8 +29,8 @@ public class Hotel {
 	@Column(name = "name", nullable = false)
 	private String name;
 
-	@Column(name = "address", nullable = false)
-	private String address;
+	@OneToOne(fetch = FetchType.EAGER)
+	private Location location;
 
 	@Column(name = "description", nullable = true)
 	private String description;
@@ -42,15 +44,17 @@ public class Hotel {
 	@OneToMany(mappedBy = "id.hotel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<HotelRating> hotelRatings = new HashSet<>();
 	
+	@Version
+	private Long version;
+	
 	public Hotel(){}
 	
 	public Hotel(HotelDTO hotelDTO) {
-		this(hotelDTO.getName(), hotelDTO.getAddress(), hotelDTO.getDescription());
+		this(hotelDTO.getName(), hotelDTO.getDescription());
 	}
 	
-	public Hotel(String name, String address, String description){
+	public Hotel(String name, String description){
 		this.name = name;
-		this.address = address;
 		this.description = description;
 	}
 
@@ -69,13 +73,13 @@ public class Hotel {
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	public String getAddress() {
-		return address;
+	
+	public Location getLocation() {
+		return location;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
 	public String getDescription() {
@@ -84,6 +88,14 @@ public class Hotel {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 
 	public List<Room> getRooms() {

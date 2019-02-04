@@ -20,7 +20,7 @@ public class ServiceHotel {
 	@Column(name="name", nullable = false)
 	private String name;
 	
-	@Column(name="price", nullable = false)
+	@Column(name="price")
 	private Double price;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
@@ -28,10 +28,13 @@ public class ServiceHotel {
 	
 	public ServiceHotel() { }
 
-	public ServiceHotel(String name, Double price) {
+	
+	
+	public ServiceHotel(String name, Double price, Hotel hotel) {
 		super();
 		this.name = name;
 		this.price = price;
+		this.hotel = hotel;
 	}
 	
 	public Long getId() {

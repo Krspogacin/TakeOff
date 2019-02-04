@@ -16,16 +16,17 @@ public class RoomDTO {
 	private boolean hasAirCondition;
 	private Integer numberOfRooms;
 	private HotelDTO hotel;
+	private Long version;
 	
 	public RoomDTO(){}
 	
 	public RoomDTO(Room room){
 		this(room.getId(), room.getDefaultPrice(), room.getDiscount(), room.getIsReserved(), room.getFloor(),
-		room.getNumberOfBeds(), room.getType(), room.isHasBalcony(), room.isHasAirCondition(), room.getNumberOfRooms(), new HotelDTO(room.getHotel()));
+		room.getNumberOfBeds(), room.getType(), room.isHasBalcony(), room.isHasAirCondition(), room.getNumberOfRooms(), new HotelDTO(room.getHotel()), room.getVersion());
 	}
 	
 	public RoomDTO(Long id, Double defaultPrice, Double discount, boolean isReserved, Integer floor, Integer numberOfBeds, RoomType roomType, boolean hasBalcony,
-			boolean hasAirCondition, Integer numberOfRooms, HotelDTO hotel) {
+			boolean hasAirCondition, Integer numberOfRooms, HotelDTO hotel, Long version) {
 		this.id = id;
 		this.defaultPrice = defaultPrice;
 		this.discount = discount;
@@ -37,6 +38,7 @@ public class RoomDTO {
 		this.hasAirCondition = hasAirCondition;
 		this.numberOfRooms = numberOfRooms;
 		this.hotel = hotel;
+		this.version = version;
 	}
 
 	public Long getId() {
@@ -108,7 +110,12 @@ public class RoomDTO {
 	public void setHotel(HotelDTO hotel) {
 		this.hotel = hotel;
 	}
-	
-	
-	
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
+	}
 }

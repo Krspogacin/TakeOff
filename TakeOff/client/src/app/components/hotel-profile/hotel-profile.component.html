@@ -3,15 +3,31 @@
         <h1 style="text-align: center">{{hotel.name}}</h1>
         <button mat-raised-button color="primary" style="float: right;margin: 5px;" (click)="openAddRoomDialog()"><mat-icon>add</mat-icon> Add room</button>
         <button mat-raised-button color="primary" style="float: right;margin: 5px;" (click)="openUpdateDialog()"><mat-icon>edit</mat-icon> Update hotel</button>
-        <p><font size="5"><b>Address:</b> {{hotel.address}}</font></p>
         <p><font size="5"><b>Description:</b> {{hotel.description}}</font></p>
+        <b><font size="5">Rating: </font></b>
+        <span style="display: flex; flex-direction: row">
+            <div class="star-ratings-css">
+              <div class="star-ratings-css-top" [ngStyle]="{'width': ((rating * 100) / 5) + '%'}"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+              <div class="star-ratings-css-bottom"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+            </div>
+            <p style="padding-left: 20px;">{{rating}}/5</p>
+          </span>
+          <p><font size="5"><b>Address:</b> {{hotel.location.address}}</font> &nbsp;
+          <button mat-button color="primary" *ngIf="!clicked" (click)="clicked = true">Show on map</button>
+          <button mat-button color="primary" *ngIf="clicked" (click)="clicked = false">Close map</button></p>
+            <div *ngIf="clicked">
+              <iframe width="600" height="500" [src]='url' 
+                      frameborder="0" scrolling="no" marginheight="0" marginwidth="0">
+              </iframe>
+            </div>
         <div class="mat-elevation-z8" *ngIf="rooms">
+        <b><font size="5">Rooms: </font></b>
         <table style="width:100%" mat-table matSort [dataSource]="rooms.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)">
             
-<!--             <ng-container matColumnDef="position">
+            <ng-container matColumnDef="position">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> No. </th>
                 <td mat-cell *matCellDef="let room"> {{room.id}} </td>
-            </ng-container> -->
+            </ng-container>
 
             <ng-container matColumnDef="type">
                 <th mat-header-cell *matHeaderCellDef> Type </th>
@@ -65,38 +81,19 @@
                 <td style="padding-left:2%" mat-cell *matCellDef="let room"> {{room.numberOfRooms}} </td>
             </ng-container>
  
-            <ng-container matColumnDef="priceFor5Days">
-                <th mat-header-cell *matHeaderCellDef> Price for 5 days </th>
-                <td style="padding-left:2%" mat-cell *matCellDef="let room">
-                    <div *ngFor="let prices of roomPrices">
-                        <div *ngIf="prices.room.id == room.id && prices.period == '5'"> {{prices.price}} </div>
-                    </div>
-                </td>
-            </ng-container>
-
-            <ng-container matColumnDef="priceFor10Days">
-                <th mat-header-cell *matHeaderCellDef> Price for 10 days </th>
-                <td style="padding-left:2%" mat-cell *matCellDef="let room">
-                    <div *ngFor="let prices of roomPrices">
-                        <div *ngIf="prices.room.id == room.id && prices.period == '10'"> {{prices.price}} </div>
-                    </div>
-                </td>
-            </ng-container>
-
-            <ng-container matColumnDef="priceFor20Days">
-                <th mat-header-cell *matHeaderCellDef> Price for 20 days </th>
-                <td style="padding-left:2%" mat-cell *matCellDef="let room">
-                    <div *ngFor="let prices of roomPrices">
-                        <div *ngIf="prices.room.id == room.id && prices.period == '20'"> {{prices.price}} </div>
-                    </div>
-                </td>
-            </ng-container>
-
-            <ng-container matColumnDef="priceForMoreDays">
-                <th mat-header-cell *matHeaderCellDef> Price for more than 20 days </th>
-                <td style="padding-left:2%" mat-cell *matCellDef="let room">
-                    <div *ngFor="let prices of roomPrices">
-                        <div *ngIf="prices.room.id == room.id && prices.period == 'MoreThan20'"> {{prices.price}} </div>
+            <ng-container matColumnDef="rating">
+                <th mat-header-cell *matHeaderCellDef> Room rating </th>
+                <td mat-cell *matCellDef="let room">
+                    <div *ngFor="let rating of roomRatings">
+                        <div *ngIf="rating.room.id == room.id">
+                            <span style="display: flex; flex-direction: row">
+                                <div class="star-ratings-css">
+                                    <div class="star-ratings-css-top" [ngStyle]="{'width': ((rating.rating * 100) / 5) + '%'}"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+                                    <div class="star-ratings-css-bottom"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+                                </div>
+                                <p style="padding-left: 20px;">{{rating.rating}}/5</p>
+                            </span>
+                        </div>
                     </div>
                 </td>
             </ng-container>
@@ -130,9 +127,108 @@
             (page)="pageFunction($event)">
         </mat-paginator>
         </div>
+        <br><br>
+        <div class="mat-elevation-z8" *ngIf="rooms">
+        <b><font size="5">Room prices: </font></b>
+        <table style="width:100%" mat-table matSort [dataSource]="rooms.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)">
+        
+            <ng-container matColumnDef="position">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Room No. </th>
+                <td mat-cell *matCellDef="let room"> {{room.id}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="priceFor5Days">
+                <th mat-header-cell *matHeaderCellDef> Price for 5 days </th>
+                <td style="padding-left:2%" mat-cell *matCellDef="let room">
+                    <div *ngFor="let prices of roomPrices">
+                        <div *ngIf="prices.room.id == room.id && prices.period == '5'"> {{prices.price}} </div>
+                    </div>
+                </td>
+            </ng-container>
+    
+            <ng-container matColumnDef="priceFor10Days">
+                <th mat-header-cell *matHeaderCellDef> Price for 10 days </th>
+                <td style="padding-left:2%" mat-cell *matCellDef="let room">
+                    <div *ngFor="let prices of roomPrices">
+                        <div *ngIf="prices.room.id == room.id && prices.period == '10'"> {{prices.price}} </div>
+                    </div>
+                </td>
+            </ng-container>
+    
+            <ng-container matColumnDef="priceFor20Days">
+                <th mat-header-cell *matHeaderCellDef> Price for 20 days </th>
+                <td style="padding-left:2%" mat-cell *matCellDef="let room">
+                    <div *ngFor="let prices of roomPrices">
+                        <div *ngIf="prices.room.id == room.id && prices.period == '20'"> {{prices.price}} </div>
+                    </div>
+                </td>
+            </ng-container>
+    
+            <ng-container matColumnDef="priceForMoreDays">
+                <th mat-header-cell *matHeaderCellDef> Price for more than 20 days </th>
+                <td style="padding-left:2%" mat-cell *matCellDef="let room">
+                    <div *ngFor="let prices of roomPrices">
+                        <div *ngIf="prices.room.id == room.id && prices.period == 'MoreThan20'"> {{prices.price}} </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns2;"></tr>
+        </table>
+        </div>
         <div *ngIf="!rooms || rooms.length == 0">
                 <h4>This hotel does not have any rooms yet!</h4>
         </div>
+    </div>
+    <br><br>
+    <b><font size="5">Additional services: </font></b>&nbsp;&nbsp;
+    <button mat-button color="primary" *ngIf="!edit" (click)="edit = true"><mat-icon>edit</mat-icon></button>
+    <button mat-button color="primary" *ngIf="edit" (click)="save()"> Save changes</button>
+    <div *ngIf="edit">
+        <form [formGroup]="additionalServices">
+        <table style="width: 40%" mat-table matSort [dataSource]="defaultServices">
+
+                <ng-container matColumnDef="service">
+                        <th mat-header-cell *matHeaderCellDef> Service </th>
+                        <td style="padding-left:2%" mat-cell *matCellDef="let service"> {{service.name}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="flag">
+                        <th mat-header-cell *matHeaderCellDef></th>
+                        <td style="padding-left:2%" mat-cell *matCellDef="let service">
+                            <mat-checkbox [formControlName]="'CB'+service.id" color="primary"></mat-checkbox>
+                        </td>
+                </ng-container>
+
+                <ng-container matColumnDef="price">
+                        <th mat-header-cell *matHeaderCellDef> Price </th>
+                        <td style="padding-left:2%" mat-cell *matCellDef="let service">
+                            <input matInput autocomplete="off" [formControlName]="'Price'+service.id" type="number" placeholder="Service price">
+                        </td>
+                </ng-container>
+        
+                <tr mat-header-row *matHeaderRowDef="displayedColumns3"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns3;"></tr>
+        </table>
+        </form>
+    </div>
+    <div *ngIf="!edit">
+        <table style="width: 40%" mat-table matSort [dataSource]="selectedServices">
+
+                <ng-container matColumnDef="service">
+                        <th mat-header-cell *matHeaderCellDef> Service </th>
+                        <td style="padding-left:2%" mat-cell *matCellDef="let service"> {{service.name}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="price">
+                        <th mat-header-cell *matHeaderCellDef> Price </th>
+                        <td style="padding-left:2%" mat-cell *matCellDef="let service"> {{service.price}} </td>
+                </ng-container>
+        
+                <tr mat-header-row *matHeaderRowDef="displayedColumns4"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns4;"></tr>
+        </table>
     </div>
     <div *ngIf="!hotelExists">
         <p>

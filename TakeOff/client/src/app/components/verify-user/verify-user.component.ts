@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RegistrationService } from 'src/app/services/registration/registration.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 enum VerificationStatus {
   OK = 200,
@@ -15,23 +15,30 @@ enum VerificationStatus {
 })
 export class VerifyUserComponent implements OnInit {
 
-  waiting = true;
-  verificationStatus: VerificationStatus;
-
-  constructor(private registrationService: RegistrationService, private activatedRoute: ActivatedRoute) { }
+  constructor(private registrationService: RegistrationService,
+              private activatedRoute: ActivatedRoute,
+              private router: Router) { }
 
   ngOnInit() {
     this.activatedRoute.queryParams.subscribe(params => {
       const token = params['token'];
       this.registrationService.verifyUser(token).subscribe(
         () => {
-          this.verificationStatus = VerificationStatus.OK;
-          this.waiting = false;
+          alert('Verified successfully! Please log in to continue browsing our site.');
+          this.router.navigate(['/']);
         },
         (error) => {
-            this.verificationStatus = error.status;
-            this.waiting = false;
-        });
+            let message = '';
+            if (error.status === 400) {
+              message = 'Error! User is already verified!';
+            } else if (error.status === 404) {
+              message = 'Error! User is not found!';
+            }
+
+            alert(message);
+            this.router.navigate(['/']);
+        }
+      );
     });
   }
 }
