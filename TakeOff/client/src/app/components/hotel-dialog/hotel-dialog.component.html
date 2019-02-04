@@ -8,8 +8,7 @@
     </mat-form-field>
     <br>
     <mat-form-field>
-        <mat-icon matSuffix color="primary">location_on</mat-icon>
-        <input matInput type="text" formControlName="address" placeholder="Address">
+        <input matInput id="address-input" type="text" formControlName="address" placeholder="Address">
         <mat-error *ngIf="hotelUpdateForm.get('address').invalid && (hotelUpdateForm.get('address').dirty || hotelUpdateForm.get('address').touched)">
                 <div *ngIf="hotelUpdateForm.get('address').errors.required"> Address is required.</div>
         </mat-error>

@@ -43,8 +43,8 @@ import { OfficeDialogComponent } from './components/office-dialog/office-dialog.
         RentACarsComponent,
         NameFilterPipe,
         RentACarMainServiceDialogComponent,
-        ReservationsComponent
-        OfficeDialogComponent,
+        ReservationsComponent,
+        OfficeDialogComponent
     ],
     entryComponents: [
         RoutingComponents,

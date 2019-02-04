@@ -18,7 +18,7 @@
               <tr>
                   <td>
                     <mat-form-field>
-                      <input matInput type="text"formControlName="address" placeholder="Address">
+                      <input matInput type="search" id="address-input" formControlName="address" placeholder="Address">
                       <mat-error *ngIf="firstFormGroup.get('address').invalid && (firstFormGroup.get('address').dirty || firstFormGroup.get('address').touched)">
                           <div *ngIf="firstFormGroup.get('address').errors.required"> Address is required.</div>
                       </mat-error>
