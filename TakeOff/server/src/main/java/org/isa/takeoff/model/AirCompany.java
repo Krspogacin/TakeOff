@@ -17,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Version;
 
 import org.isa.takeoff.dto.AirCompanyDTO;
@@ -31,8 +32,8 @@ public class AirCompany {
 	@Column(name = "name", unique = true, nullable = false)
 	private String name;
 
-	@Column(name = "address", nullable = false)
-	private String address;
+	@OneToOne(fetch = FetchType.EAGER)
+	private Location location;	
 
 	@Column(name = "description", nullable = true)
 	private String description;
@@ -54,12 +55,11 @@ public class AirCompany {
 	}
 	
 	public AirCompany(AirCompanyDTO airCompanyDTO) {
-		this(airCompanyDTO.getName(), airCompanyDTO.getAddress(), airCompanyDTO.getDescription());
+		this(airCompanyDTO.getName(), airCompanyDTO.getDescription());
 	}
 
-	public AirCompany(String name, String address, String description) {
+	public AirCompany(String name, String description) {
 		this.name = name;
-		this.address = address;
 		this.description = description;
 	}
 
@@ -79,12 +79,12 @@ public class AirCompany {
 		this.name = name;
 	}
 
-	public String getAddress() {
-		return address;
+	public Location getLocation() {
+		return location;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
 	public String getDescription() {
@@ -111,8 +111,8 @@ public class AirCompany {
 		this.flights = new HashSet<>(flights);
 	}
 
-	public Set<AirCompanyRating> getCompanyRatings() {
-		return companyRatings;
+	public List<AirCompanyRating> getCompanyRatings() {
+		return new ArrayList<>(companyRatings);
 	}
 
 	public void setCompanyRatings(List<AirCompanyRating> companyRatings) {

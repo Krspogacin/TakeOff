@@ -6,7 +6,7 @@ public class AirCompanyDTO {
 
 	private Long id;
 	private String name;
-	private String address;
+	private LocationDTO location;
 	private String description;
 	private Long version;
 
@@ -15,15 +15,15 @@ public class AirCompanyDTO {
 	}
 
 	public AirCompanyDTO(AirCompany airCompany) {
-		this(airCompany.getId(), airCompany.getName(), airCompany.getAddress(), airCompany.getDescription(),
-				airCompany.getVersion());
+		this(airCompany.getId(), airCompany.getName(), new LocationDTO(airCompany.getLocation()),
+				airCompany.getDescription(), airCompany.getVersion());
 	}
 
-	public AirCompanyDTO(Long id, String name, String address, String description, Long version) {
+	public AirCompanyDTO(Long id, String name, LocationDTO location, String description, Long version) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.address = address;
+		this.location = location;
 		this.description = description;
 		this.version = version;
 	}
@@ -44,12 +44,12 @@ public class AirCompanyDTO {
 		this.name = name;
 	}
 
-	public String getAddress() {
-		return address;
+	public LocationDTO getLocation() {
+		return location;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
+	public void setLocation(LocationDTO location) {
+		this.location = location;
 	}
 
 	public String getDescription() {

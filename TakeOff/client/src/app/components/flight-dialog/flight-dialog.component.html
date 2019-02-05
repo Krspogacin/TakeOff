@@ -1,49 +1,53 @@
 <h1 mat-dialog-title>{{update ? 'Update flight' : 'Add new flight'}}</h1>
 <mat-dialog-content [formGroup]="flightForm" class="fields-container">
   <mat-form-field>
-    <input matInput type="datetime-local" formControlName="takeOffDate" placeholder="Take off date">
+    <input matInput type="text" id="takeOffLocation-input" formControlName="takeOffLocation" required>
+    <mat-label>From <mat-icon>flight_takeoff</mat-icon></mat-label>
+    <mat-error *ngIf="flightForm.get('takeOffLocation').invalid && (flightForm.get('takeOffLocation').dirty || flightForm.get('takeOffLocation').touched)">
+      <div *ngIf="flightForm.get('takeOffLocation').errors.required"> Take off location is required.</div>
+    </mat-error>
+  </mat-form-field>
+  <br>
+  <mat-form-field>
+    <input matInput type="text" id="landingLocation-input" formControlName="landingLocation" placeholder="To" required>
+    <mat-label>To <mat-icon>flight_land</mat-icon></mat-label>
+    <mat-error *ngIf="flightForm.get('landingLocation').invalid && (flightForm.get('landingLocation').dirty || flightForm.get('landingLocation').touched)">
+      <div *ngIf="flightForm.get('landingLocation').errors.required"> Landing location is required.</div>
+    </mat-error>
+  </mat-form-field>
+  <br>
+  <mat-form-field>
+    <input matInput type="datetime-local" formControlName="takeOffDate" placeholder="Take off date" required>
     <mat-error *ngIf="flightForm.get('takeOffDate').invalid && (flightForm.get('takeOffDate').dirty || flightForm.get('takeOffDate').touched)">
       <div *ngIf="flightForm.get('takeOffDate').errors.required"> Take off date is required.</div>
     </mat-error>
   </mat-form-field>
   <br>
   <mat-form-field>
-    <input matInput type="datetime-local" formControlName="landingDate" placeholder="Landing date">
+    <input matInput type="datetime-local" formControlName="landingDate" placeholder="Landing date" required>
     <mat-error *ngIf="flightForm.get('landingDate').invalid && (flightForm.get('landingDate').dirty || flightForm.get('landingDate').touched)">
       <div *ngIf="flightForm.get('landingDate').errors.required"> Landing date is required.</div>
     </mat-error>
   </mat-form-field>
   <br>
   <mat-form-field>
-    <input matInput type="number" formControlName="distance" placeholder="Distance">
-    <mat-error *ngIf="flightForm.get('distance').invalid && (flightForm.get('distance').dirty || flightForm.get('distance').touched)">
-      <div *ngIf="flightForm.get('distance').errors.required"> Distance is required.</div>
-    </mat-error>
-  </mat-form-field>
-  <br>
-  <mat-form-field>
-    <input matInput type="number" formControlName="ticketPrice" placeholder="Price">
+    <input matInput type="number" formControlName="ticketPrice" placeholder="Price" required>
     <mat-error *ngIf="flightForm.get('ticketPrice').invalid && (flightForm.get('ticketPrice').dirty || flightForm.get('ticketPrice').touched)">
       <div *ngIf="flightForm.get('ticketPrice').errors.required"> Price is required.</div>
     </mat-error>
   </mat-form-field>
+  <br>
   <mat-form-field>
-    <mat-chip-list #chipList>
-      <mat-chip *ngFor="let dest of destinations" color="primary" [removable]="true" (removed)="removeDestination(dest)">
+    <input matInput type="text" id="transferLocations-input" formControlName="destinations" placeholder="Transfer locations">
+  </mat-form-field>
+  <br>
+  <mat-form-field>
+    <mat-chip-list>
+      <mat-chip *ngFor="let dest of destinations" color="primary" (removed)="removeDestination(dest)">
         {{dest.city}}, {{dest.country}}
-        <mat-icon matChipRemove *ngIf="true">cancel</mat-icon>
+        <mat-icon matChipRemove>cancel</mat-icon>
       </mat-chip>
-      <input #destInput placeholder="Destinations" formControlName="destinations" [matChipInputFor]="chipList"
-        [matAutocomplete]="auto">
-      <!-- <mat-error *ngIf="flightForm.get('destinations').invalid && (flightForm.get('destinations').dirty || flightForm.get('destinations').touched)">
-        <div *ngIf="flightForm.get('destinations').errors.required"> Destinations are required.</div>
-      </mat-error> -->
     </mat-chip-list>
-    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="selectDestination($event)">
-      <mat-option *ngFor="let dest of filteredDestinations | async" [value]="dest">
-        {{dest.city}}, {{dest.country}}
-      </mat-option>
-    </mat-autocomplete>
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions>

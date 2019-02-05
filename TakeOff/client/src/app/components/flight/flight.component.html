@@ -6,11 +6,15 @@
       <button mat-raised-button color="primary" (click)="openUpdateDialog()">
         <mat-icon>edit</mat-icon> Update
       </button>
+      <br>
     </div>
+    <br>
 
+    <p><b>From:</b>{{flight.takeOffLocation.city}}</p>
+    <p><b>To:</b> {{flight.landingLocation.city}} </p>
     <p><b>Take off date:</b> {{flight.takeOffDate | date}} </p>
     <p><b>Landing date:</b> {{flight.landingDate}} </p>
-    <p><b>Distance:</b> {{flight.distance}} </p>
+    <p><b>Distance:</b> calculating... </p>
     <p><b>Ticket price:</b> {{flight.ticketPrice | currency}} </p>
     <h3>Destinations:</h3>
     <mat-form-field>

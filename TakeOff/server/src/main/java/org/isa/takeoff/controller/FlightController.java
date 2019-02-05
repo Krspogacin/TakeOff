@@ -3,18 +3,20 @@ package org.isa.takeoff.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
-import org.isa.takeoff.dto.LocationDTO;
 import org.isa.takeoff.dto.FlightDTO;
+import org.isa.takeoff.dto.LocationDTO;
 import org.isa.takeoff.dto.TicketDTO;
 import org.isa.takeoff.model.AirCompany;
-import org.isa.takeoff.model.Location;
 import org.isa.takeoff.model.Flight;
 import org.isa.takeoff.model.FlightDiagram;
+import org.isa.takeoff.model.FlightRating;
+import org.isa.takeoff.model.Location;
 import org.isa.takeoff.model.Ticket;
 import org.isa.takeoff.service.AirCompanyService;
-import org.isa.takeoff.service.LocationService;
 import org.isa.takeoff.service.FlightService;
+import org.isa.takeoff.service.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,7 +38,7 @@ public class FlightController {
 	private AirCompanyService airCompanyService;
 
 	@Autowired
-	private LocationService destinationService;
+	private LocationService locationService;
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<FlightDTO> getFlight(@PathVariable Long id) {
@@ -62,7 +64,7 @@ public class FlightController {
 		try {
 			AirCompany company = airCompanyService.findOne(flightDTO.getCompany().getId());
 
-			Flight flight = new Flight(flightDTO.getTakeOffDate(), flightDTO.getLandingDate(), flightDTO.getDistance(),
+			Flight flight = new Flight(flightDTO.getTakeOffDate(), flightDTO.getLandingDate(),
 					flightDTO.getTicketPrice());
 
 			List<Ticket> tickets = new ArrayList<>();
@@ -80,8 +82,26 @@ public class FlightController {
 			FlightDiagram diagram = new FlightDiagram(9, 9, new ArrayList<>(Arrays.asList(4)),
 					new ArrayList<>(Arrays.asList(4)));
 
+			Location takeOffLocation = this.locationService.findOneByLatitudeAndLongitude(
+					flightDTO.getTakeOffLocation().getLatitude(), flightDTO.getTakeOffLocation().getLongitude());
+
+			if (takeOffLocation == null) {
+				takeOffLocation = new Location(flightDTO.getTakeOffLocation());
+				takeOffLocation = this.locationService.save(takeOffLocation);
+			}
+
+			Location landingLocation = this.locationService.findOneByLatitudeAndLongitude(
+					flightDTO.getLandingLocation().getLatitude(), flightDTO.getLandingLocation().getLongitude());
+
+			if (landingLocation == null) {
+				landingLocation = new Location(flightDTO.getLandingLocation());
+				landingLocation = this.locationService.save(landingLocation);
+			}
+
 			flight.setDiagram(diagram);
 			flight.setTickets(tickets);
+			flight.setTakeOffLocation(takeOffLocation);
+			flight.setLandingLocation(landingLocation);
 			flight.setCompany(company);
 			flight = flightService.save(flight);
 
@@ -99,7 +119,6 @@ public class FlightController {
 			Flight flight = flightService.findOne(flightDTO.getId());
 			flight.setTakeOffDate(flightDTO.getTakeOffDate());
 			flight.setLandingDate(flightDTO.getLandingDate());
-			flight.setDistance(flightDTO.getDistance());
 			flight.setTicketPrice(flightDTO.getTicketPrice());
 			flight = flightService.save(flight);
 
@@ -138,8 +157,17 @@ public class FlightController {
 			Flight flight = flightService.findOne(id);
 
 			List<Location> destinations = new ArrayList<>();
-			for (LocationDTO d : destinationsDTO) {
-				destinations.add(destinationService.findOne(d.getId()));
+			for (LocationDTO dest : destinationsDTO) {
+
+				Location location = this.locationService.findOneByLatitudeAndLongitude(dest.getLatitude(),
+						dest.getLongitude());
+				
+				if (location == null) {
+					location = new Location(dest);
+					location = this.locationService.save(location);
+				}
+
+				destinations.add(location);
 			}
 
 			flight.setTransferDestinations(destinations);
@@ -171,21 +199,21 @@ public class FlightController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
-	
-	@RequestMapping(value = "/{id}/reservations", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<TicketDTO>> reserveFlightTickets(@PathVariable Long id,
-			@RequestBody List<TicketDTO> ticketsDTO) {
 
+	@RequestMapping(value = "/{id}/rating", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Double> getFlightRating(@PathVariable Long id) {
 		try {
 			Flight flight = flightService.findOne(id);
-			List<Ticket> tickets = flight.getTickets();
+			List<FlightRating> ratings = flight.getFlightRatings();
 
-//			List<TicketDTO> ticketsDTO = new ArrayList<>();
-//			for (Ticket t : tickets) {
-//				ticketsDTO.add(new TicketDTO(t));
-//			}
+			if (ratings.isEmpty()) {
+				return new ResponseEntity<>(new Double(0), HttpStatus.OK);
+			}
 
-			return new ResponseEntity<>(ticketsDTO, HttpStatus.OK);
+			AtomicReference<Double> ratingsSum = new AtomicReference<Double>(0.0);
+			ratings.forEach(rating -> ratingsSum.accumulateAndGet(rating.getRating(), (x, y) -> x + y));
+
+			return new ResponseEntity<>(ratingsSum.get() / ratings.size(), HttpStatus.OK);
 
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);

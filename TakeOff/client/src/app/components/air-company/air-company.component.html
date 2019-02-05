@@ -6,13 +6,28 @@
             <button mat-raised-button color="primary" (click)="openAddFlightDialog()">
                 <mat-icon>add</mat-icon> Add flight
             </button>
-            <button mat-raised-button color="primary" (click)="openUpdateDialog()">
+            <button mat-raised-button color="primary" (click)="openUpdateDialog()" style="margin: 5px">
                 <mat-icon>edit</mat-icon> Update
             </button>
         </div>
 
-        <p><b>Address:</b> {{company.address}} </p>
-        <p><b>Description:</b> {{company.description}} </p>
+        <div class="p-3">
+            <p><b>Description:</b> {{(!company.description) ? '✗' : company.description}}</p>
+            <b>Rating: </b>
+            <div class="star-ratings-css mx-2">
+                <div class="star-ratings-css-top">
+                    <span [ngStyle]="{'width': ((rating * 100) / 5) + '%'}">★★★★★</span>
+                </div>
+                <div><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+            </div>
+            <span class="badge badge-pill badge-info align-middle">{{rating}}/5</span>
+            <p><br><b>Address:</b> {{company.location.address}}</p>
+            <div>
+                <iframe width="600" height="500" [src]='mapUrl' frameborder="0" scrolling="no" marginheight="0"
+                    marginwidth="0">
+                </iframe>
+            </div>
+        </div>
 
         <h3>Destinations:</h3>
         <mat-form-field>
@@ -24,13 +39,43 @@
         </mat-form-field>
 
         <h3>Flights:</h3>
-        <mat-card class="example-card" *ngFor="let flight of flights">
+        <ul class="list-group col-6">
+            <a class="list-group-item list-group-item-action row" *ngFor="let flight of flights" routerLink="/flights/{{flight.id}}">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">
+                        <mat-icon>flight_takeoff</mat-icon>&nbsp;&nbsp;{{flight.takeOffLocation.city}}&nbsp;
+                        <mat-icon>flight_land</mat-icon>&nbsp;&nbsp;{{flight.landingLocation.city}}
+                    </h5>
+                    <small>from {{flight.ticketPrice | currency}}</small>
+                </div>
+                <!-- <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius
+                    blandit.</p> -->
+                <small>{{flight.takeOffDate | date}}</small>
+                <!-- <div class="col-3">
+                    <mat-label>
+                        <mat-icon>flight_takeoff</mat-icon> {{flight.takeOffLocation.city}} &nbsp;
+                    </mat-label>
+                    <mat-label>
+                        <mat-icon>flight_land</mat-icon> {{flight.landingLocation.city}}
+                    </mat-label>
+                </div>
+                <div class="col-3">
+                    {{flight.takeOffDate | date}} <b>-</b> {{flight.landingDate | date}}
+                </div> -->
+            </a>
+        </ul>
+        <!-- <mat-card *ngFor="let flight of flights">
             <mat-card-header>
-                <mat-card-title>{{flight.takeOffDate | date}}</mat-card-title>
-                <mat-card-subtitle>take off</mat-card-subtitle>
-
-                <mat-card-title>{{flight.landingDate}}</mat-card-title>
-                <mat-card-subtitle>landing</mat-card-subtitle>
+                <mat-card-title>
+                    <mat-label>
+                        <mat-icon>flight_takeoff</mat-icon> {{flight.takeOffLocation.city}}
+                    </mat-label>
+                    <mat-label>
+                        <mat-icon>flight_land</mat-icon> {{flight.landingLocation.city}}
+                    </mat-label>
+                </mat-card-title>
+                {{flight.takeOffDate | date}}
+                {{flight.landingDate}}
             </mat-card-header>
             <mat-card-content>
                 <p><b>Distance:</b> {{flight.distance}} </p>
@@ -39,7 +84,7 @@
             <mat-card-actions>
                 <button mat-stroked-button color="primary" routerLink="/flights/{{flight.id}}">DETAILS</button>
             </mat-card-actions>
-        </mat-card>
+        </mat-card> -->
 
     </div>
 

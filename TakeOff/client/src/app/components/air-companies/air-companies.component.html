@@ -1,26 +1,70 @@
-<h2 style="padding: 0% 0% 0% 2.5%;">List of air companies:</h2>
-<div style="display:flex; flex-wrap: wrap" *ngIf="companies">
-  <mat-card *ngFor="let company of companies.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)" class="example-card">
-    <mat-card-header>
-      <mat-card-title>{{company.name}}</mat-card-title>
-    </mat-card-header>
-    <img mat-card-image src="https://media.etihad.com/cms/webimage/BaseImage_Standard/Documents/Press-Release-Images/ey-eap-1.jpg.jpg">
-    <mat-card-content>
-      <p>
-        <b>Address: </b> {{company.address}}
-      </p>
-      <p>
-        <b>Description: </b> {{company.description}}
-      </p>
-    </mat-card-content>
-    <mat-card-actions>
-      <button mat-stroked-button color="primary" routerLink="/companies/{{company.id}}">DETAILS</button>
-    </mat-card-actions>
-  </mat-card>
+<button *ngIf="userRole === 'ROLE_USER'" mat-raised-button (click)="openAddCompanyDialog()" color="primary" style="margin: 2.5% 0% 0% 0%;">
+  <mat-icon>add</mat-icon> Add Air Company
+</button>
+<mat-form-field style="float: right; padding-right: 3%; padding-top: 2%;">
+  <mat-select placeholder="Sort by" (selectionChange)="sort($event.value)" [(ngModel)]="selected" style="width: 110%;">
+    <mat-select-trigger>
+      {{selectedOption.viewValue}} <mat-icon color="primary">{{selectedOption.icon}}</mat-icon>
+    </mat-select-trigger>
+    <mat-option *ngFor="let option of sortOptions" [value]="option.value">{{option.viewValue}} <mat-icon color="primary">{{option.icon}}</mat-icon>
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+<div class="row">
+  <!-- <div class="col-md-2 ml-5">
+    <div class="mt-5">
+      <h3>Search:</h3>
+      <mat-form-field>
+        <input matInput [(ngModel)]="nameParam" placeholder="Search by name">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput [(ngModel)]="countryParam" placeholder="Search by country">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput [(ngModel)]="cityParam" placeholder="Search by city">
+      </mat-form-field>
+    </div>
+    <button mat-raised-button color="primary" (click)="search(nameParam, countryParam, cityParam)">
+      Search <mat-icon>search</mat-icon>
+    </button>
+  </div> -->
+  <div class="col-md-9">
+    <div *ngIf="!loading && companies">
+      <div class="container d-flex justify-content-start m-5" *ngFor="let company of companies.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)">
+        <div class="card w-100 p-4 mat-elevation-z12">
+          <div class="row">
+            <div class="col-md-6">
+              <img src="https://media.etihad.com/cms/webimage/BaseImage_Standard/Documents/Press-Release-Images/ey-eap-1.jpg.jpg"
+                alt="No photo" class="w-100 mat-elevation-z12" style="border-radius: 10%;">
+            </div>
+            <div class="col-md-6 px-3">
+              <div class="card-body px-3 text-info">
+                <h4 class="card-title">{{company.name}}</h4>
+                <p class="card-text"><b>Address: </b> {{company.location.address}}</p>
+                <p class="card-text"><b>Description:</b> {{(!company.description) ? '✗' : company.description}}</p>
+                <b>Rating: </b>
+                <div class="star-ratings-css mx-2">
+                  <div class="star-ratings-css-top">
+                    <span [ngStyle]="{'width': ((company.rating * 100) / 5) + '%'}">
+                      ★★★★★
+                    </span>
+                  </div>
+                  <div>★★★★★</div>
+                </div>
+                <span class="badge badge-pill badge-info align-middle">{{company.rating}}/5</span>
+                <div class="d-flex justify-content-end align-items-end mt-5">
+                  <button mat-raised-button color="primary" [routerLink]="[ '/companies', company.id ]" class="m-2">
+                    Details <mat-icon>arrow_forward</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-<mat-paginator [length]=companies.length [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" [showFirstLastButtons]="true"
-  (page)="pageFunction($event)">
+<mat-paginator *ngIf="companies && companies.length > 0" [length]=companies.length [pageSize]="pageSize"
+  [pageSizeOptions]="[5, 10, 25, 100]" [showFirstLastButtons]="true" (page)="switchPage($event)">
 </mat-paginator>
-
-
-<button mat-button (click)="openDialog()">Create Air company</button>
