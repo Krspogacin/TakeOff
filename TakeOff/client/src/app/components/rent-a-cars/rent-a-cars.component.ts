@@ -144,21 +144,25 @@ export class RentACarsComponent implements OnInit {
       return;
     }
     this.rentACarService.areThereAvailableVehiclesNotOnDiscount(rentACar.id).subscribe(
-      (thereAreAvailableVehicles: any[]) => {
-        if (thereAreAvailableVehicles && thereAreAvailableVehicles.length > 0) {
+      (thereAreAvailableVehicles) => {
+        if (thereAreAvailableVehicles) {
           this.reservationService.getReservations(this.authService.getUsername()).subscribe(
             (userReservations: any[]) => {
               const availableReservations = new Array();
               userReservations.forEach(reservation => {
                 // find all active reservations in choosen place
-                console.log(reservation);
+                const landingDate = reservation.ticket.flight.landingDate;
+                if (landingDate.getTime() > new Date().getTime()) {
+                  availableReservations.push(reservation.reservationDTO);
+                }
               });
               if (availableReservations.length > 0) {
                 const reservation = availableReservations[0];
                 availableReservations.forEach(availableReservation => {
                   // find reservation which is nearest by the plane take off date
                 });
-                this.openReservationDialog(rentACar, reservation);
+                console.log(reservation);
+                // this.openReservationDialog(rentACar, reservation);
               } else {
                 this.appComponent.showSnackBar('You have no active flight reservation at the moment at the place you are looking for!');
               }

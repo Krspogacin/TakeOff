@@ -64,11 +64,6 @@ export class RegistrationDialogComponent implements OnInit {
   submitForm() {
     const element = document.getElementById('scrollId');
     element.scrollTo(0, 0);
-    // const date1 = new Date();
-    // const date2 = new Date(this.registrationForm.value.dateOfBirth);
-    // const timeDiff = Math.abs(date2.getTime() - date1.getTime());
-    // const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-    // console.log(diffDays);
     this.validateByUsername();
   }
 
@@ -76,6 +71,9 @@ export class RegistrationDialogComponent implements OnInit {
     if (this.registrationForm.valid) {
       const userToRegister = this.registrationForm.value;
       userToRegister.image = this.imgSrc;
+      userToRegister.dateOfBirth = new Date(Date.UTC(userToRegister.dateOfBirth.getFullYear(),
+                                                     userToRegister.dateOfBirth.endDate.getMonth(),
+                                                     userToRegister.dateOfBirth.endDate.getDate()));
       delete userToRegister['confirmPassword'];
       this.dialogRef.close(userToRegister);
     }

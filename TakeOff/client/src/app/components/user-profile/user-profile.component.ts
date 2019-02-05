@@ -88,13 +88,8 @@ export class UserProfileComponent implements OnInit {
 
     // again playing with dates :)
     const date = this.profileForm.controls.dateOfBirth.value;
-    // newUser.dateOfBirth = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-    console.log(date.getFullYear());
-    if (date) {
+    if (date instanceof Date) {
       newUser.dateOfBirth = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-
-      console.log(new Date(date));
-      console.log(newUser.dateOfBirth);
     }
 
     this.userService.updateUser(newUser).subscribe(
@@ -111,63 +106,4 @@ export class UserProfileComponent implements OnInit {
     );
 
   }
-
-  // sendFriendRequest(user2: any) {
-  //   const friend = {
-  //     'user1': this.user,
-  //     'user2': user2,
-  //     'accepted': false
-  //   };
-  //   this.userService.sendFriendRequest(friend).subscribe(
-  //     (data) => {
-  //       this.friends.push(data);
-  //       this.message = 'Request successfully sent!';
-  //       this.showSnackBar();
-  //     },
-  //     () => {
-  //       this.message = 'Error while sending request!';
-  //       this.showSnackBar();
-  //     }
-  //   );
-  // }
-
-  // acceptRequest(friend: any) {
-  //   this.userService.acceptFriendRequest(friend).subscribe(
-  //     () => {
-  //       friend.accepted = true;
-  //       this.message = 'You are now friends with \'' + friend.user1.firstName + ' ' + friend.user1.lastName + '\'!';
-  //       this.showSnackBar();
-  //     },
-  //     () => {
-  //       this.message = 'Error while accepting request!';
-  //       this.showSnackBar();
-  //     }
-  //   );
-  // }
-
-  // deleteRequest(friend: any) {
-  //   this.userService.deleteFriendRequest(friend).subscribe(
-  //     () => {
-  //       const index = this.friends.indexOf(friend);
-  //       if (index >= 0) {
-  //         this.friends.splice(index, 1);
-  //       }
-  //       const sender = this.user.id === friend.user1.id;
-  //       const name = sender ? friend.user2.firstName + ' ' + friend.user2.lastName
-  //         : friend.user1.firstName + ' ' + friend.user1.lastName;
-
-  //       if (friend.accepted) {
-  //         this.message = 'You are no longer friends with \'' + name + '\'!';
-  //       } else {
-  //         this.message = 'Request ' + (sender ? 'to \'' : 'from \'') + name + '\' canceled!';
-  //       }
-  //       this.showSnackBar();
-  //     },
-  //     () => {
-  //       this.message = 'Error while canceling request!';
-  //       this.showSnackBar();
-  //     }
-  //   );
-  // }
-
 }
