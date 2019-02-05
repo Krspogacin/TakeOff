@@ -8,14 +8,12 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
 
 @Entity
 public class RoomReservation {
@@ -38,9 +36,6 @@ public class RoomReservation {
 	@Column(name = "price", nullable = false)
 	private Double price;
 	
-	@OneToOne(fetch = FetchType.EAGER)
-	private Reservation reservation;
-
 	public Long getId() {
 		return id;
 	}
@@ -79,13 +74,5 @@ public class RoomReservation {
 
 	public void setPrice(Double price) {
 		this.price = price;
-	}
-
-	public Reservation getReservation() {
-		return reservation;
-	}
-
-	public void setReservation(Reservation reservation) {
-		this.reservation = reservation;
 	}
 }

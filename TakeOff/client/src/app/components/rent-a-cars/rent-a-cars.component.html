@@ -50,7 +50,7 @@
                             </div>
                             <span class="badge badge-pill badge-info align-middle">{{rentACar.rating | ratingRound}}/5</span> 
                             <div class="d-flex justify-content-end align-items-end mt-5">
-                                <button mat-raised-button color="primary" (click)="openReservationDialog(rentACar)" 
+                                <button mat-raised-button color="primary" (click)="beginReservationProcess(rentACar)" 
                                         class="m-2" *ngIf="userRole && userRole === 'ROLE_USER'">
                                     Reservation <mat-icon>today</mat-icon>
                                 </button>

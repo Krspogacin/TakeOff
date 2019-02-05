@@ -89,7 +89,7 @@ export class UserProfileComponent implements OnInit {
     // again playing with dates :)
     const date = this.profileForm.controls.dateOfBirth.value;
     // newUser.dateOfBirth = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-
+    console.log(date.getFullYear());
     if (date) {
       newUser.dateOfBirth = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
 

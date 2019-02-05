@@ -274,7 +274,6 @@ public class RentACarController
 		System.out.println(parameters);
 		if (parameters.getStartDate() == null || parameters.getEndDate() == null || parameters.getNumOfPassengers() == null)
 		{
-			System.out.println("JEDIGOVNA");
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
@@ -283,7 +282,6 @@ public class RentACarController
 			RentACar rentACar = rentACarService.findOne(parameters.getRentACarId());
 			List<RentACarMainService> rentACarMainServices = rentACar.getMainServicesRentACar();
 			long reservationDays = ChronoUnit.DAYS.between(parameters.getStartDate(), parameters.getEndDate()) + 1;
-			System.out.println(reservationDays);
 			Long mainServiceId = null;
 			
 			for(RentACarMainService mainService : rentACarMainServices)

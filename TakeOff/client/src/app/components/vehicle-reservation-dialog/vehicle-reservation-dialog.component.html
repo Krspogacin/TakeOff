@@ -17,9 +17,9 @@
                 <mat-form-field appearance="outline" class="w-100">
                   <mat-label>End day </mat-label>
                   <input matInput #endDateInput [matDatepicker]="endDatePicker" 
-                        [min]="startDate" formControlName="endDate" required>
+                        min="{{startDateInput.value}}" formControlName="endDate" required>
                   <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
-                  <mat-datepicker #endDatePicker disabled="false" [startAt]="startDate"></mat-datepicker>
+                  <mat-datepicker #endDatePicker disabled="false" startAt="{{startDateInput.value}}"></mat-datepicker>
                 </mat-form-field>
             </div>
           </div>
