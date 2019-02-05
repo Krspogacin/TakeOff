@@ -4,6 +4,7 @@ import { HotelService } from 'src/app/services/hotel/hotel.service';
 import { AddHotelModalComponent } from 'src/app/components/add-hotel-modal/add-hotel-modal.component';
 import { MatDialog, PageEvent } from '@angular/material';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service'
+import { HotelReserveDialogComponent } from '../hotel-reserve-dialog/hotel-reserve-dialog.component';
 
 @Component({
   selector: 'app-hotel',
@@ -26,7 +27,8 @@ export class HotelComponent implements OnInit {
 
   ngOnInit() {
       this.HotelService.getHotels().subscribe(
-      (data:any) => {  
+      (data:any) => { 
+        console.log(data); 
         this.hotels = data;
       });
       this.userRole = this.authService.getAuthority();
@@ -58,6 +60,17 @@ export class HotelComponent implements OnInit {
       }
     });
     this.hotels = this.filteredHotels;
+  }
+
+  openReserveDialog(id: number){
+    const dialogRef = this.dialog.open(HotelReserveDialogComponent,
+      {
+        data: id,
+        disableClose: true,
+        autoFocus: true,
+        height: '90%',
+        width: '50%',
+      });
   }
 
 }

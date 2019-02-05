@@ -44,7 +44,7 @@ import { OfficeDialogComponent } from './components/office-dialog/office-dialog.
         NameFilterPipe,
         RentACarMainServiceDialogComponent,
         ReservationsComponent,
-        OfficeDialogComponent
+        OfficeDialogComponent,
     ],
     entryComponents: [
         RoutingComponents,

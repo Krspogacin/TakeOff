@@ -1,18 +1,24 @@
 package org.isa.takeoff.controller;
 
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.isa.takeoff.dto.AvailableRoomsDTO;
 import org.isa.takeoff.dto.HotelDTO;
 import org.isa.takeoff.dto.RoomDTO;
 import org.isa.takeoff.dto.RoomRatingDTO;
+import org.isa.takeoff.dto.RoomSearchDTO;
 import org.isa.takeoff.dto.ServiceDTO;
 import org.isa.takeoff.dto.ServiceHotelDTO;
 import org.isa.takeoff.model.Hotel;
 import org.isa.takeoff.model.HotelRating;
 import org.isa.takeoff.model.Location;
 import org.isa.takeoff.model.Room;
+import org.isa.takeoff.model.RoomPrice;
 import org.isa.takeoff.model.RoomRating;
+import org.isa.takeoff.model.RoomReservation;
 import org.isa.takeoff.model.Service;
 import org.isa.takeoff.model.ServiceHotel;
 import org.isa.takeoff.service.HotelService;
@@ -26,7 +32,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping(value = "/hotels")
@@ -40,6 +49,9 @@ public class HotelController {
 	
 	@Autowired 
 	private ServiceService serviceService;
+	
+	@Autowired 
+	private ObjectMapper objectMapper;
 
 	@RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<HotelDTO>> getHotels() {
@@ -281,5 +293,94 @@ public class HotelController {
 		}
 	}
 	
-	
+	@RequestMapping(value = "/getAvailableRooms", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<AvailableRoomsDTO>> getAvailableRooms(@RequestParam String parameters) {
+		
+		RoomSearchDTO roomSearch = new RoomSearchDTO();
+		try {
+			roomSearch = objectMapper.readValue(parameters, RoomSearchDTO.class);
+			Hotel hotel = hotelService.findOne(roomSearch.getHotelId());
+			List<AvailableRoomsDTO> roomsDTO = new ArrayList<>();
+			List<Room> rooms = hotel.getRooms();
+			int counter = 0;
+			boolean flag = false;
+			int allRooms = 0;
+			for (Room room : rooms){
+				
+				if(room.getDiscount() != null && room.getDiscount() > 0){
+					continue;
+				}
+				
+				List<RoomReservation> reservations = room.getRoomReservations();
+				LocalDate endingDate = roomSearch.getCheckIn().plusDays(roomSearch.getNumberOfDays());
+				for(RoomReservation reservation: reservations){
+					if((roomSearch.getCheckIn().isBefore(reservation.getReservationEndDate()) && roomSearch.getCheckIn().isAfter(reservation.getReservationStartDate())) ||
+					   (endingDate.isBefore(reservation.getReservationEndDate()) && endingDate.isAfter(reservation.getReservationStartDate()))){
+						counter++;
+					}
+				}
+				int availableRooms = room.getNumberOfRooms() - counter; 
+				if (availableRooms == 0){
+					continue;
+				}else{
+					allRooms += availableRooms;
+				}
+				for(int numberOfBeds : roomSearch.getNumberOfBeds()){
+					if(numberOfBeds == room.getNumberOfBeds()){
+						flag = true;
+					}
+				}
+				if(!flag){
+					continue;
+				}
+				List<RoomPrice> prices = room.getRoomPrices();
+				double price = 0;
+				for(RoomPrice roomPrice: prices){
+					if(roomPrice.getPeriod().equals("5") && roomSearch.getNumberOfDays() < 5){
+						price = roomPrice.getPrice();
+						break;
+					}else if(roomPrice.getPeriod().equals("10") && roomSearch.getNumberOfDays() >= 5 && roomSearch.getNumberOfDays() < 10){
+						price = roomPrice.getPrice();
+						break;
+					}else if(roomPrice.getPeriod().equals("20") && roomSearch.getNumberOfDays() >= 10 && roomSearch.getNumberOfDays() < 20){
+						price = roomPrice.getPrice();
+						break;
+					}else if(roomPrice.getPeriod().equals("MoreThan20") && roomSearch.getNumberOfDays() >= 20){
+						price = roomPrice.getPrice();
+						break;
+					}
+				}
+				
+				double totalPrice = price*roomSearch.getNumberOfDays();
+				if(roomSearch.getPriceMax() != null && roomSearch.getPriceMin() != null){
+					if (totalPrice*roomSearch.getNumberOfRooms() > roomSearch.getPriceMax() || totalPrice*roomSearch.getNumberOfRooms() < roomSearch.getPriceMin()){
+						continue;
+					}
+				}else if(roomSearch.getPriceMax() != null){
+					if (totalPrice*roomSearch.getNumberOfRooms() > roomSearch.getPriceMax()){
+						continue;
+					}
+				}else if(roomSearch.getPriceMin() != null){
+					if (totalPrice*roomSearch.getNumberOfRooms() < roomSearch.getPriceMin()){
+						continue;
+					}
+				}
+				
+				Double sum = 0.0;
+				for(RoomRating rr: room.getRoomRatings()){
+					sum += rr.getRating();
+				}
+				Double rating = sum/room.getRoomRatings().size();
+				roomsDTO.add(new AvailableRoomsDTO(new RoomDTO(room), totalPrice,rating, availableRooms));
+			}
+			if(allRooms < roomSearch.getNumberOfRooms()){
+				roomsDTO = new ArrayList<>();
+				return new ResponseEntity<>(roomsDTO,HttpStatus.OK);
+			}
+			return new ResponseEntity<>(roomsDTO,HttpStatus.OK);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
 }

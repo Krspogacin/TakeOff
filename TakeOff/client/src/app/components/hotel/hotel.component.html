@@ -15,12 +15,12 @@
     <img mat-card-image src="https://hotelperrakis.com/wp-content/uploads/slider-back-hotel.jpg">
     <mat-card-content>
         <p>
-        <b>Address</b> : {{h.address}} <br/>
+        <b>Address</b> : {{h.location.address}} <br/>
         <b>Description</b> : {{h.description}}
         </p> 
     </mat-card-content>
     <mat-card-actions style="float:right;"> 
-        <button mat-raised-button color="primary" >RESERVE</button>
+        <button mat-raised-button color="primary" (click)="openReserveDialog(h.id)">RESERVE</button>
         <button mat-raised-button color="primary" [routerLink]="'/hotels/' + h.id">DETAILS</button>
     </mat-card-actions>
 </mat-card>

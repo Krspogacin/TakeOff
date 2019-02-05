@@ -1,6 +1,6 @@
 <h1 mat-dialog-title align="center">New hotel</h1>
 <mat-dialog-content>
-<mat-horizontal-stepper [linear]="isLinear" #stepper>
+<mat-horizontal-stepper #stepper>
     <mat-step [stepControl]="firstFormGroup">
       <form [formGroup]="firstFormGroup">
         <ng-template matStepLabel>Create hotel</ng-template>

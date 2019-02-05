@@ -1,0 +1,150 @@
+<h5 mat-dialog-title>Room reservation</h5>
+<mat-dialog-content>
+  <mat-horizontal-stepper linear labelPosition="bottom">
+    <mat-step [stepControl]="parametersForm" label="Reservation parameters" state="filter_list">
+      <form [formGroup]="parametersForm">
+        <div class="row">
+          <div class="col">
+            <mat-form-field appearance="outline">
+              <mat-label>Check in date</mat-label>
+              <input autocomplete="off" matInput [matDatepicker]="picker" formControlName="checkInDate" required>
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker disabled="false"></mat-datepicker>
+            </mat-form-field>
+          </div>
+          <div class="col">
+            <mat-form-field appearance="outline">
+              <mat-label>Number of nights</mat-label>
+              <input matInput autocomplete="off" type="number" formControlName="nightsNumber" step="1" required>
+              <mat-error *ngIf="parametersForm.get('nightsNumber').invalid && (parametersForm.get('nightsNumber').dirty || parametersForm.get('nightsNumber').touched)">
+                <div *ngIf="parametersForm.get('nightsNumber').errors.min">
+                              Minimum {{nightsNumberMin}} night </div>
+            </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col">
+              <mat-form-field appearance="outline">
+                <mat-label>Number of guests</mat-label>
+                <input matInput autocomplete="off" type="number" formControlName="guestsNumber" step="1" required>
+                <mat-error *ngIf="parametersForm.get('guestsNumber').invalid && (parametersForm.get('guestsNumber').dirty || parametersForm.get('guestsNumber').touched)">
+                  <div *ngIf="parametersForm.get('guestsNumber').errors.min">
+                                Minimum {{nightsNumberMin}} guest </div>
+              </mat-error>
+              </mat-form-field>
+          </div>
+          <div class="col">
+              <mat-form-field appearance="outline">
+                <mat-label>Number of rooms</mat-label>
+                <input matInput autocomplete="off" type="number" formControlName="roomsNumber" step="1" (input)="change($event.target.value)" required>
+                <mat-error *ngIf="parametersForm.get('roomsNumber').invalid && (parametersForm.get('roomsNumber').dirty || parametersForm.get('roomsNumber').touched)">
+                  <div *ngIf="parametersForm.get('roomsNumber').errors.min">
+                                Minimum {{nightsNumberMin}} room </div>
+              </mat-error>
+              </mat-form-field>
+          </div>
+        </div>
+        <div class="row" *ngIf="rooms != 0">
+          <div class="col" *ngFor="let bed of beds">
+            <mat-form-field appearance="outline">
+              <mat-label>Number of beds in each room</mat-label>
+              <input matInput autocomplete="off" type="number" [formControlName]="'Bed'+bed" step="1" required>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <mat-form-field appearance="outline">
+              <mat-label>Min price</mat-label>
+              <input matInput autocomplete="off" type="number" formControlName="minPrice">
+            </mat-form-field>
+          </div>
+          <div class="col">
+            <mat-form-field appearance="outline">
+              <mat-label>Max price</mat-label>
+              <input matInput autocomplete="off" type="number" formControlName="maxPrice">
+            </mat-form-field>
+          </div>
+        </div>
+      </form>
+      <br>
+      <div class="d-flex justify-content-center">
+        <button mat-raised-button [mat-dialog-close]>Cancel</button>&nbsp;
+        <button mat-raised-button color="primary" (click)="getRooms()" matStepperNext>Next</button>
+      </div>
+    </mat-step>
+    <mat-step [stepControl]="selectionForm" label="Available rooms" state="hotel">
+    <mat-hint>Need to select {{numberOfRooms-selectedRooms}} rooms</mat-hint>
+      <ul class="list-group">
+        <form [formGroup]="selectionForm">
+        <li *ngFor="let room of availableRooms" class="list-group-item list-group-item-primary flex-column align-items-start">
+          <div class="d-flex justify-content-center">
+            <h5>{{room.room.type}}</h5>
+          </div>
+          <div class="row">
+            <div class="col">
+              <b>Floor: </b> {{room.room.floor}} <br>
+              <b>Number of beds: </b> {{room.room.numberOfBeds}} <br>
+              <b>Has balcony: </b> <span *ngIf="room.room.hasBalcony"> ✓ </span>
+              <span *ngIf="!room.room.hasBalcony"> ✗ </span> <br>
+              <b>Has air condition: </b> <span *ngIf="room.room.hasAirCondition"> ✓ </span>
+              <span *ngIf="!room.room.hasAirCondition"> ✗ </span> <br>
+              <b>Rating: </b> {{room.rating}} <br>
+              <b>Number of available rooms: </b> <span style="color:red">{{room.number}}</span> <br>
+            </div>
+            <div class="col">
+              <font size="5"><b>Room price:</b> {{room.totalPrice}} </font>
+              <span class="d-flex justify-content-end">
+                  <mat-form-field><input matInput type="number" step="1" [formControlName]="'Room'+room.room.id" (input)="selectRoom($event.target.value)">
+                <mat-hint>Enter number of rooms you want to reserve</mat-hint></mat-form-field>
+              </span> 
+            </div>
+          </div>
+        </li>
+        </form>
+      </ul>
+      <br>
+      <div class="d-flex justify-content-center">
+        <button mat-raised-button matStepperPrevious>Back</button>&nbsp;
+        <button mat-raised-button [mat-dialog-close]>Cancel</button>&nbsp;
+        <button mat-raised-button color="primary" matStepperNext>Next</button>
+      </div>
+    </mat-step>
+
+    <h2 style="text-align:center">Additional services</h2>
+    <mat-step label="Additional services" state="filter_list">
+      <form [formGroup]="CBForm">
+        <table style="width:100%" mat-table [dataSource]="additionalServices" class="mat-elevation-z8">
+          
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef> Name </th>
+              <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+            </ng-container>
+        
+            <ng-container matColumnDef="price">
+              <th mat-header-cell *matHeaderCellDef> Price </th>
+              <td mat-cell *matCellDef="let element"> {{element.price}} </td>
+            </ng-container>
+          
+            <ng-container matColumnDef="select">
+              <th mat-header-cell *matHeaderCellDef> Select </th>
+              <td mat-cell *matCellDef="let element">
+                <mat-checkbox [formControlName]="'CB'+element.id" color="primary"></mat-checkbox>
+              </td>
+            </ng-container>
+          
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table> 
+      </form>
+      <br>
+      <div class="d-flex justify-content-center">
+        <button mat-raised-button matStepperPrevious>Back</button>&nbsp;
+        <button mat-raised-button [mat-dialog-close]>Cancel</button>&nbsp;         
+        <button mat-raised-button color="primary" color="primary" type="submit">Finish</button>
+      </div>
+    </mat-step>
+  </mat-horizontal-stepper>
+</mat-dialog-content>

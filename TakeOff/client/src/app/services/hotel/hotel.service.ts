@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { jsonpCallbackContext } from '@angular/common/http/src/module';
 
 @Injectable({
   providedIn: 'root'
@@ -50,5 +51,9 @@ export class HotelService {
 
   getHotelServices(id: number){
     return this.http.get('/hotels/' + id + '/getHotelServices');
+  }
+
+  getAvailableRooms(object: any){
+    return this.http.get('/hotels/getAvailableRooms?parameters='+ encodeURI(JSON.stringify(object)));
   }
 }
