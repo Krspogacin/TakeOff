@@ -116,21 +116,21 @@ export class FriendsComponent implements OnInit {
           if (index >= 0) {
             this.acceptedRequests.splice(index, 1);
           }
-          message = 'You are no longer friends with \'' + name + '\'!';
+          message = 'You are no longer friends with ' + name + '!';
 
         } else if (type === 1) {
           const index = this.sentRequests.indexOf(friend);
           if (index >= 0) {
             this.sentRequests.splice(index, 1);
           }
-          message = 'Request to \'' + name + '\' canceled!';
+          message = 'Request to ' + name + ' canceled!';
 
         } else {
           const index = this.receivedRequests.indexOf(friend);
           if (index >= 0) {
             this.receivedRequests.splice(index, 1);
           }
-          message = 'Request from \'' + name + '\' canceled!';
+          message = 'Request from ' + name + ' canceled!';
         }
 
         this.appComponent.showSnackBar(message);
@@ -164,6 +164,7 @@ export class FriendsComponent implements OnInit {
             };
             this.userService.sendFriendRequest(friend).subscribe(
               (friendData) => {
+                this.allFriends.push(friend);
                 this.sentRequests.push(user);
               },
               () => {

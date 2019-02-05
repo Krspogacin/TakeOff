@@ -9,13 +9,14 @@
 
                 <div *ngIf="username">
                         <button mat-button [matMenuTriggerFor]="menu">
-                                <mat-icon *ngIf="!profileImage && userRole === 'ROLE_USER'" style="margin-right: 5%;">person</mat-icon>
-                                <mat-icon *ngIf="!profileImage && userRole !== 'ROLE_USER'" style="margin-right: 5%;">security</mat-icon>
+                                <mat-icon *ngIf="!profileImage && userRole && userRole === 'ROLE_USER'" style="margin-right: 5%;">person</mat-icon>
+                                <mat-icon *ngIf="!profileImage && userRole && userRole !== 'ROLE_USER'" style="margin-right: 5%;">security</mat-icon>
                                 <img class="mat-card-avatar-custom" src={{profileImage}} *ngIf="profileImage" style="margin-right: 10%;"> 
                                 {{username}}
                         </button>
                         <mat-menu #menu="matMenu">
-                                <a mat-menu-item style="color: orange" [routerLink]="[ '/users/profile' ]">My profile</a>
+                                <a mat-menu-item style="color: orange" [routerLink]="[ '/users/profile' ]" *ngIf="userRole && userRole === 'ROLE_USER'">My profile</a>
+                                <a mat-menu-item style="color: orange" (click)="changePassword()" *ngIf="userRole && userRole !== 'ROLE_USER'">Change password</a>
                                 <mat-divider></mat-divider>
                                 <app-logout></app-logout>
                         </mat-menu>   

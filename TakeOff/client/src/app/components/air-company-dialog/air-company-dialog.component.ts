@@ -1,17 +1,6 @@
-import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatAutocomplete, MatAutocompleteSelectedEvent, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
-import { AirCompanyService } from 'src/app/services/air-company/air-company.service';
-
-export interface Destination {
-  id: number;
-  airportName: string;
-  city: string;
-  country: string;
-  version: number;
-}
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 @Component({
   selector: 'app-air-company-dialog',
@@ -21,47 +10,97 @@ export interface Destination {
 export class AirCompanyDialogComponent implements OnInit {
 
   companyUpdateForm: FormGroup;
+  update = false;
+  company = {
+    'id': null,
+    'name': '',
+    'location': { 'address': '' },
+    'description': '',
+  };
+  location: any = {};
   destinations = [];
-  allDestinations: Destination[] = [];
-  filteredDestinations: Observable<Destination[]>;
 
-  @ViewChild('destInput') destInput: ElementRef<HTMLInputElement>;
-  @ViewChild('auto') matAutocomplete: MatAutocomplete;
+  // @ViewChild('destInput') destInput: ElementRef<HTMLInputElement>;
+  // @ViewChild('auto') matAutocomplete: MatAutocomplete;
 
-  constructor(private airCompanyService: AirCompanyService, private dialogRef: MatDialogRef<AirCompanyDialogComponent>,
-    private formBuilder: FormBuilder,
-    @Inject(MAT_DIALOG_DATA) private data: any) { }
+  constructor(private dialogRef: MatDialogRef<AirCompanyDialogComponent>,
+    private formBuilder: FormBuilder, @Inject(MAT_DIALOG_DATA) private data: any) { }
 
   ngOnInit() {
-    this.destinations = JSON.parse(JSON.stringify(this.data.destinations));
-
-    this.airCompanyService.getAllDestinations().subscribe(
-      (data: []) => {
-        this.allDestinations = data;
-      });
+    if (this.data) {
+      this.update = true;
+      this.company = this.data.company;
+      this.location = this.company.location;
+      this.destinations = JSON.parse(JSON.stringify(this.data.destinations));
+    }
 
     this.companyUpdateForm = this.formBuilder.group({
-      name: [this.data.company.name, Validators.required],
-      address: [this.data.company.address, Validators.required],
-      description: [this.data.company.description],
+      name: [this.company.name, Validators.required],
+      address: [this.company.location.address, Validators.required],
+      description: [this.company.description],
       destinations: []
     });
 
-    this.filteredDestinations = this.companyUpdateForm.controls.destinations.valueChanges
-      .pipe(
-        startWith(''),
-        // map(value => typeof value === 'string' ? value : value.city),
-        map(value => typeof value === 'string' ? this.filterDestinations(value) : this.allDestinations.slice())
-      );
+    // address field
+    const placesAddress = require('places.js');
+    const placesAddressAutocomplete = placesAddress({
+      appId: 'pl14EZX3IQNN',
+      apiKey: 'ad1257b86ef3f77014a0b7f168c417f7',
+      container: document.querySelector('#address-input')
+    });
+
+    placesAddressAutocomplete.on('change', e => {
+      this.location.id = null;
+      this.location.address = e.suggestion.value;
+      this.location.country = e.suggestion.country;
+      this.location.city = e.suggestion.city ? e.suggestion.city : e.suggestion.name;
+      this.location.latitude = e.suggestion.latlng.lat;
+      this.location.longitude = e.suggestion.latlng.lng;
+    });
+
+    placesAddressAutocomplete.on('clear', e => {
+      this.companyUpdateForm.controls.address.setValue('');
+    });
+
+    // destinations field
+    const placesDestinations = require('places.js');
+    const placesDestinationsAutocomplete = placesDestinations({
+      appId: 'pl14EZX3IQNN',
+      apiKey: 'ad1257b86ef3f77014a0b7f168c417f7',
+      container: document.querySelector('#dest-input')
+    });
+
+    placesDestinationsAutocomplete.on('change', e => {
+      const location: any = {};
+      location.id = null;
+      location.address = e.suggestion.value;
+      location.country = e.suggestion.country;
+      location.city = e.suggestion.city ? e.suggestion.city : e.suggestion.name;
+      location.latitude = e.suggestion.latlng.lat;
+      location.longitude = e.suggestion.latlng.lng;
+
+      let exists = false;
+      this.destinations.forEach(element => {
+        if (element.latitude === location.latitude && element.longitude === location.longitude) {
+          exists = true;
+        }
+      });
+
+      if (!exists) {
+        this.destinations.push(location);
+      }
+      this.companyUpdateForm.controls.destinations.setValue('');
+    });
+
   }
 
-  filterDestinations(value: string): Destination[] {
-    const filterValue = value.toLowerCase();
-    return this.allDestinations.filter(dest => dest.city.toLowerCase().indexOf(filterValue) === 0 ||
-      dest.country.toLowerCase().indexOf(filterValue) === 0);
-  }
+  // filterDestinations(value: string): Destination[] {
+  //   const filterValue = value.toLowerCase();
+  //   return this.allDestinations.filter(dest => dest.city.toLowerCase().indexOf(filterValue) === 0 ||
+  //     dest.country.toLowerCase().indexOf(filterValue) === 0);
+  // }
 
-  removeDestination(destination: Destination): void {
+  removeDestination(destination): void {
     const index = this.destinations.indexOf(destination);
 
     if (index >= 0) {
@@ -69,30 +108,33 @@ export class AirCompanyDialogComponent implements OnInit {
     }
   }
 
-  selectDestination(event: MatAutocompleteSelectedEvent): void {
-    const destination = event.option.value;
-    this.destInput.nativeElement.value = '';
-    this.companyUpdateForm.controls.destinations.setValue('');
+  // selectDestination(event: MatAutocompleteSelectedEvent): void {
+  //   const destination = event.option.value;
+  //   this.destInput.nativeElement.value = '';
+  //   this.companyUpdateForm.controls.destinations.setValue('');
 
-    let index = -1;
-    for (let i = 0; i < this.destinations.length; i++) {
-      if (destination.id === this.destinations[i].id) {
-        index = i;
-        break;
-      }
-    }
+  //   let index = -1;
+  //   for (let i = 0; i < this.destinations.length; i++) {
+  //     if (destination.id === this.destinations[i].id) {
+  //       index = i;
+  //       break;
+  //     }
+  //   }
 
-    if (index < 0) {
-      this.destinations.push(destination);
-    }
-  }
+  //   if (index < 0) {
+  //     this.destinations.push(destination);
+  //   }
+  // }
 
   submitForm() {
-    this.companyUpdateForm.value.id = this.data.company.id;
-    this.companyUpdateForm.value.version = this.data.company.version;
-    delete this.companyUpdateForm.value.destinations;
+    const company = this.companyUpdateForm.value;
+    delete company.address;
+    delete company.destinations;
+    company.id = this.company.id;
+    company.location = this.location;
+
     const updated = {
-      'company': this.companyUpdateForm.value,
+      'company': company,
       'destinations': this.destinations
     };
 

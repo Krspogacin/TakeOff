@@ -29,14 +29,17 @@ public class Flight {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@OneToOne(fetch = FetchType.EAGER)
+	private Location takeOffLocation;
+
+	@OneToOne(fetch = FetchType.EAGER)
+	private Location landingLocation;
+
 	@Column(name = "takeOffDate", nullable = false)
 	private LocalDateTime takeOffDate;
 
 	@Column(name = "landingDate", nullable = false)
 	private LocalDateTime landingDate;
-
-	@Column(name = "distance", nullable = false)
-	private Double distance;
 
 	@ManyToMany
 	@JoinTable(name = "flight_destination", joinColumns = @JoinColumn(name = "flight_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "dest_id", referencedColumnName = "id"))
@@ -63,10 +66,9 @@ public class Flight {
 	public Flight() {
 	}
 
-	public Flight(LocalDateTime takeOffDate, LocalDateTime landingDate, double distance, Double ticketPrice) {
+	public Flight(LocalDateTime takeOffDate, LocalDateTime landingDate, Double ticketPrice) {
 		this.takeOffDate = takeOffDate;
 		this.landingDate = landingDate;
-		this.distance = distance;
 		this.ticketPrice = ticketPrice;
 	}
 
@@ -76,6 +78,22 @@ public class Flight {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public Location getTakeOffLocation() {
+		return takeOffLocation;
+	}
+
+	public void setTakeOffLocation(Location takeOffLocation) {
+		this.takeOffLocation = takeOffLocation;
+	}
+
+	public Location getLandingLocation() {
+		return landingLocation;
+	}
+
+	public void setLandingLocation(Location landingLocation) {
+		this.landingLocation = landingLocation;
 	}
 
 	public LocalDateTime getTakeOffDate() {
@@ -94,14 +112,6 @@ public class Flight {
 		this.landingDate = landingDate;
 	}
 
-	public Double getDistance() {
-		return distance;
-	}
-
-	public void setDistance(Double distance) {
-		this.distance = distance;
-	}
-
 	public List<Location> getTransferDestinations() {
 		return new ArrayList<>(transferDestinations);
 	}
@@ -116,6 +126,14 @@ public class Flight {
 
 	public void setTickets(List<Ticket> tickets) {
 		this.tickets = new HashSet<>(tickets);
+	}
+
+	public List<FlightRating> getFlightRatings() {
+		return new ArrayList<>(flightRatings);
+	}
+
+	public void setFlightRatings(List<FlightRating> flightRatings) {
+		this.flightRatings = new HashSet<>(flightRatings);
 	}
 
 	public Double getTicketPrice() {

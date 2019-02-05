@@ -5,6 +5,7 @@ import { AppComponent } from 'src/app/app.component';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { VehicleReservationDialogComponent } from '../vehicle-reservation-dialog/vehicle-reservation-dialog.component';
 import { AddEntityDialogComponent } from '../add-entity-dialog/add-entity-dialog.component';
+import { ReservationService } from 'src/app/services/reservation/reservation.service';
 
 @Component({
   selector: 'app-rent-a-cars',
@@ -31,6 +32,7 @@ export class RentACarsComponent implements OnInit {
 
   constructor(private authService: AuthenticationService,
               private rentACarService: RentACarService,
+              private reservationService: ReservationService,
               public dialog: MatDialog,
               public appComponent: AppComponent) { }
 
@@ -116,7 +118,25 @@ export class RentACarsComponent implements OnInit {
     this.cityFilterParam = cityParam;
   }
 
-  openReservationDialog(rentACar) {
+  openReservationDialog(rentACar: any, reservation: any) {
+    const dialogRef = this.dialog.open(VehicleReservationDialogComponent,
+    {
+      data: rentACar,
+      disableClose: true,
+      autoFocus: true,
+      width: '60%',
+      height: '90%'
+    });
+    dialogRef.afterClosed().subscribe(
+      (vehicleToReserve) => {
+        if (vehicleToReserve) {
+          this.finishReservationProcess(vehicleToReserve, reservation);
+        }
+      }
+    );
+  }
+
+  beginReservationProcess(rentACar) {
     if (!this.authService.getUsername() || this.userRole !== 'ROLE_USER') {
       this.appComponent.showSnackBar('Error! You have no right to make any reservation.');
       return;
@@ -124,25 +144,41 @@ export class RentACarsComponent implements OnInit {
     this.rentACarService.areThereAvailableVehiclesNotOnDiscount(rentACar.id).subscribe(
       (thereAreAvailableVehicles) => {
         if (thereAreAvailableVehicles) {
-          const dialogRef = this.dialog.open(VehicleReservationDialogComponent,
-          {
-            data: rentACar,
-            disableClose: true,
-            autoFocus: true,
-            width: '60%',
-            height: '90%'
-          });
-          dialogRef.afterClosed().subscribe(
-          (data) => {
-            if (data) {
-              console.log(data);
+          this.reservationService.getReservations(this.authService.getUsername()).subscribe(
+            (userReservations: any[]) => {
+              const availableReservations = new Array();
+              userReservations.forEach(reservation => {
+                // find all active reservations in choosen place
+                const landingDate = reservation.ticket.flight.landingDate;
+                if (landingDate.getTime() > new Date().getTime()) {
+                  availableReservations.push(reservation.reservationDTO);
+                }
+              });
+              if (availableReservations.length > 0) {
+                const reservation = availableReservations[0];
+                availableReservations.forEach(availableReservation => {
+                  // find reservation which is nearest by the plane take off date
+                });
+                console.log(reservation);
+                // this.openReservationDialog(rentACar, reservation);
+              } else {
+                this.appComponent.showSnackBar('You have no active flight reservation at the moment at the place you are looking for!');
+              }
             }
-          }
           );
         } else  {
           this.appComponent.showSnackBar('There are no available any vehicle at the moment.');
         }
       }
     );
+  }
+
+  finishReservationProcess(vehicleToReserve: any, reservation: any) {
+    if (!vehicleToReserve || !reservation) {
+      this.appComponent.showSnackBar('Error! Something went wrong.');
+      return;
+    }
+    console.log(vehicleToReserve);
+    console.log(reservation);
   }
 }

@@ -35,4 +35,12 @@ export class UserService {
   deleteFriendRequest(friend: any) {
     return this.http.put('/users/friends/delete', friend);
   }
+
+  checkUserType(authenticationRequest: any) {
+    return this.http.get('/users/checkUserType?parameters=' + encodeURI(JSON.stringify(authenticationRequest)));
+  }
+
+  updatePassword(authenticationRequest: any) {
+    return this.http.put('/users/updatePassword', authenticationRequest);
+  }
 }

@@ -32,11 +32,19 @@ export class AirCompanyService {
     return this.http.get('/companies');
   }
 
+  addCompany(company) {
+    return this.http.post('/companies', company);
+  }
+
   updateCompany(company) {
     return this.http.put('/companies', company);
   }
 
-  addCompany(company) {
-    return this.http.post('/companies',company)
+  getCompaniesRatings() {
+    return this.http.get('/companies/ratings');
+  }
+
+  getCompanyRating(id: number) {
+    return this.http.get('/companies/' + id + '/rating');
   }
 }

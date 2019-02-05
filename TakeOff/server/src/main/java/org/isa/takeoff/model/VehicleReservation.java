@@ -10,7 +10,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 
 @Entity
 public class VehicleReservation {
@@ -31,9 +30,6 @@ public class VehicleReservation {
 	
 	@Column(name = "price", nullable = false)
 	private Double price;
-	
-	@OneToOne(fetch = FetchType.EAGER)
-	private Reservation reservation;
 	
 	public Long getId() {
 		return id;
@@ -73,13 +69,5 @@ public class VehicleReservation {
 
 	public void setPrice(Double price) {
 		this.price = price;
-	}
-
-	public Reservation getReservation() {
-		return reservation;
-	}
-
-	public void setReservation(Reservation reservation) {
-		this.reservation = reservation;
 	}
 }

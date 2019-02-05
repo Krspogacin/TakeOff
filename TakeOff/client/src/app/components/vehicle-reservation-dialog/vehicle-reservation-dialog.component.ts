@@ -32,7 +32,6 @@ export class VehicleReservationDialogComponent implements OnInit {
 
   constructor(private rentACarService: RentACarService,
               private vehicleService: VehicleService,
-              private authService: AuthenticationService,
               private dialogRef: MatDialogRef<VehicleReservationDialogComponent>,
               private formBuilder: FormBuilder,
               @Inject(MAT_DIALOG_DATA) public rentACar: any) { }

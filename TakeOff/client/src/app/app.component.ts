@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthenticationService } from './services/authentication/authentication.service';
 import { MatSnackBar, MatDialog } from '@angular/material';
 import { SysAdminDialogComponent } from './components/sys-admin-dialog/sys-admin-dialog.component';
+import { ChangePasswordDialogComponent } from './components/change-password-dialog/change-password-dialog.component';
 
 @Component({
   selector: 'app-root',
@@ -36,6 +37,21 @@ export class AppComponent implements OnInit {
 
   open() {
     const dialogRef = this.dialog.open(SysAdminDialogComponent, { disableClose: true });
+  }
+
+  changePassword() {
+    const dialogRef = this.dialog.open(ChangePasswordDialogComponent,
+    {
+      data: this.authenticationService.isUserEnabled(),
+      disableClose: true,
+      autoFocus: true,
+      width: '30%'
+    });
+    dialogRef.afterClosed().subscribe(
+      () => {
+        this.showSnackBar('You have changed your password successfully!');
+      }
+    );
   }
 
   showSnackBar(message: string) {

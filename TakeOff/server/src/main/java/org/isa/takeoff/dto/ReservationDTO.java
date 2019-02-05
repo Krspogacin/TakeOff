@@ -1,35 +1,42 @@
 package org.isa.takeoff.dto;
 
-public class ReservationDTO {
+import org.isa.takeoff.model.Reservation;
 
-	private UserDTO user;
-
-	private TicketDTO ticket;
-
-	public ReservationDTO() {
-
-	}
-
-	public ReservationDTO(UserDTO user, TicketDTO ticket) {
+public class ReservationDTO 
+{
+	private Long id;
+	private RoomReservationDTO roomReservation;
+	private VehicleReservationDTO vehicleReservation;
+	
+	public ReservationDTO() { }
+	
+	public ReservationDTO(Long id, RoomReservationDTO roomReservation, VehicleReservationDTO vehicleReservation) {
 		super();
-		this.user = user;
-		this.ticket = ticket;
+		this.id = id;
+		this.roomReservation = roomReservation;
+		this.vehicleReservation = vehicleReservation;
 	}
 
-	public UserDTO getUser() {
-		return user;
+	public ReservationDTO(Reservation reservation) {
+		this(reservation.getId(), new RoomReservationDTO(reservation.getRoomReservation()), new VehicleReservationDTO(reservation.getVehicleReservation()));
 	}
 
-	public void setUser(UserDTO user) {
-		this.user = user;
+	public Long getId() {
+		return id;
 	}
-
-	public TicketDTO getTicket() {
-		return ticket;
+	public void setId(Long id) {
+		this.id = id;
 	}
-
-	public void setTicket(TicketDTO ticket) {
-		this.ticket = ticket;
+	public RoomReservationDTO getRoomReservation() {
+		return roomReservation;
 	}
-
+	public void setRoomReservation(RoomReservationDTO roomReservation) {
+		this.roomReservation = roomReservation;
+	}
+	public VehicleReservationDTO getVehicleReservation() {
+		return vehicleReservation;
+	}
+	public void setVehicleReservation(VehicleReservationDTO vehicleReservation) {
+		this.vehicleReservation = vehicleReservation;
+	}
 }

@@ -3,6 +3,7 @@ package org.isa.takeoff.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.isa.takeoff.dto.FlightReservationDTO;
 import org.isa.takeoff.dto.ReservationDTO;
 import org.isa.takeoff.dto.TicketDTO;
 import org.isa.takeoff.dto.UserDTO;
@@ -38,12 +39,12 @@ public class FlightReservationController {
 	private FlightService flightService;
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<ReservationDTO>> addReservations(@RequestBody List<ReservationDTO> reservationsDTO) {
+	public ResponseEntity<List<FlightReservationDTO>> addReservations(@RequestBody List<FlightReservationDTO> reservationsDTO) {
 
 		try {
 			Flight flight = flightService.findOne(reservationsDTO.get(0).getTicket().getFlight().getId());
 			List<Ticket> tickets = flight.getTickets();
-			for (ReservationDTO r : reservationsDTO) {
+			for (FlightReservationDTO r : reservationsDTO) {
 
 				Ticket ticket = null;
 				for (Ticket t : tickets) {
@@ -79,16 +80,16 @@ public class FlightReservationController {
 	}
 
 	@RequestMapping(value = "/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<ReservationDTO>> getReservations(@PathVariable String username) {
+	public ResponseEntity<List<FlightReservationDTO>> getReservations(@PathVariable String username) {
 		
 		User user = userService.findByUsernameUser(username);
 		if (user != null) {
 
 			List<FlightReservation> flightReservations = user.getReservation();
 
-			List<ReservationDTO> reservationsDTO = new ArrayList<>();
+			List<FlightReservationDTO> reservationsDTO = new ArrayList<>();
 			for (FlightReservation fr : flightReservations) {
-				reservationsDTO.add(new ReservationDTO(new UserDTO(fr.getUser()), new TicketDTO(fr.getTicket())));
+				reservationsDTO.add(new FlightReservationDTO(new UserDTO(fr.getUser()), new TicketDTO(fr.getTicket()), new ReservationDTO(fr.getReservation())));
 			}
 
 			return new ResponseEntity<>(reservationsDTO, HttpStatus.OK);
@@ -97,5 +98,4 @@ public class FlightReservationController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
-
 }

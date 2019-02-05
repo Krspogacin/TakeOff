@@ -6,6 +6,8 @@ import { AuthenticationService } from 'src/app/services/authentication/authentic
 import { FlightService } from 'src/app/services/flight/flight.service';
 import { AirCompanyDialogComponent } from '../air-company-dialog/air-company-dialog.component';
 import { FlightDialogComponent } from '../flight-dialog/flight-dialog.component';
+import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-air-company',
@@ -20,23 +22,15 @@ export class AirCompanyComponent implements OnInit {
   loadingDestinations = true;
   userRole: any;
   message: string;
-  company = {};
+  company: any;
   destinations = [];
   flights = [];
-  form = {
-    takeOffDate: null,
-    landingDate: null,
-    distance: null,
-    numberOfTransfers: null,
-    destinations: null,
-    ticketPrice: null,
-    company: null
-  };
+  mapUrl: SafeResourceUrl;
+  rating: number;
 
   constructor(private airCompanyService: AirCompanyService, private route: ActivatedRoute,
     private flightService: FlightService, private authService: AuthenticationService, private dialog: MatDialog,
-    private snackBar: MatSnackBar,
-  ) { }
+    private sanitizer: DomSanitizer, private appComponent: AppComponent) { }
 
   ngOnInit() {
     const id = parseInt(this.route.snapshot.paramMap.get('id'), 10);
@@ -46,7 +40,17 @@ export class AirCompanyComponent implements OnInit {
           this.company = data;
           this.userRole = this.authService.getAuthority();
           this.companyExists = true;
-          this.loadingCompany = false;
+          this.airCompanyService.getCompanyRating(id).subscribe(
+            (rating: number) => {
+              this.rating = rating;
+              this.loadingCompany = false;
+            }
+          );
+          this.mapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+            'https://maps.google.com/maps?q=' +
+            this.company.location.latitude + ', ' +
+            this.company.location.longitude +
+            '&t=&z=11&ie=UTF8&iwloc=&output=embed');
         },
         error => {
           this.loadingCompany = false;
@@ -81,6 +85,12 @@ export class AirCompanyComponent implements OnInit {
     } else {
       // not found
     }
+
+    this.authService.onSubject.subscribe(
+      () => {
+        this.userRole = this.authService.getAuthority();
+      }
+    );
   }
 
   openUpdateDialog() {
@@ -100,11 +110,11 @@ export class AirCompanyComponent implements OnInit {
         if (updated) {
           this.airCompanyService.updateCompany(updated.company).subscribe(
             (data) => {
-              this.message = 'Updated successfully!';
               this.airCompanyService.setCompanyDestinations(updated.company.id, updated.destinations).subscribe(
                 (destinations: []) => {
                   this.company = data;
                   this.destinations = destinations;
+                  this.message = 'Updated successfully!';
                 }
               );
             },
@@ -112,7 +122,7 @@ export class AirCompanyComponent implements OnInit {
               this.message = 'Error updating air company!';
             },
             () => {
-              this.showSnackBar();
+              this.appComponent.showSnackBar(this.message);
             }
           );
         }
@@ -148,23 +158,11 @@ export class AirCompanyComponent implements OnInit {
               this.message = 'Error creating flight!';
             },
             () => {
-              this.showSnackBar();
+              this.appComponent.showSnackBar(this.message);
             }
           );
 
         }
-      }
-    );
-  }
-
-  showSnackBar() {
-    if (!this.message) {
-      return;
-    }
-    const snackBarRef = this.snackBar.open(this.message, 'Dismiss', { duration: 3000 });
-    snackBarRef.onAction().subscribe(
-      () => {
-        snackBarRef.dismiss();
       }
     );
   }
