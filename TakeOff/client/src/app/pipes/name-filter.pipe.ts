@@ -5,12 +5,17 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class NameFilterPipe implements PipeTransform {
 
-  transform(rentACars: [], searchName: string) {
-    if (!rentACars || !searchName || searchName.length === 0) {
-      return rentACars;
+  transform(rentACars: [], searchName: string, searchCountry: string, searchCity: string) {
+    if (!rentACars || !searchName || !searchCountry || !searchCity) {
+      if (!(searchName === '' || searchCountry === '' || searchCity === '')) {
+        return rentACars;
+      }
     }
     searchName = searchName.toLowerCase();
-    return rentACars.filter((elem: any) => elem.name.toLowerCase().includes(searchName));
+    searchCountry = searchCountry.toLowerCase();
+    searchCity = searchCity.toLowerCase();
+    return rentACars.filter((elem: any) => elem.name.toLowerCase().includes(searchName) &&
+                                           elem.location.country.toLowerCase().includes(searchCountry) &&
+                                           elem.location.city.toLowerCase().includes(searchCity));
   }
-
 }

@@ -1,7 +1,6 @@
 package org.isa.takeoff.model;
 
 import java.time.LocalDate;
-import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 @Entity
 public class VehicleReservation {
@@ -28,6 +28,12 @@ public class VehicleReservation {
 	
 	@Column(name = "reservationEndDate", nullable = false)
 	private LocalDate reservationEndDate;
+	
+	@Column(name = "price", nullable = false)
+	private Double price;
+	
+	@OneToOne(fetch = FetchType.EAGER)
+	private Reservation reservation;
 	
 	public Long getId() {
 		return id;
@@ -61,20 +67,19 @@ public class VehicleReservation {
 		this.reservationEndDate = reservationEndDate;
 	}
 
-	@Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
- 
-        if (o == null || getClass() != o.getClass()) 
-            return false;
- 
-        VehicleReservation that = (VehicleReservation) o;
-        return Objects.equals(id, that.id);
-    }
- 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-	
+	public Double getPrice() {
+		return price;
+	}
+
+	public void setPrice(Double price) {
+		this.price = price;
+	}
+
+	public Reservation getReservation() {
+		return reservation;
+	}
+
+	public void setReservation(Reservation reservation) {
+		this.reservation = reservation;
+	}
 }

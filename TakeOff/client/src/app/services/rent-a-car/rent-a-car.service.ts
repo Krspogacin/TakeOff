@@ -12,7 +12,7 @@ export class RentACarService {
     if (isNaN(id)) {
       id = null;
     }
-    return this.http.get('/rent-a-cars/checkMainServiceName/' + + id + '/' + name);
+    return this.http.get('/rent-a-cars/checkMainServiceName/' + id + '/' + name);
   }
 
   getRentACarById(id: number) {
@@ -33,6 +33,18 @@ export class RentACarService {
 
   getVehicles(id: number) {
     return this.http.get('/rent-a-cars/' + id + '/vehicles');
+  }
+
+  areThereAvailableVehiclesNotOnDiscount(id: number) {
+    return this.http.get('/rent-a-cars/' + id + '/areThereAvailableVehiclesNotOnDiscount');
+  }
+
+  getVehiclesOnDiscount(id: number) {
+    return this.http.get('/rent-a-cars/' + id + '/vehiclesOnDiscount');
+  }
+
+  getAvailableVehicles(parameters: any) {
+    return this.http.get('/rent-a-cars/vehicles/availableVehicles?parametersDTO=' + encodeURI(JSON.stringify(parameters)));
   }
 
   getRentACarRatings() {

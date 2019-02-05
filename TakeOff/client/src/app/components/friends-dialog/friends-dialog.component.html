@@ -1,0 +1,29 @@
+<h1 mat-dialog-title>Search for friends</h1>
+<mat-dialog-content>
+  <div class="friend-dialog">
+    <mat-form-field class="search-field">
+      <input matInput [(ngModel)]="searchValue">
+      <mat-label><mat-icon>search</mat-icon> Search</mat-label>
+    </mat-form-field>
+    <div *ngIf="!loading">
+      <mat-list *ngIf="allUsers.length > 0">
+        <mat-list-item *ngFor="let user of allUsers | friendsFilter : searchValue;">
+          <img matListAvatar src="{{user.image}}" alt="">
+          <h3 matLine> {{user.firstName}} {{user.lastName}}</h3>
+          <button mat-button color="primary" matTooltip="Send request" (click)="sendFriendRequest(user)" *ngIf="!addedFriends.includes(user)">
+            <mat-icon>person_add</mat-icon>
+          </button>
+          <button mat-button color="warn" matTooltip="Cancel request" (click)="cancelFriendRequest(user)" *ngIf="addedFriends.includes(user)">
+            <mat-icon>person_add_disabled</mat-icon>
+          </button>
+          <mat-divider></mat-divider>
+        </mat-list-item>
+      </mat-list>
+
+      <h6 *ngIf="allUsers.length === 0">No available users</h6>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-raised-button [mat-dialog-close]=addedFriends>Close</button>
+</mat-dialog-actions>

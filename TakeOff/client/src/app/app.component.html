@@ -1,6 +1,6 @@
 <mat-toolbar color="primary" style="overflow: hidden; position: fixed; z-index: 999;">
         <mat-toolbar-row>
-                <a style="text-decoration: none; color: white" href="">TakeOff</a>
+                <a style="text-decoration: none; color: white" [routerLink]="[ '/' ]">TakeOff</a>
             
                 <span class="fill"></span>
                 <div *ngIf="userRole && userRole === 'ROLE_SYS_ADMIN'">
@@ -9,8 +9,9 @@
 
                 <div *ngIf="username">
                         <button mat-button [matMenuTriggerFor]="menu">
-                                <mat-icon *ngIf="!profileImage" style="margin-right: 5%;">person</mat-icon>
-                                <img class="mat-card-avatar-custom" src={{profileImage}} *ngIf="profileImage"> 
+                                <mat-icon *ngIf="!profileImage && userRole === 'ROLE_USER'" style="margin-right: 5%;">person</mat-icon>
+                                <mat-icon *ngIf="!profileImage && userRole !== 'ROLE_USER'" style="margin-right: 5%;">security</mat-icon>
+                                <img class="mat-card-avatar-custom" src={{profileImage}} *ngIf="profileImage" style="margin-right: 10%;"> 
                                 {{username}}
                         </button>
                         <mat-menu #menu="matMenu">

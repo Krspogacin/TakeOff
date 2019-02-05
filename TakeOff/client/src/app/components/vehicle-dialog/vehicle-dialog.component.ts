@@ -72,8 +72,7 @@ export class VehicleDialogComponent implements OnInit {
         (mainServices: []) => {
           this.mainServices = mainServices;
           // tslint:disable-next-line:forin
-          for (const i in this.mainServices) {
-            const mainService: any = this.mainServices[i];
+          for (const mainService of this.mainServices) {
             this.vehicleForm.addControl(mainService.name + mainService.id, this.formBuilder.control('', Validators.required));
           }
         }

@@ -1,0 +1,161 @@
+<h1 mat-dialog-title>Vehicle reservation</h1>
+<mat-dialog-content [formGroup]="">
+  <mat-horizontal-stepper #stepper linear labelPosition="bottom">
+    <mat-step [stepControl]="reservationForm" label="Enter reservation parameters" state="filter_list">
+      <form [formGroup]="reservationForm">
+          <div class="row d-flex justify-content-center">
+            <div class="col d-flex justify-content-center">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Start day </mat-label>
+                  <input matInput #startDateInput [matDatepicker]="startDatePicker" 
+                         [min]="currentDate" formControlName="startDate" required>
+                  <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+                  <mat-datepicker #startDatePicker disabled="false" [startAt]="currentDate"></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <div class="col d-flex justify-content-center">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>End day </mat-label>
+                  <input matInput #endDateInput [matDatepicker]="endDatePicker" 
+                        [min]="startDate" formControlName="endDate" required>
+                  <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+                  <mat-datepicker #endDatePicker disabled="false" [startAt]="startDate"></mat-datepicker>
+                </mat-form-field>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col d-flex justify-content-center">
+              <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Number of passengers </mat-label>
+                  <input matInput type="number" formControlName="numOfPassengers" required>
+                  <mat-error *ngIf="reservationForm.get(numOfPassengers) && reservationForm.get(numOfPassengers).invalid">
+                    <div *ngIf="reservationForm.get(numOfPassengers).errors.required"> Number of passengers is required.</div>
+                    <div *ngIf="reservationForm.get(numOfPassengers).errors.min || reservationForm.get(numOfPassengers).errors.max"> Wrong number of passengers!</div>
+                  </mat-error>
+                  <mat-hint>
+                    Number of passengers must be in range 1-7.
+                  </mat-hint>
+                </mat-form-field>
+            </div>
+            <div class="col d-flex justify-content-start">
+              <mat-form-field appearance="outline" class="w-50 mr-3">
+                <mat-label>Min price </mat-label>
+                <input #minPriceInput matInput type="number" formControlName="minPrice" min="0" max="{{maxPriceInput.value ? maxPriceInput.value : 999999999}}">
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="w-50">
+                <mat-label>Max price </mat-label>
+                <input #maxPriceInput matInput type="number" formControlName="maxPrice" min="{{minPriceInput.value ? minPriceInput.value : 0}}" max="999999999">
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col d-flex justify-content-center">
+              <mat-selection-list #fuelTypesList class="w-100">
+                  <h5 mat-subheader>Fuel types</h5>
+                  <mat-list-option *ngFor="let fuel of fuelTypes" [value]="fuel">
+                    {{fuel}}
+                  </mat-list-option>
+                </mat-selection-list>
+            </div>
+            <div class="col d-flex justify-content-center">
+              <mat-selection-list #transmissionTypesList class="w-100">
+                <h5 mat-subheader>Transmission types</h5>
+                <mat-list-option *ngFor="let transmission of transmissionTypes" [value]="transmission">
+                  {{transmission}}
+                </mat-list-option>
+              </mat-selection-list>
+            </div>
+          </div>
+      </form>
+      <div class="d-flex justify-content-end mt-5">
+        <button mat-raised-button [mat-dialog-close] class="mr-2">Cancel</button>
+        <button mat-raised-button matStepperNext color="primary" (click)="findVehicles()">Next</button>
+      </div>
+    </mat-step>
+    <mat-step label="Vehicles" state="directions_car">
+      <div *ngIf="vehiclesLoaded && !vehicles || vehicles.length == 0" class="row d-flex justify-content-center">
+        <h4>There are no any vehicle available!</h4>
+        <h4>Please redefine your parameters.</h4>
+      </div>
+      <div *ngIf="vehiclesLoaded && vehicles && vehicles.length > 0" class="row d-flex justify-content-center">
+        <div class="list-group w-75">
+          <button class="list-group-item list-group-item-action flex-column align-items-stretch"
+                  *ngFor="let item of vehicles" (click)="choosenItem = item"
+                  [ngClass]="{'list-group-item-info': !choosenItem || choosenItem.vehicle.id != item.vehicle.id, 
+                              'list-group-item-success': choosenItem && choosenItem.vehicle.id == item.vehicle.id}"
+                  style="cursor: pointer;">
+            <div class="row mb-2">
+                <img class="mat-card-avatar-custom mx-4" src="{{item.vehicle.image}}" 
+                      alt="No photo" style="width: 50px !important; height: 50px !important;">
+                <h4>{{item.vehicle.brand}} {{item.vehicle.model}}</h4>
+            </div>
+            <div class="row">
+              <div class="col">
+                <p><b>Year: </b> {{item.vehicle.year}}</p>
+                <p><b>No. of seats: </b> {{item.vehicle.numOfSeats}}</p>
+                <b>Rating: </b>
+                <div class="star-ratings-css mx-2">
+                    <div class="star-ratings-css-top">
+                      <span [ngStyle]="{'width': ((item.rating * 100) / 5) + '%'}">
+                        ★★★★★
+                      </span>
+                    </div>
+                    <div>★★★★★</div>
+                </div>
+                <span class="badge badge-pill badge-info">{{item.rating | ratingRound}}/5</span> 
+              </div>
+              <div class="col">
+                <p><b>Fuel: </b> {{item.vehicle.fuel}}</p>
+                <p><b>Transmission: </b> {{item.vehicle.transmission}}</p>
+                <p class="mt-2"><b>Total price: </b> {{item.totalPrice}}</p>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+      <div class="d-flex justify-content-end mt-5">
+        <button mat-raised-button [mat-dialog-close] class="mr-2">Cancel</button>
+        <button mat-raised-button matStepperPrevious class="mr-2">Back</button>
+        <button mat-raised-button matStepperNext color="primary" [disabled]="!choosenItem">Next</button>
+      </div>
+    </mat-step>
+    <mat-step label="Done" state="done">
+      <h4>You have choosen following vehicle:</h4>
+      <div class="list-group mt-5" *ngIf="choosenItem">
+        <div class="list-group-item flex-column align-items-stretch">
+          <div class="row mb-2">
+              <img class="mat-card-avatar-custom mx-4" src="{{choosenItem.vehicle.image}}" 
+                   alt="No photo" style="width: 50px !important; height: 50px !important;">
+              <h4>{{choosenItem.vehicle.brand}} {{choosenItem.vehicle.model}}</h4>
+          </div>
+          <div class="row">
+            <div class="col">
+              <p><b>Year: </b> {{choosenItem.vehicle.year}}</p>
+              <p><b>No. of seats: </b> {{choosenItem.vehicle.numOfSeats}}</p>
+              <b>Rating: </b>
+              <div class="star-ratings-css mx-2">
+                <div class="star-ratings-css-top">
+                  <span [ngStyle]="{'width': ((choosenItem.rating * 100) / 5) + '%'}">
+                    ★★★★★
+                  </span>
+                </div>
+                <div>★★★★★</div>
+              </div>
+              <span class="badge badge-pill badge-info">{{choosenItem.rating | ratingRound}}/5</span> 
+            </div>
+            <div class="col">
+              <p><b>Fuel: </b> {{choosenItem.vehicle.fuel}}</p>
+              <p><b>Transmission: </b> {{choosenItem.vehicle.transmission}}</p>
+              <p class="mt-2"><b>Total price: </b> {{choosenItem.totalPrice}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-end mt-5">
+        <button mat-raised-button [mat-dialog-close] class="mr-2">Cancel</button>
+        <button mat-raised-button matStepperPrevious class="mr-2">Back</button>
+        <button mat-raised-button (click)="finish()" color="primary">Finish</button>
+      </div>
+    </mat-step>
+  </mat-horizontal-stepper>
+</mat-dialog-content>

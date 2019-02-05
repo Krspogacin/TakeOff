@@ -6,7 +6,6 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 import { HotelComponent } from './components/hotel/hotel.component';
 import { FlightComponent } from './components/flight/flight.component';
 import { RegistrationComponent } from './components/registration/registration.component';
-import { SuccessfulRegistrationComponent } from './components/successful-registration/successful-registration.component';
 import { LoginComponent } from './components/login/login.component';
 import { VerifyUserComponent } from './components/verify-user/verify-user.component';
 import { RentACarComponent } from './components/rent-a-car/rent-a-car.component';
@@ -23,16 +22,14 @@ import { AirCompaniesComponent } from './components/air-companies/air-companies.
 import { FlightReservationComponent } from './components/flight-reservation/flight-reservation.component';
 import { FriendsComponent } from './components/friends/friends.component';
 import { HotelReserveDialogComponent } from './components/hotel-reserve-dialog/hotel-reserve-dialog.component';
+import { FriendsDialogComponent } from './components/friends-dialog/friends-dialog.component';
 
 const routes: Routes = [
   { path: '', component: HomepageComponent },
   { path: 'companies/:id', component: AirCompanyComponent },
   { path: 'flights/:id', component: FlightComponent },
   { path: 'hotels/:id', component: HotelProfileComponent },
-  { path: 'users/registration', component: RegistrationComponent },
-  { path: 'users/successful_registration', component: SuccessfulRegistrationComponent },
   { path: 'users/register/verify', component: VerifyUserComponent },
-  { path: 'users/login', component: LoginComponent },
   { path: 'users/profile', component: UserProfileComponent },
   { path: 'rent-a-cars', component: RentACarsComponent },
   { path: 'rent-a-cars/:id', component: RentACarComponent },
@@ -51,7 +48,6 @@ export const RoutingComponents = [
   RegistrationComponent,
   FlightComponent,
   HotelComponent,
-  SuccessfulRegistrationComponent,
   VerifyUserComponent,
   LoginComponent,
   RentACarsComponent,
@@ -67,4 +63,5 @@ export const RoutingComponents = [
   AirCompaniesComponent,
   FlightReservationComponent,
   FriendsComponent,
-  HotelReserveDialogComponent];
+  HotelReserveDialogComponent,
+  FriendsDialogComponent];

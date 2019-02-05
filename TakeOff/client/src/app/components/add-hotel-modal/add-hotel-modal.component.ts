@@ -3,12 +3,16 @@ import { MatDialogRef} from '@angular/material';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { RegistrationService } from 'src/app/services/registration/registration.service';
 import { HotelService } from 'src/app/services/hotel/hotel.service';
+import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 
 declare let require: any;
 
 @Component({
   selector: 'app-add-hotel-modal',
   templateUrl: 'add-hotel-modal.component.html',
+  providers: [{
+    provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false }
+  }]
 })
 export class AddHotelModalComponent implements OnInit, AfterViewInit{
   

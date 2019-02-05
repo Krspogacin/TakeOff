@@ -12,7 +12,6 @@ import { MaterialModule } from './material';
 import { RegistrationDialogComponent } from './components/registration-dialog/registration-dialog.component';
 import { AddHotelModalComponent } from './components/add-hotel-modal/add-hotel-modal.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { SuccessfulRegistrationComponent } from './components/successful-registration/successful-registration.component';
 import { LoginDialogComponent } from './components/login-dialog/login-dialog.component';
 import { TokenInterceptor } from './http-interceptor';
 import { VerifyUserComponent } from './components/verify-user/verify-user.component';
@@ -25,6 +24,9 @@ import { NameFilterPipe } from './pipes/name-filter.pipe';
 import { RentACarMainServiceDialogComponent } from './components/rent-a-car-main-service-dialog/rent-a-car-main-service-dialog.component';
 import { ReservationsComponent } from './components/reservations/reservations.component';
 import { OfficeDialogComponent } from './components/office-dialog/office-dialog.component';
+import { FriendsFilterPipe } from './pipes/friends-filter/friends-filter.pipe';
+import { VehicleReservationDialogComponent } from './components/vehicle-reservation-dialog/vehicle-reservation-dialog.component';
+import { RatingRoundPipe } from './pipes/rating-round/rating-round.pipe';
 
 @NgModule({
     declarations: [
@@ -32,7 +34,6 @@ import { OfficeDialogComponent } from './components/office-dialog/office-dialog.
         RoutingComponents,
         NotFoundComponent,
         RegistrationDialogComponent,
-        SuccessfulRegistrationComponent,
         LoginDialogComponent,
         VerifyUserComponent,
         RentACarComponent,
@@ -43,8 +44,12 @@ import { OfficeDialogComponent } from './components/office-dialog/office-dialog.
         RentACarsComponent,
         NameFilterPipe,
         RentACarMainServiceDialogComponent,
+        FriendsFilterPipe,
+        OfficeDialogComponent,
+        VehicleReservationDialogComponent,
         ReservationsComponent,
         OfficeDialogComponent,
+        RatingRoundPipe,
     ],
     entryComponents: [
         RoutingComponents,
@@ -54,7 +59,8 @@ import { OfficeDialogComponent } from './components/office-dialog/office-dialog.
         VehicleDialogComponent,
         AddHotelModalComponent,
         RentACarMainServiceDialogComponent,
-        OfficeDialogComponent
+        OfficeDialogComponent,
+        VehicleReservationDialogComponent
     ],
     imports: [
         BrowserModule,

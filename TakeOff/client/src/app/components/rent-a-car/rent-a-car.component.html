@@ -13,7 +13,7 @@
               </div>
               <div><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
             </div>
-            <span class="badge badge-pill badge-info align-middle">{{rating}}/5</span>  
+            <span class="badge badge-pill badge-info align-middle">{{rating | ratingRound}}/5</span>  
             <p><b>Address:</b> {{rentACar.location.address}}
             <div>
               <iframe width="600" height="500" [src]='mapUrl' 
@@ -61,19 +61,18 @@
       </mat-tab>
       <mat-tab label="Vehicles">
         <button mat-raised-button color="primary" class="button-right" (click)="openAddVehicleDialog()" *ngIf="userRole && userRole === 'ROLE_USER'"><mat-icon>add</mat-icon> Add vehicle</button>
-        <div class="container d-flex justify-content-center m-5" *ngFor="let vehicle of vehicles.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)">
-          <div class="card w-75 p-4 mat-elevation-z12" style="border-radius: 5%;">
+        <div class="container d-flex justify-content-end m-5" *ngFor="let vehicle of vehicles.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)">
+          <div class="card w-75 p-4 mat-elevation-z12">
             <div class="row">
-              <div class="col-md-8">
+              <div class="col-md-7">
                 <img src="{{vehicle.image}}" alt="Vehicle photo" class="w-100 mat-elevation-z12" style="border-radius: 10%;">
               </div>
-              <div class="col-md-4 px-3">
+              <div class="col-md-5 px-3">
+                <span class="badge badge-danger" style="float: right; font-size: 120%; border-radius: 50%; padding-top: 5%; padding-bottom: 5%;" 
+                      *ngIf="vehicle.discount && vehicle.discount > 0">
+                  -{{vehicle.discount}}%
+                </span>
                 <div class="card-body px-3 text-info">
-                  <h4>
-                    <span class="badge badge-success" style="float: right;" *ngIf="vehicle.discount && vehicle.discount > 0">
-                      -{{vehicle.discount}}%
-                    </span>
-                  </h4>
                   <h4 class="card-title">{{vehicle.brand}} {{vehicle.model}}</h4>
                   <p class="card-text"><b>Year:</b> {{vehicle.year}}</p>
                   <p class="card-text"><b>Fuel type:</b> {{vehicle.fuel}}</p>
@@ -90,8 +89,8 @@
                       </div>
                       <div>★★★★★</div>
                   </div>
-                  <span class="badge badge-pill badge-info align-middle">{{rating}}/5</span> 
-                  <div *ngIf="userRole && userRole === 'ROLE_USER'" style="float: right;">
+                  <span class="badge badge-pill badge-info align-middle">{{vehicle.rating | ratingRound}}/5</span> 
+                  <div *ngIf="userRole && userRole === 'ROLE_USER'" class="d-flex justify-content-end mt-1">
                     <span matTooltip="Cannot be updated because it is reserved!" [matTooltipDisabled]="!vehicle.reserved">
                       <button mat-button color="primary" (click)="openUpdateVehicleDialog(vehicle)" [disabled]="vehicle.reserved"><mat-icon>edit</mat-icon></button>
                     </span>
@@ -116,13 +115,13 @@
         </mat-paginator>
       </mat-tab>
       <mat-tab label="Offices">
+        <button mat-raised-button color="primary" class="mt-3 mr-3" 
+                (click)="openAddOfficeDialog()" 
+                *ngIf="userRole && userRole === 'ROLE_USER'">
+        <mat-icon>add</mat-icon> Add office
+        </button>
         <div *ngIf="offices && offices.length > 0">
-          <button mat-raised-button color="primary" class="button-right" 
-                  (click)="openAddOfficeDialog()" 
-                  *ngIf="userRole && userRole === 'ROLE_USER'">
-          <mat-icon>add</mat-icon> Add office
-          </button>
-          <div class="container mt-5">
+          <div class="container">
               <div class="row">
                 <div class="col-md-5">
                     <div class="list-group" style="overflow: auto; height: 400px;">

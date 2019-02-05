@@ -4,6 +4,7 @@ import { RentACarDialogComponent } from '../rent-a-car-dialog/rent-a-car-dialog.
 import { RentACarService } from 'src/app/services/rent-a-car/rent-a-car.service';
 import { AppComponent } from 'src/app/app.component';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
+import { VehicleReservationDialogComponent } from '../vehicle-reservation-dialog/vehicle-reservation-dialog.component';
 
 @Component({
   selector: 'app-rent-a-cars',
@@ -25,6 +26,8 @@ export class RentACarsComponent implements OnInit {
   selected = this.sortOptions[0].value;
   selectedOption = this.sortOptions[0];
   nameFilterParam = '';
+  countryFilterParam = '';
+  cityFilterParam = '';
 
   constructor(private authService: AuthenticationService,
               private rentACarService: RentACarService,
@@ -109,7 +112,39 @@ export class RentACarsComponent implements OnInit {
     this.rentACars = this.appComponent.sortArray(this.rentACars, this.selectedOption.sortBy, this.selectedOption.asc);
   }
 
-  searchName(searchName: string) {
+  search(searchName: string, countryParam: string, cityParam: string) {
     this.nameFilterParam = searchName;
+    this.countryFilterParam = countryParam;
+    this.cityFilterParam = cityParam;
+  }
+
+  openReservationDialog(rentACar) {
+    if (!this.authService.getUsername() || this.userRole !== 'ROLE_USER') {
+      this.appComponent.showSnackBar('Error! You have no right to make any reservation.');
+      return;
+    }
+    this.rentACarService.areThereAvailableVehiclesNotOnDiscount(rentACar.id).subscribe(
+      (thereAreAvailableVehicles) => {
+        if (thereAreAvailableVehicles) {
+          const dialogRef = this.dialog.open(VehicleReservationDialogComponent,
+          {
+            data: rentACar,
+            disableClose: true,
+            autoFocus: true,
+            width: '60%',
+            height: '90%'
+          });
+          dialogRef.afterClosed().subscribe(
+          (data) => {
+            if (data) {
+              console.log(data);
+            }
+          }
+          );
+        } else  {
+          this.appComponent.showSnackBar('There are no available any vehicle at the moment.');
+        }
+      }
+    );
   }
 }
