@@ -34,8 +34,10 @@ export class HotelComponent implements OnInit {
 
   openDialog(){
     const dialogRef = this.dialog.open(AddHotelModalComponent,
-      {
+    {
       disableClose: true,
+      width: '60%',
+      height: '90%'
     });
 
     dialogRef.afterClosed().subscribe(result => {

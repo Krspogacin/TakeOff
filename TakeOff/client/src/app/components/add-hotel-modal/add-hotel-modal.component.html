@@ -1,98 +1,73 @@
 <h1 mat-dialog-title align="center">New hotel</h1>
 <mat-dialog-content>
-<mat-horizontal-stepper [linear]="isLinear" #stepper>
-    <mat-step [stepControl]="firstFormGroup">
+<mat-horizontal-stepper labelPosition="bottom">
+    <mat-step label="Create hotel" state="hotel">
       <form [formGroup]="firstFormGroup">
-        <ng-template matStepLabel>Create hotel</ng-template>
-            <table align="center">
-              <tr>
-                <td>
-                  <mat-form-field>
-                    <input matInput type="text" formControlName="name" placeholder="Name">
-                    <mat-error *ngIf="firstFormGroup.get('name').invalid && (firstFormGroup.get('name').dirty || firstFormGroup.get('name').touched)">
-                        <div *ngIf="firstFormGroup.get('name').errors.required"> Name is required.</div>
-                    </mat-error>
-                  </mat-form-field>
-                </td>
-              </tr>
-              <tr>
-                  <td>
-                    <mat-form-field>
-                      <input matInput type="search" id="address-input" formControlName="address" placeholder="Address">
-                      <mat-error *ngIf="firstFormGroup.get('address').invalid && (firstFormGroup.get('address').dirty || firstFormGroup.get('address').touched)">
-                          <div *ngIf="firstFormGroup.get('address').errors.required"> Address is required.</div>
-                      </mat-error>
-                    </mat-form-field>
-                  </td>
-              </tr>
-              <tr>
-                  <td>
-                    <mat-form-field>
-                        <textarea matInput type="text" rows="5" formControlName="description" placeholder="Description"></textarea>
-                    </mat-form-field>
-                  </td>
-              </tr>
-            </table>
-        <div align="center">
-          <button mat-button matStepperNext>Next</button>
+        <div class="row d-flex justify-content-center mt-3">
+          <mat-form-field class="w-75">
+            <input matInput type="text" formControlName="name" placeholder="Name">
+            <mat-error *ngIf="firstFormGroup.get('name').invalid && (firstFormGroup.get('name').dirty || firstFormGroup.get('name').touched)">
+                <div *ngIf="firstFormGroup.get('name').errors.required"> Name is required.</div>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="row d-flex justify-content-center">
+          <mat-form-field class="w-75">
+            <input matInput type="search" id="address-input" formControlName="address" placeholder="Address">
+            <mat-error *ngIf="firstFormGroup.get('address').invalid && (firstFormGroup.get('address').dirty || firstFormGroup.get('address').touched)">
+                <div *ngIf="firstFormGroup.get('address').errors.required"> Address is required.</div>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="row d-flex justify-content-center">
+          <mat-form-field class="w-75">
+              <textarea matInput type="text" rows="5" formControlName="description" placeholder="Description"></textarea>
+          </mat-form-field>
         </div>
       </form>
-    </mat-step>
-    <mat-step [stepControl]="secondFormGroup">
-      <form [formGroup]="secondFormGroup">
-        <ng-template matStepLabel>Create hotel administrator</ng-template>
-          <table table align="center">
-              <tr>
-                  <td>
-                    <mat-form-field>
-                      <input matInput type="text" formControlName="username" placeholder="Username">
-                      <mat-error *ngIf="secondFormGroup.get('username').invalid && (secondFormGroup.get('username').dirty || secondFormGroup.get('username').touched)">
-                          <div *ngIf="secondFormGroup.get('username').errors.required"> Username is required.</div>
-                          <div *ngIf="!secondFormGroup.get('username').errors.required &&
-                                      (secondFormGroup.get('username').errors.minlength || secondFormGroup.get('username').errors.maxlength)">
-                                      Invalid username length!
-                          </div>
-                          <div *ngIf="secondFormGroup.get('username').errors.usernameExists"> User with username <i>{{secondFormGroup.value.username}}</i> already exists.</div>
-                      </mat-error>
-                      <mat-hint>
-                              Username length must be between {{usernameMinLength}} and {{usernameMaxLength}}. <br>
-                      </mat-hint>
-                    </mat-form-field>
-                  </td>
-                </tr>
-                <br>
-                <tr>
-                    <td>
-                      <mat-form-field>
-                        <input matInput type="password" formControlName="password" placeholder="Password">
-                        <mat-error *ngIf="secondFormGroup.get('password').invalid && (secondFormGroup.get('password').dirty || secondFormGroup.get('password').touched)">
-                            <div *ngIf="secondFormGroup.get('password').errors.required"> Password is required.</div>
-                            <div *ngIf="!secondFormGroup.get('password').errors.required &&
-                                        (secondFormGroup.get('password').errors.minlength || secondFormGroup.get('password').errors.maxlength)">
-                                        Invalid password length!
-                            </div>
-                        </mat-error>
-                        <mat-hint>
-                                Password length must be between {{passwordMinLength}} and {{passwordMaxLength}}.
-                        </mat-hint>
-                      </mat-form-field>
-                    </td>
-                </tr>
-          </table>
-          <br>
-        <div align="center">
-          <button mat-button matStepperPrevious>Back</button>
-          <button mat-button matStepperNext>Next</button>
-        </div>
-      </form>
-    </mat-step>
-    <mat-step>
-      <ng-template matStepLabel>Done</ng-template>
-      <p align="center">You are now done. </p>
       <div align="center">
-        <button mat-button matStepperPrevious>Back</button>
-        <button mat-button color="primary" type="submit" (click)="addHotel()"  [disabled]="firstFormGroup.invalid || secondFormGroup.invalid">Finish</button>
-        <button mat-button [mat-dialog-close]>Cancel</button>
+        <button mat-raised-button [mat-dialog-close] class="mr-2">Cancel</button>
+        <button mat-raised-button matStepperNext color="primary">Next</button>
+      </div>
+    </mat-step>
+    <mat-step label="Create hotel administrator" state="security">
+      <form [formGroup]="secondFormGroup">
+        <div class="row d-flex justify-content-center mt-3">
+          <mat-form-field class="w-75">
+            <input matInput type="text" formControlName="username" placeholder="Username">
+            <mat-error *ngIf="secondFormGroup.get('username').invalid && (secondFormGroup.get('username').dirty || secondFormGroup.get('username').touched)">
+                <div *ngIf="secondFormGroup.get('username').errors.required"> Username is required.</div>
+                <div *ngIf="!secondFormGroup.get('username').errors.required &&
+                            (secondFormGroup.get('username').errors.minlength || secondFormGroup.get('username').errors.maxlength)">
+                            Invalid username length!
+                </div>
+                <div *ngIf="secondFormGroup.get('username').errors.usernameExists"> User with username <i>{{secondFormGroup.value.username}}</i> already exists.</div>
+            </mat-error>
+            <mat-hint>
+                    Username length must be between {{usernameMinLength}} and {{usernameMaxLength}}. <br>
+            </mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="row d-flex justify-content-center">
+          <mat-form-field class="w-75">
+            <input matInput type="password" formControlName="password" placeholder="Password">
+            <mat-error *ngIf="secondFormGroup.get('password').invalid && (secondFormGroup.get('password').dirty || secondFormGroup.get('password').touched)">
+                <div *ngIf="secondFormGroup.get('password').errors.required"> Password is required.</div>
+                <div *ngIf="!secondFormGroup.get('password').errors.required &&
+                            (secondFormGroup.get('password').errors.minlength || secondFormGroup.get('password').errors.maxlength)">
+                            Invalid password length!
+                </div>
+            </mat-error>
+            <mat-hint>
+                    Password length must be between {{passwordMinLength}} and {{passwordMaxLength}}.
+            </mat-hint>
+          </mat-form-field>
+        </div>
+      </form>
+      <div align="center" class="mt-5">
+        <button mat-raised-button [mat-dialog-close] class="mr-2">Cancel</button>
+        <button mat-raised-button matStepperPrevious class="mr-2">Back</button>
+        <button mat-raised-button color="primary" type="submit" (click)="addHotel()" [disabled]="firstFormGroup.invalid || secondFormGroup.invalid">Finish</button>
       </div>
     </mat-step>
   </mat-horizontal-stepper>

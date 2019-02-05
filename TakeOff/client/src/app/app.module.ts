@@ -26,6 +26,7 @@ import { ReservationsComponent } from './components/reservations/reservations.co
 import { OfficeDialogComponent } from './components/office-dialog/office-dialog.component';
 import { FriendsFilterPipe } from './pipes/friends-filter/friends-filter.pipe';
 import { VehicleReservationDialogComponent } from './components/vehicle-reservation-dialog/vehicle-reservation-dialog.component';
+import { RatingRoundPipe } from './pipes/rating-round/rating-round.pipe';
 
 @NgModule({
     declarations: [
@@ -47,6 +48,7 @@ import { VehicleReservationDialogComponent } from './components/vehicle-reservat
         OfficeDialogComponent,
         VehicleReservationDialogComponent,
         ReservationsComponent,
+        RatingRoundPipe,
     ],
     entryComponents: [
         RoutingComponents,

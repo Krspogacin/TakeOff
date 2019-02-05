@@ -42,7 +42,7 @@ export class AppComponent implements OnInit {
     if (!message) {
       return;
     }
-    const snackBarRef = this.snackBar.open(message, 'Dissmiss', { duration: 3000 });
+    const snackBarRef = this.snackBar.open(message, 'Dissmiss', { verticalPosition: 'top', duration: 4000 });
     snackBarRef.onAction().subscribe(
       () => {
         snackBarRef.dismiss();

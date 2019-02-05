@@ -119,16 +119,31 @@ export class RentACarsComponent implements OnInit {
   }
 
   openReservationDialog(rentACar) {
-    const dialogRef = this.dialog.open(VehicleReservationDialogComponent,
-    {
-      data: rentACar,
-      disableClose: true,
-      autoFocus: true,
-      width: '60%',
-      height: '90%'
-    });
-    dialogRef.afterClosed().subscribe(
-      (data) => {
+    if (!this.authService.getUsername() || this.userRole !== 'ROLE_USER') {
+      this.appComponent.showSnackBar('Error! You have no right to make any reservation.');
+      return;
+    }
+    this.rentACarService.areThereAvailableVehiclesNotOnDiscount(rentACar.id).subscribe(
+      (thereAreAvailableVehicles) => {
+        if (thereAreAvailableVehicles) {
+          const dialogRef = this.dialog.open(VehicleReservationDialogComponent,
+          {
+            data: rentACar,
+            disableClose: true,
+            autoFocus: true,
+            width: '60%',
+            height: '90%'
+          });
+          dialogRef.afterClosed().subscribe(
+          (data) => {
+            if (data) {
+              console.log(data);
+            }
+          }
+          );
+        } else  {
+          this.appComponent.showSnackBar('There are no available any vehicle at the moment.');
+        }
       }
     );
   }

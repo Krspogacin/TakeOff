@@ -19,12 +19,14 @@ import { element } from 'protractor';
 export class VehicleReservationDialogComponent implements OnInit {
 
   reservationForm: FormGroup;
-  secondFormGroup: FormGroup;
+  choosenItem: any = null;
   vehicles: any[] = [];
   minPassengers = 1;
   maxPassengers = 7;
   fuelTypes: any[] = [];
   transmissionTypes: any[] = [];
+  vehiclesLoaded = false;
+  currentDate = new Date();
   @ViewChild('fuelTypesList') fuelTypesList: MatSelectionList;
   @ViewChild('transmissionTypesList') transmissionTypesList: MatSelectionList;
 
@@ -36,12 +38,9 @@ export class VehicleReservationDialogComponent implements OnInit {
               @Inject(MAT_DIALOG_DATA) public rentACar: any) { }
 
   ngOnInit() {
-
-    if (!this.rentACar || !this.authService.getUsername() || this.authService.getAuthority() !== 'ROLE_USER') {
+    if (!this.rentACar) {
       this.dialogRef.close();
     }
-
-    // this.fuelTypesList.selectedOptions = new SelectionModel<MatListOption>(false);
 
     this.vehicleService.getFuelTypes().subscribe(
       (data: any[]) => {
@@ -70,12 +69,12 @@ export class VehicleReservationDialogComponent implements OnInit {
 
     const parameters = this.reservationForm.value;
     parameters.rentACarId = this.rentACar.id;
-    parameters.startDay = new Date(Date.UTC(parameters.startDay.getFullYear(),
-                                            parameters.startDay.getMonth(),
-                                            parameters.startDay.getDate()));
-    parameters.endDay = new Date(Date.UTC(parameters.endDay.getFullYear(),
-                                          parameters.endDay.getMonth(),
-                                          parameters.endDay.getDate()));
+    parameters.startDate = new Date(Date.UTC(parameters.startDate.getFullYear(),
+                                            parameters.startDate.getMonth(),
+                                            parameters.startDate.getDate()));
+    parameters.endDate = new Date(Date.UTC(parameters.endDate.getFullYear(),
+                                          parameters.endDate.getMonth(),
+                                          parameters.endDate.getDate()));
     const fuelTypes = [];
     const transmissionTypes = [];
     this.fuelTypesList.selectedOptions.selected.map(elem => fuelTypes.push(elem.value));
@@ -85,15 +84,27 @@ export class VehicleReservationDialogComponent implements OnInit {
     this.rentACarService.getAvailableVehicles(parameters).subscribe(
       (vehicles: any[]) => {
         this.vehicles = vehicles;
-        console.log(this.vehicles);
+        this.vehiclesLoaded = true;
       },
       (error) => {
-        alert('Error!');
+        alert('Error! Vehicles could not be loaded!');
       }
     );
   }
 
   finish() {
-    console.log('reserved!');
+    if (this.choosenItem) {
+      const choosenItem = this.choosenItem;
+      delete choosenItem['rating'];
+      const reservationStartDate: Date = this.reservationForm.get('startDate').value;
+      choosenItem.reservationStartDate = new Date(Date.UTC(reservationStartDate.getFullYear(),
+                                                           reservationStartDate.getMonth(),
+                                                           reservationStartDate.getDate()));
+      const reservationEndDate: Date = this.reservationForm.get('startDate').value;
+      choosenItem.reservationEndDate = new Date(Date.UTC(reservationEndDate.getFullYear(),
+                                                          reservationEndDate.getMonth(),
+                                                          reservationEndDate.getDate()));
+      this.dialogRef.close(this.choosenItem);
+    }
   }
 }

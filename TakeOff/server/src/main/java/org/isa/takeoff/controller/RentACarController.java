@@ -3,7 +3,7 @@ package org.isa.takeoff.controller;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 import java.io.IOException;
-import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -234,6 +234,30 @@ public class RentACarController
 		}
 	}
 	
+	@RequestMapping(value = "/{id}/areThereAvailableVehiclesNotOnDiscount", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Boolean> areThereAvailableVehiclesNotOnDiscount(@PathVariable Long id) 
+	{
+		try 
+		{
+			RentACar rentACar = rentACarService.findOne(id);
+			List<Vehicle> vehicles = rentACar.getVehicles();
+		
+			for (Vehicle vehicle : vehicles)
+			{
+				if (vehicle.getDiscount() == null || vehicle.getDiscount() == 0)
+				{
+					return new ResponseEntity<>(true, HttpStatus.OK);
+				}
+			}
+			
+			return new ResponseEntity<>(false, HttpStatus.OK);
+		}
+		catch (Exception e) 
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
 	@RequestMapping(value = "/vehicles/availableVehicles", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<AvailableVehiclesDTO>> getAvailableVehicles(@RequestParam String parametersDTO) 
 	{
@@ -258,7 +282,7 @@ public class RentACarController
 		{
 			RentACar rentACar = rentACarService.findOne(parameters.getRentACarId());
 			List<RentACarMainService> rentACarMainServices = rentACar.getMainServicesRentACar();
-			long reservationDays = Duration.between(parameters.getStartDate(), parameters.getEndDate()).toDays();
+			long reservationDays = ChronoUnit.DAYS.between(parameters.getStartDate(), parameters.getEndDate()) + 1;
 			System.out.println(reservationDays);
 			Long mainServiceId = null;
 			
@@ -278,7 +302,7 @@ public class RentACarController
 			for (Vehicle vehicle : vehicles)
 			{
 				//If vehicle is on discount, skip it
-				if (vehicle.getDiscount() == null || vehicle.getDiscount() == 0) 
+				if (vehicle.getDiscount() != null && vehicle.getDiscount() > 0) 
 				{
 					continue;					
 				}
@@ -342,13 +366,24 @@ public class RentACarController
 					continue;
 				}
 				
-				AvailableVehiclesDTO availableVehicle = new AvailableVehiclesDTO(new VehicleDTO(vehicle), vehiclePrice * reservationDays);
+				List<VehicleRating> ratings = vehicle.getVehicleRatings();
+				Double vehicleRating = 0.0;
+				
+				if (!ratings.isEmpty())
+				{
+					AtomicReference<Double> ratingsSum = new AtomicReference<Double>(0.0);
+					ratings.forEach(rating -> ratingsSum.accumulateAndGet(rating.getRating(), (x, y) -> x + y));
+					vehicleRating = ratingsSum.get() / ratings.size();
+				}
+				
+				AvailableVehiclesDTO availableVehicle = new AvailableVehiclesDTO(new VehicleDTO(vehicle), vehiclePrice * reservationDays, vehicleRating);
 				availableVehicles.add(availableVehicle);
 			}
 			return new ResponseEntity<>(availableVehicles, HttpStatus.OK);
 		}
 		catch (Exception e) 
 		{
+			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}

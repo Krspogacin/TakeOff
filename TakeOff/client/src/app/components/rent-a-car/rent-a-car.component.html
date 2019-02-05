@@ -13,7 +13,7 @@
               </div>
               <div><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
             </div>
-            <span class="badge badge-pill badge-info align-middle">{{rating}}/5</span>  
+            <span class="badge badge-pill badge-info align-middle">{{rating | ratingRound}}/5</span>  
             <p><b>Address:</b> {{rentACar.location.address}}
             <div>
               <iframe width="600" height="500" [src]='mapUrl' 
@@ -89,7 +89,7 @@
                       </div>
                       <div>★★★★★</div>
                   </div>
-                  <span class="badge badge-pill badge-info align-middle">{{vehicle.rating}}/5</span> 
+                  <span class="badge badge-pill badge-info align-middle">{{vehicle.rating | ratingRound}}/5</span> 
                   <div *ngIf="userRole && userRole === 'ROLE_USER'" class="d-flex justify-content-end mt-1">
                     <span matTooltip="Cannot be updated because it is reserved!" [matTooltipDisabled]="!vehicle.reserved">
                       <button mat-button color="primary" (click)="openUpdateVehicleDialog(vehicle)" [disabled]="vehicle.reserved"><mat-icon>edit</mat-icon></button>

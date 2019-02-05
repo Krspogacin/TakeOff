@@ -1,4 +1,4 @@
-<button *ngIf="userRole === 'ROLE_USER'" mat-raised-button (click)="openAddRentACarDialog()" color="primary" style="margin: 2.5% 0% 0% 0%;"><mat-icon>add</mat-icon> Add Rent A Car</button>
+<button *ngIf="userRole === 'ROLE_SYS_ADMIN'" mat-raised-button (click)="openAddRentACarDialog()" color="primary" style="margin: 2.5% 0% 0% 0%;"><mat-icon>add</mat-icon> Add Rent A Car</button>
 <mat-form-field style="float: right; padding-right: 3%; padding-top: 2%;">
     <mat-select placeholder="Sort by" (selectionChange)="sort($event.value)" [(ngModel)]="selected" style="width: 110%;">
         <mat-select-trigger>
@@ -48,9 +48,10 @@
                                 </div>
                                 <div>★★★★★</div>
                             </div>
-                            <span class="badge badge-pill badge-info align-middle">{{rentACar.rating}}/5</span> 
+                            <span class="badge badge-pill badge-info align-middle">{{rentACar.rating | ratingRound}}/5</span> 
                             <div class="d-flex justify-content-end align-items-end mt-5">
-                                <button mat-raised-button color="primary" (click)="openReservationDialog(rentACar)" class="m-2">
+                                <button mat-raised-button color="primary" (click)="openReservationDialog(rentACar)" 
+                                        class="m-2" *ngIf="userRole && userRole === 'ROLE_USER'">
                                     Reservation <mat-icon>today</mat-icon>
                                 </button>
                                 <button mat-raised-button color="primary" [routerLink]="[ '/rent-a-cars', rentACar.id ]" class="m-2">
