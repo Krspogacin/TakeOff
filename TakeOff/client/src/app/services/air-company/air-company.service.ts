@@ -35,4 +35,8 @@ export class AirCompanyService {
   updateCompany(company) {
     return this.http.put('/companies', company);
   }
+
+  addCompany(company) {
+    return this.http.post('/companies',company)
+  }
 }

@@ -41,6 +41,10 @@ export class HotelService {
     return this.http.get('/hotels/' + id + '/getRoomRatings')
   }
 
+  getHotelRatings(){
+    return this.http.get('/hotels/getHotelRatings')
+  }
+
   getServices(){
     return this.http.get('/hotels/allServices');
   }

@@ -1,11 +1,19 @@
-<h2 style="padding: 0% 0% 0% 2.5%;">Search hotels: </h2>
-<div align="center">
-    <input [(ngModel)]="nameLocation" style="height:40px; width:20%; border: 2px solid orange;" type="text" placeholder="Hotel name or location">
-    <input style="height:40px; width:20%; border: 2px solid orange;" type="text" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="Check in date">
-    <input style="height:40px; width:20%; border: 2px solid orange;" type="text" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="Check out date">&nbsp;&nbsp;
-    <button mat-raised-button style="background-color: orange; color: white;" (click)="search()">Search</button>
+<div *ngIf="userRole && userRole === 'ROLE_SYS_ADMIN'">
+    <button mat-raised-button color="primary" style="float: right;margin: 5px;" mat-button (click)="openDialog()"><mat-icon>add</mat-icon>Create hotel</button>
 </div>
-
+<h2 style="padding: 0% 0% 0% 2.5%;">Search hotels: </h2>
+<br>
+<div align="center">
+    <input matInput [(ngModel)]="nameLocation" style="height:40px; width:20%; border: 2px solid orange;" type="text" placeholder="Hotel name or location">
+    <input autocomplete="off" matInput style="height:40px; width:20%; border: 2px solid orange;" [matDatepicker]="picker" placeholder="Check in date">
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker disabled="false"></mat-datepicker>
+    <input autocomplete="off" matInput style="height:40px; width:20%; border: 2px solid orange;" [matDatepicker]="picker2" placeholder="Check out date">
+    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+    <mat-datepicker #picker2 disabled="false"></mat-datepicker>&nbsp;&nbsp;
+    <button mat-raised-button style="background-color: orange; color: white;" (click)="search()"><mat-icon>search</mat-icon>Search</button>
+</div>
+<br>
 <h2 style="padding: 0% 0% 0% 2.5%;">List of hotels:</h2>
 <div style="display:flex; flex-wrap: wrap" *ngIf="hotels">
 <mat-card *ngFor="let h of hotels.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)" class="example-card">
@@ -14,14 +22,26 @@
     </mat-card-header>
     <img mat-card-image src="https://hotelperrakis.com/wp-content/uploads/slider-back-hotel.jpg">
     <mat-card-content>
-        <p>
         <b>Address</b> : {{h.location.address}} <br/>
-        <b>Description</b> : {{h.description}}
-        </p> 
+        <b>Description</b> : {{h.description}} <br/>
+        <b>Rating: </b>
+        <span *ngFor="let rating of hotelRatings">
+            <span *ngIf="rating.hotel.id == h.id">
+                <div class="star-ratings-css mx-2">
+                    <div class="star-ratings-css-top">
+                        <span [ngStyle]="{'width': ((rating.rating * 100) / 5) + '%'}">
+                        ★★★★★
+                        </span>
+                    </div>
+                    <div>★★★★★</div>
+                </div>
+                <span class="badge badge-pill badge-info align-middle">{{rating.rating | ratingRound }}/5</span>
+            </span>
+        </span>
     </mat-card-content>
     <mat-card-actions style="float:right;"> 
-        <button mat-raised-button color="primary" (click)="openReserveDialog(h.id)">RESERVE</button>
-        <button mat-raised-button color="primary" [routerLink]="'/hotels/' + h.id">DETAILS</button>
+        <button *ngIf="userRole && userRole === 'ROLE_USER'" mat-raised-button color="primary" (click)="openReserveDialog(h.id)">Reserve<mat-icon>today</mat-icon></button>
+        <button mat-raised-button color="primary" [routerLink]="'/hotels/' + h.id">Details<mat-icon>arrow_forward</mat-icon></button>
     </mat-card-actions>
 </mat-card>
 </div>
@@ -31,7 +51,3 @@
               [showFirstLastButtons]="true"
               (page)="pageFunction($event)">
 </mat-paginator>
-
-<div *ngIf="userRole && userRole === 'ROLE_SYS_ADMIN'">
-    <button mat-button (click)="openDialog()">Create hotel</button>
-</div>

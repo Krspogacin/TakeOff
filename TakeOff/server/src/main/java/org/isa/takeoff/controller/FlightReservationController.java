@@ -47,7 +47,7 @@ public class FlightReservationController {
 
 				Ticket ticket = null;
 				for (Ticket t : tickets) {
-					if (t.getId() == r.getTicket().getId()) {
+					if (t.getId().equals(r.getTicket().getId())) {
 						if (t.getIsReserved()) {
 							return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 						}

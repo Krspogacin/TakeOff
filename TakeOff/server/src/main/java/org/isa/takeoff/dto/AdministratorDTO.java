@@ -7,21 +7,23 @@ public class AdministratorDTO
 	private Long id;
 	private String username;
 	private String password;
+	private Boolean enabled;
 	private AirCompanyDTO airCompanyDTO;
 	private HotelDTO hotelDTO;
 	private RentACarDTO rentACarDTO;
 	
 	public AdministratorDTO() { }
 	
-	public AdministratorDTO(Long id, String username, String password) {
+	public AdministratorDTO(Long id, String username, String password, Boolean enabled) {
 		this.id = id;
 		this.username = username;
 		this.password = password;
+		this.enabled = enabled;
 	}
 	
 	public AdministratorDTO(Administrator admin)
 	{
-		this(admin.getId(), admin.getUsername(), admin.getPassword());
+		this(admin.getId(), admin.getUsername(), admin.getPassword(), admin.isEnabled());
 	}
 
 	public Long getId() {
@@ -46,6 +48,14 @@ public class AdministratorDTO
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public Boolean getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	public AirCompanyDTO getAirCompanyDTO() {

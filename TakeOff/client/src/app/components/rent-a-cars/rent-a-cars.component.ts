@@ -1,10 +1,10 @@
 import { Component, OnInit, Pipe, PipeTransform } from '@angular/core';
 import { PageEvent, MatDialog, MatSnackBar, MatSelect } from '@angular/material';
-import { RentACarDialogComponent } from '../rent-a-car-dialog/rent-a-car-dialog.component';
 import { RentACarService } from 'src/app/services/rent-a-car/rent-a-car.service';
 import { AppComponent } from 'src/app/app.component';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { VehicleReservationDialogComponent } from '../vehicle-reservation-dialog/vehicle-reservation-dialog.component';
+import { AddEntityDialogComponent } from '../add-entity-dialog/add-entity-dialog.component';
 
 @Component({
   selector: 'app-rent-a-cars',
@@ -69,33 +69,31 @@ export class RentACarsComponent implements OnInit {
   // }
 
   openAddRentACarDialog() {
-    const dialogRef = this.dialog.open(RentACarDialogComponent,
+    const dialogRef = this.dialog.open(AddEntityDialogComponent,
     {
-      data: null,
+      data: 2,
       disableClose: true,
       autoFocus: true,
-      width: '40%'
+      width: '60%',
+      height: '90%'
     });
     dialogRef.afterClosed().subscribe(
-      (data) => {
-        if (data) {
-          this.rentACarService.addRentACar(data).subscribe(
-            (rentACar: any) => {
-              this.message = 'Added successfully!';
-              const newRentACar = rentACar;
-              newRentACar.rating = 0;
-              this.rentACars.push(newRentACar);
-              this.rentACars = this.appComponent.sortArray(this.rentACars, this.selectedOption.sortBy, this.selectedOption.asc);
-            },
-            () => {
-              this.message = 'Error! Rent A Car could not be added!';
-            },
-            () => {
-              this.appComponent.showSnackBar(this.message);
-            }
-          );
+      (result) => {
+        if (result) {
+            this.message = 'Added successfully!';
+            const newRentACar = result;
+            newRentACar.rating = 0;
+            this.rentACars.push(newRentACar);
+            this.rentACars = this.appComponent.sortArray(this.rentACars, this.selectedOption.sortBy, this.selectedOption.asc);
         }
-    });
+      },
+      () => {
+        this.message = 'Error! Rent A Car could not be added!';
+      },
+      () => {
+        this.appComponent.showSnackBar(this.message);
+      }
+    );
   }
 
   switchPage(event: PageEvent) {

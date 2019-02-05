@@ -10,7 +10,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MaterialModule } from './material';
 import { RegistrationDialogComponent } from './components/registration-dialog/registration-dialog.component';
-import { AddHotelModalComponent } from './components/add-hotel-modal/add-hotel-modal.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { LoginDialogComponent } from './components/login-dialog/login-dialog.component';
 import { TokenInterceptor } from './http-interceptor';
@@ -27,7 +26,6 @@ import { OfficeDialogComponent } from './components/office-dialog/office-dialog.
 import { FriendsFilterPipe } from './pipes/friends-filter/friends-filter.pipe';
 import { VehicleReservationDialogComponent } from './components/vehicle-reservation-dialog/vehicle-reservation-dialog.component';
 import { RatingRoundPipe } from './pipes/rating-round/rating-round.pipe';
-
 @NgModule({
     declarations: [
         AppComponent,
@@ -39,7 +37,6 @@ import { RatingRoundPipe } from './pipes/rating-round/rating-round.pipe';
         RentACarComponent,
         RentACarDialogComponent,
         VehicleDialogComponent,
-        AddHotelModalComponent,
         LogoutComponent,
         RentACarsComponent,
         NameFilterPipe,
@@ -57,7 +54,6 @@ import { RatingRoundPipe } from './pipes/rating-round/rating-round.pipe';
         LoginDialogComponent,
         RentACarDialogComponent,
         VehicleDialogComponent,
-        AddHotelModalComponent,
         RentACarMainServiceDialogComponent,
         OfficeDialogComponent,
         VehicleReservationDialogComponent

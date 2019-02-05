@@ -33,6 +33,9 @@ public class Administrator implements UserDetails {
 	@Column(name="password", nullable=false)
 	private String password;
 	
+	@Column(name="enabled", nullable=false)
+	private Boolean enabled;
+	
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Authority authority;
 	
@@ -47,9 +50,10 @@ public class Administrator implements UserDetails {
 	
 	public Administrator() { }
 
-	public Administrator(String username, String password) {
+	public Administrator(String username, String password, Boolean enabled) {
 		this.username = username;
 		this.password = password;
+		this.enabled = enabled;
 	}
 
 	public Long getId() {
@@ -98,6 +102,10 @@ public class Administrator implements UserDetails {
 
 	public void setRentACar(RentACar rentACar) {
 		this.rentACar = rentACar;
+	}
+
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	@Override
@@ -150,6 +158,6 @@ public class Administrator implements UserDetails {
 	@JsonIgnore
 	@Override
 	public boolean isEnabled() {
-		return true;
+		return enabled;
 	}
 }

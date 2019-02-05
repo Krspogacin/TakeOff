@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AddHotelModalComponent } from './add-hotel-modal.component';
+import { AddEntityDialogComponent } from './add-entity-dialog.component';
 
-describe('AddHotelModalComponent', () => {
-  let component: AddHotelModalComponent;
-  let fixture: ComponentFixture<AddHotelModalComponent>;
+describe('AddEntityDialogComponent', () => {
+  let component: AddEntityDialogComponent;
+  let fixture: ComponentFixture<AddEntityDialogComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AddHotelModalComponent ]
+      declarations: [ AddEntityDialogComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AddHotelModalComponent);
+    fixture = TestBed.createComponent(AddEntityDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

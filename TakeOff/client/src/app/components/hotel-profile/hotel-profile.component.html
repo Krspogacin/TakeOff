@@ -4,22 +4,24 @@
         <button mat-raised-button color="primary" style="float: right;margin: 5px;" (click)="openAddRoomDialog()"><mat-icon>add</mat-icon> Add room</button>
         <button mat-raised-button color="primary" style="float: right;margin: 5px;" (click)="openUpdateDialog()"><mat-icon>edit</mat-icon> Update hotel</button>
         <p><font size="5"><b>Description:</b> {{hotel.description}}</font></p>
-        <b><font size="5">Rating: </font></b>
-        <span style="display: flex; flex-direction: row">
-            <div class="star-ratings-css">
-              <div class="star-ratings-css-top" [ngStyle]="{'width': ((rating * 100) / 5) + '%'}"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-              <div class="star-ratings-css-bottom"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <b>Rating: </b>
+        <div class="star-ratings-css mx-2">
+            <div class="star-ratings-css-top">
+                <span [ngStyle]="{'width': ((rating * 100) / 5) + '%'}">
+                ★★★★★
+                </span>
             </div>
-            <p style="padding-left: 20px;">{{rating}}/5</p>
-          </span>
-          <p><font size="5"><b>Address:</b> {{hotel.location.address}}</font> &nbsp;
-          <button mat-button color="primary" *ngIf="!clicked" (click)="clicked = true">Show on map</button>
-          <button mat-button color="primary" *ngIf="clicked" (click)="clicked = false">Close map</button></p>
-            <div *ngIf="clicked">
-              <iframe width="600" height="500" [src]='url' 
-                      frameborder="0" scrolling="no" marginheight="0" marginwidth="0">
-              </iframe>
-            </div>
+            <div>★★★★★</div>
+        </div>
+        <span class="badge badge-pill badge-info align-middle">{{rating | ratingRound }}/5</span> 
+        <p><font size="5"><b>Address:</b> {{hotel.location.address}}</font> &nbsp;
+        <button mat-button color="primary" *ngIf="!clicked" (click)="clicked = true">Show on map</button>
+        <button mat-button color="primary" *ngIf="clicked" (click)="clicked = false">Close map</button></p>
+        <div *ngIf="clicked">
+            <iframe width="600" height="500" [src]='url' 
+                    frameborder="0" scrolling="no" marginheight="0" marginwidth="0">
+            </iframe>
+        </div>
         <div class="mat-elevation-z8" *ngIf="rooms">
         <b><font size="5">Rooms: </font></b>
         <table style="width:100%" mat-table matSort [dataSource]="rooms.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)">
@@ -86,13 +88,15 @@
                 <td mat-cell *matCellDef="let room">
                     <div *ngFor="let rating of roomRatings">
                         <div *ngIf="rating.room.id == room.id">
-                            <span style="display: flex; flex-direction: row">
-                                <div class="star-ratings-css">
-                                    <div class="star-ratings-css-top" [ngStyle]="{'width': ((rating.rating * 100) / 5) + '%'}"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-                                    <div class="star-ratings-css-bottom"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+                            <div class="star-ratings-css mx-2">
+                                <div class="star-ratings-css-top">
+                                    <span [ngStyle]="{'width': ((rating.rating * 100) / 5) + '%'}">
+                                    ★★★★★
+                                    </span>
                                 </div>
-                                <p style="padding-left: 20px;">{{rating.rating}}/5</p>
-                            </span>
+                                <div>★★★★★</div>
+                            </div>
+                            <span class="badge badge-pill badge-info align-middle">{{rating.rating | ratingRound }}/5</span>
                         </div>
                     </div>
                 </td>

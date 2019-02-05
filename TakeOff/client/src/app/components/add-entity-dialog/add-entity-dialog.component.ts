@@ -1,20 +1,22 @@
 import { Component, OnInit, Inject, AfterViewInit } from '@angular/core';
-import { MatDialogRef} from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { RegistrationService } from 'src/app/services/registration/registration.service';
 import { HotelService } from 'src/app/services/hotel/hotel.service';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
+import { AirCompanyService } from 'src/app/services/air-company/air-company.service';
+import { RentACarService } from 'src/app/services/rent-a-car/rent-a-car.service';
 
 declare let require: any;
 
 @Component({
-  selector: 'app-add-hotel-modal',
-  templateUrl: 'add-hotel-modal.component.html',
+  selector: 'app-add-entity-dialog',
+  templateUrl: 'add-entity-dialog.component.html',
   providers: [{
     provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false }
   }]
 })
-export class AddHotelModalComponent implements OnInit, AfterViewInit{
+export class AddEntityDialogComponent implements OnInit, AfterViewInit{
   
   passwordMinLength = 8;
   passwordMaxLength = 32;
@@ -24,10 +26,13 @@ export class AddHotelModalComponent implements OnInit, AfterViewInit{
   secondFormGroup: FormGroup;
   location: any = {};
 
-  constructor(private dialogRef: MatDialogRef<AddHotelModalComponent>,
+  constructor(private dialogRef: MatDialogRef<AddEntityDialogComponent>,
               private formBuilder: FormBuilder,
               private registrationService: RegistrationService,
-              private hotelService: HotelService) { }
+              private hotelService: HotelService,
+              private airCompanyService: AirCompanyService,
+              private rentACarService: RentACarService,
+              @Inject(MAT_DIALOG_DATA) public entityNo: any) { }
 
     ngOnInit() {
       this.firstFormGroup = this.formBuilder.group({
@@ -68,7 +73,7 @@ export class AddHotelModalComponent implements OnInit, AfterViewInit{
       });
     }
 
-    addHotel(){
+    addEntity(){
       this.validateByUsername();
     }
 
@@ -82,29 +87,51 @@ export class AddHotelModalComponent implements OnInit, AfterViewInit{
           usernameControl.setErrors({ usernameExists: true });
         },
         () => {
-          this.addHotelIfUserIfValid();
+          this.addEntityIfUserIsValid();
         });
     }
 
-    addHotelIfUserIfValid() {
+    addEntityIfUserIsValid() {
       if (this.firstFormGroup.valid && this.secondFormGroup.valid) {
-        const hotel = this.firstFormGroup.value;
-        delete hotel['address'];
-        hotel.location = this.location;
+        const entity = this.firstFormGroup.value;
+        delete entity['address'];
+        entity.location = this.location;
         const administrator = this.secondFormGroup.value;
-        this.hotelService.addHotel(hotel).subscribe(
-          (data:{}) => {
-            administrator.hotelDTO = data;
-            this.registrationService.addAdmin(administrator).subscribe(
-              (admin:{}) => {
-                console.log(admin);
-              }
-            )
-            this.dialogRef.close(data);
-          }
-        )
+        if(this.entityNo == 0){
+          this.airCompanyService.addCompany(entity).subscribe(
+            (data) => {
+              administrator.airCompanyDTO = data;
+              this.registrationService.addAdmin(administrator).subscribe(
+                (admin) => {
+                }
+              )
+              this.dialogRef.close(data);
+            }
+          );
+        }else if(this.entityNo == 1){
+          this.hotelService.addHotel(entity).subscribe(
+            (data) => {
+              administrator.hotelDTO = data;
+              this.registrationService.addAdmin(administrator).subscribe(
+                (admin) => {
+                }
+              )
+              this.dialogRef.close(data);
+            }
+          );
+        }else{
+          this.rentACarService.addRentACar(entity).subscribe(
+            (data) => {
+              administrator.rentACarDTO = data;
+              this.registrationService.addAdmin(administrator).subscribe(
+                (admin) => {
+                }
+              )
+              this.dialogRef.close(data);
+            }
+          );
+        }
       }
     }
-
-
 }
+

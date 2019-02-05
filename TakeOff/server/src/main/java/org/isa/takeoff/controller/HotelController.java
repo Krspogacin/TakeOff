@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.isa.takeoff.dto.AvailableRoomsDTO;
 import org.isa.takeoff.dto.HotelDTO;
+import org.isa.takeoff.dto.HotelRatingDTO;
 import org.isa.takeoff.dto.RoomDTO;
 import org.isa.takeoff.dto.RoomRatingDTO;
 import org.isa.takeoff.dto.RoomSearchDTO;
@@ -211,6 +212,41 @@ public class HotelController {
 				}
 				roomRating.setRating(sum / ratings.size());
 				allRatings.add(roomRating);
+			}
+			return new ResponseEntity<>(allRatings, HttpStatus.OK);			
+		}
+		catch(Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value = "/getHotelRatings", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<HotelRatingDTO>> getHotelRatings() 
+	{
+		try
+		{
+			List<Hotel> hotels = hotelService.findAll();
+			List<HotelRatingDTO> allRatings = new ArrayList<>();
+			for (Hotel hotel: hotels)
+			{
+				HotelRatingDTO hotelRating = new HotelRatingDTO();
+				List<HotelRating> ratings = hotel.getHotelRatings();
+				hotelRating.setHotel(new HotelDTO(hotel));
+				
+				if (ratings.isEmpty())
+				{
+					hotelRating.setRating(0.0);
+					allRatings.add(hotelRating);
+					continue;
+				}
+				
+				Double sum = 0.0;
+				for(HotelRating hr: ratings){
+					sum += hr.getRating();
+				}
+				hotelRating.setRating(sum / ratings.size());
+				allRatings.add(hotelRating);
 			}
 			return new ResponseEntity<>(allRatings, HttpStatus.OK);			
 		}

@@ -1,7 +1,9 @@
-<h1 mat-dialog-title align="center">New hotel</h1>
+<h1 *ngIf="entityNo == 0" mat-dialog-title align="center">New Air Company</h1>
+<h1 *ngIf="entityNo == 1" mat-dialog-title align="center">New Hotel</h1>
+<h1 *ngIf="entityNo == 2" mat-dialog-title align="center">New Rent A Car Service</h1>
 <mat-dialog-content>
 <mat-horizontal-stepper labelPosition="bottom">
-    <mat-step label="Create hotel" state="hotel">
+    <mat-step label="Create entity" state="filter_list">
       <form [formGroup]="firstFormGroup">
         <div class="row d-flex justify-content-center mt-3">
           <mat-form-field class="w-75">
@@ -30,7 +32,7 @@
         <button mat-raised-button matStepperNext color="primary">Next</button>
       </div>
     </mat-step>
-    <mat-step label="Create hotel administrator" state="security">
+    <mat-step label="Create entity administrator" state="security">
       <form [formGroup]="secondFormGroup">
         <div class="row d-flex justify-content-center mt-3">
           <mat-form-field class="w-75">
@@ -67,7 +69,7 @@
       <div align="center" class="mt-5">
         <button mat-raised-button [mat-dialog-close] class="mr-2">Cancel</button>
         <button mat-raised-button matStepperPrevious class="mr-2">Back</button>
-        <button mat-raised-button color="primary" type="submit" (click)="addHotel()" [disabled]="firstFormGroup.invalid || secondFormGroup.invalid">Finish</button>
+        <button mat-raised-button color="primary" type="submit" (click)="addEntity()" [disabled]="firstFormGroup.invalid || secondFormGroup.invalid">Finish</button>
       </div>
     </mat-step>
   </mat-horizontal-stepper>

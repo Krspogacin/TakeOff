@@ -23,6 +23,7 @@ import { FlightReservationComponent } from './components/flight-reservation/flig
 import { FriendsComponent } from './components/friends/friends.component';
 import { HotelReserveDialogComponent } from './components/hotel-reserve-dialog/hotel-reserve-dialog.component';
 import { FriendsDialogComponent } from './components/friends-dialog/friends-dialog.component';
+import { AddEntityDialogComponent } from './components/add-entity-dialog/add-entity-dialog.component';
 
 const routes: Routes = [
   { path: '', component: HomepageComponent },
@@ -64,4 +65,5 @@ export const RoutingComponents = [
   FlightReservationComponent,
   FriendsComponent,
   HotelReserveDialogComponent,
-  FriendsDialogComponent];
+  FriendsDialogComponent,
+  AddEntityDialogComponent];

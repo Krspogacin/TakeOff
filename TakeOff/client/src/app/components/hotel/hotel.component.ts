@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HotelService } from 'src/app/services/hotel/hotel.service';
-import { AddHotelModalComponent } from 'src/app/components/add-hotel-modal/add-hotel-modal.component';
 import { MatDialog, PageEvent } from '@angular/material';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service'
 import { HotelReserveDialogComponent } from '../hotel-reserve-dialog/hotel-reserve-dialog.component';
+import { AddEntityDialogComponent } from '../add-entity-dialog/add-entity-dialog.component';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-hotel',
@@ -19,35 +20,55 @@ export class HotelComponent implements OnInit {
   pageSize = 10;
   pageIndex = 0;
   nameLocation = "";
+  message: string;
   length = this.hotels.length;
   id = 0;
   userRole: string = null;
+  hotelRatings: any;
 
-  constructor(private HotelService: HotelService, private authService: AuthenticationService, private route: ActivatedRoute,public dialog: MatDialog) { }
+  constructor(private HotelService: HotelService,
+             private authService: AuthenticationService,
+             public dialog: MatDialog,
+             public appComponent: AppComponent) { }
 
   ngOnInit() {
       this.HotelService.getHotels().subscribe(
       (data:any) => { 
-        console.log(data); 
         this.hotels = data;
       });
+      this.HotelService.getHotelRatings().subscribe(
+        (data) => {
+          console.log(data);
+          this.hotelRatings = data;
+        }
+      );
       this.userRole = this.authService.getAuthority();
   }
 
   openDialog(){
-    const dialogRef = this.dialog.open(AddHotelModalComponent,
+    const dialogRef = this.dialog.open(AddEntityDialogComponent,
     {
+      data: 1,
       disableClose: true,
+      autoFocus: true,
       width: '60%',
       height: '90%'
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe(
+    (result) => {
       if (result) {
-        console.log('Hotel:', result);
         this.hotels.push(result);
+        this.message = 'Added successfully!';
       }
-    });
+    },
+    () => {
+      this.message = 'Error! Rent A Car could not be added!';
+    },
+    () => {
+      this.appComponent.showSnackBar(this.message);
+    }
+    );
   }
 
   pageFunction(event : PageEvent) {

@@ -3,6 +3,7 @@ package org.isa.takeoff.controller;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -11,8 +12,10 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.isa.takeoff.dto.AdministratorDTO;
+import org.isa.takeoff.dto.ChangePasswordDTO;
 import org.isa.takeoff.dto.FriendDTO;
 import org.isa.takeoff.dto.UserDTO;
+import org.isa.takeoff.dto.UserTypeDTO;
 import org.isa.takeoff.model.Administrator;
 import org.isa.takeoff.model.AirCompany;
 import org.isa.takeoff.model.Authority;
@@ -20,17 +23,19 @@ import org.isa.takeoff.model.Friend;
 import org.isa.takeoff.model.Hotel;
 import org.isa.takeoff.model.RentACar;
 import org.isa.takeoff.model.User;
+import org.isa.takeoff.security.AuthenticationRequest;
 import org.isa.takeoff.service.AirCompanyService;
 import org.isa.takeoff.service.AuthorityService;
 import org.isa.takeoff.service.EmailService;
 import org.isa.takeoff.service.HotelService;
-import org.isa.takeoff.service.UserService;
 import org.isa.takeoff.service.RentACarService;
+import org.isa.takeoff.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,6 +43,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping(value = "users", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -50,10 +57,10 @@ public class UserController {
 
 	@Autowired
 	private AirCompanyService airCompanyService;
-	
+
 	@Autowired
 	private HotelService hotelService;
-	
+
 	@Autowired
 	private RentACarService rentACarService;
 
@@ -62,6 +69,9 @@ public class UserController {
 
 	@Autowired
 	public PasswordEncoder passwordEncoder;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@RequestMapping(method = GET, value = "/getUserByUsername/{username}")
 	public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
@@ -260,8 +270,7 @@ public class UserController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	
-	
+
 	// ne moze DELETE method zbog @RequestBody...
 	@RequestMapping(method = RequestMethod.PUT, value = "/friends/delete")
 	public ResponseEntity<FriendDTO> deleteFriendRequest(@RequestBody FriendDTO friendDTO) {
@@ -284,7 +293,7 @@ public class UserController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@RequestMapping(method = POST, value = "/addAdmin", consumes = "application/json")
 	public ResponseEntity<?> addAdministrator(@RequestBody AdministratorDTO adminDTO) {
 		Administrator admin = new Administrator();
@@ -296,36 +305,84 @@ public class UserController {
 		if (adminDTO.getAirCompanyDTO() != null) {
 			Authority adminAuthority = this.authorityService.findByName("ROLE_AIRCOMPANY_ADMIN");
 			admin.setAuthority(adminAuthority);
+			admin.setEnabled(false);
 			AirCompany airCompany = this.airCompanyService.findOne(adminDTO.getAirCompanyDTO().getId());
-			if (airCompany != null){
+			if (airCompany != null) {
 				admin.setAirCompany(airCompany);
-			}else{
+			} else {
 				return new ResponseEntity<>(HttpStatus.CONFLICT);
 			}
 		} else if (adminDTO.getHotelDTO() != null) {
 			Authority adminAuthority = this.authorityService.findByName("ROLE_HOTEL_ADMIN");
 			admin.setAuthority(adminAuthority);
+			admin.setEnabled(false);
 			Hotel hotel = this.hotelService.findOne(adminDTO.getHotelDTO().getId());
-			if (hotel != null){
+			if (hotel != null) {
 				admin.setHotel(hotel);
-			}else{
+			} else {
 				return new ResponseEntity<>(HttpStatus.CONFLICT);
 			}
 		} else if (adminDTO.getRentACarDTO() != null) {
 			Authority adminAuthority = this.authorityService.findByName("ROLE_RENTACAR_ADMIN");
 			admin.setAuthority(adminAuthority);
+			admin.setEnabled(false);
 			RentACar rentACar = this.rentACarService.findOne(adminDTO.getRentACarDTO().getId());
-			if (rentACar != null){
+			if (rentACar != null) {
 				admin.setRentACar(rentACar);
-			}else{
+			} else {
 				return new ResponseEntity<>(HttpStatus.CONFLICT);
 			}
 		} else {
 			Authority adminAuthority = this.authorityService.findByName("ROLE_SYS_ADMIN");
 			admin.setAuthority(adminAuthority);
+			admin.setEnabled(false);
 		}
 		admin = this.userService.save(admin);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@RequestMapping(method = GET, value = "/checkUserType", consumes = "application/json")
+	public ResponseEntity<UserTypeDTO> checkUserType(@RequestParam String parameters) {
+
+		AuthenticationRequest authenticationRequest = new AuthenticationRequest();
+		try {
+			authenticationRequest = objectMapper.readValue(parameters, AuthenticationRequest.class);
+			Administrator admin = userService.findByUsernameAdmin(authenticationRequest.getUsername());
+			if (admin != null
+					&& admin.getPassword().equals(passwordEncoder.encode(authenticationRequest.getPassword()))) {
+				return new ResponseEntity<>(new UserTypeDTO(admin.isEnabled(),
+						((Authority) ((ArrayList<? extends GrantedAuthority>) admin.getAuthorities()).get(0))
+								.getName()),
+						HttpStatus.OK);
+			}
+			User user = userService.findByUsernameUser(authenticationRequest.getUsername());
+			if (user != null
+					&& user.getPassword().equals(passwordEncoder.encode(authenticationRequest.getPassword()))) {
+				return new ResponseEntity<>(new UserTypeDTO(user.isEnabled(),
+						((Authority) ((ArrayList<? extends GrantedAuthority>) user.getAuthorities()).get(0)).getName()),
+						HttpStatus.OK);
+			}
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		} catch (IOException e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@RequestMapping(method = RequestMethod.PUT, value = "/updatePassword", consumes = "application/json")
+	public ResponseEntity<?> updatePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+		
+		Administrator admin = userService.findByUsernameAdmin(changePasswordDTO.getUsername());
+		if (admin != null) {
+			if(admin.getPassword().equals(passwordEncoder.encode(changePasswordDTO.getOldPassword()))){
+				admin.setEnabled(true);
+				admin.setPassword(changePasswordDTO.getNewPassword());
+				userService.save(admin);
+				return new ResponseEntity<>(HttpStatus.OK);
+			}else{
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
 }
