@@ -38,7 +38,6 @@ export class HotelComponent implements OnInit {
       });
       this.HotelService.getHotelRatings().subscribe(
         (data) => {
-          console.log(data);
           this.hotelRatings = data;
         }
       );

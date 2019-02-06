@@ -12,6 +12,6 @@
     </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-raised-button color="primary" type="submit" (click)="submitForm()">Login</button>
-  <button mat-raised-button [mat-dialog-close]>Cancel</button>
+  <button mat-raised-button color="primary" type="submit" (click)="submitForm()" [disabled]="disableLogin">Login</button>
+  <button mat-raised-button [mat-dialog-close] [disabled]="disableLogin">Cancel</button>
 </mat-dialog-actions>

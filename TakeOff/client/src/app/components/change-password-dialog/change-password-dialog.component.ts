@@ -15,14 +15,16 @@ export class ChangePasswordDialogComponent implements OnInit {
   passwordMinLength = 8;
   passwordMaxLength = 32;
   changePasswordForm: FormGroup;
+  enabled: boolean;
 
   constructor(private authService: AuthenticationService,
               private userService: UserService,
               private dialogRef: MatDialogRef<ChangePasswordDialogComponent>,
               private formBuilder: FormBuilder,
-              @Inject(MAT_DIALOG_DATA) public enabled: any) { }
+              @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit() {
+    this.enabled = this.data.enabled;
     this.changePasswordForm = this.formBuilder.group({
       password: ['', [Validators.required,
                       Validators.minLength(this.passwordMinLength),
@@ -41,8 +43,8 @@ export class ChangePasswordDialogComponent implements OnInit {
   submitForm() {
     if (this.enabled) {
       const user = {'username': this.authService.getUsername(),
-                    'oldPassword': this.changePasswordForm.get('oldPassword'),
-                    'newPassword': this.changePasswordForm.get('password')};
+                    'oldPassword': this.changePasswordForm.get('oldPassword').value,
+                    'newPassword': this.changePasswordForm.get('password').value};
       this.userService.updatePassword(user).subscribe(
         () => {
           this.dialogRef.close();
@@ -53,7 +55,7 @@ export class ChangePasswordDialogComponent implements OnInit {
       );
     } else {
       if (this.changePasswordForm.valid) {
-        this.dialogRef.close();
+        this.dialogRef.close(this.changePasswordForm.get('password').value);
       }
     }
   }

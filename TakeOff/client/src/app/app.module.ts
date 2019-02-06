@@ -59,7 +59,8 @@ import { ChangePasswordDialogComponent } from './components/change-password-dial
         VehicleDialogComponent,
         RentACarMainServiceDialogComponent,
         OfficeDialogComponent,
-        VehicleReservationDialogComponent
+        VehicleReservationDialogComponent,
+        ChangePasswordDialogComponent,
     ],
     imports: [
         BrowserModule,

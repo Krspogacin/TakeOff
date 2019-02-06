@@ -36,6 +36,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -341,23 +342,21 @@ public class UserController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@RequestMapping(method = GET, value = "/checkUserType", consumes = "application/json")
+	@RequestMapping(method = GET, value = "/checkUserType", produces = "application/json")
 	public ResponseEntity<UserTypeDTO> checkUserType(@RequestParam String parameters) {
 
 		AuthenticationRequest authenticationRequest = new AuthenticationRequest();
 		try {
 			authenticationRequest = objectMapper.readValue(parameters, AuthenticationRequest.class);
 			Administrator admin = userService.findByUsernameAdmin(authenticationRequest.getUsername());
-			if (admin != null
-					&& admin.getPassword().equals(passwordEncoder.encode(authenticationRequest.getPassword()))) {
+			if (admin != null && BCrypt.checkpw(authenticationRequest.getPassword(), admin.getPassword())) {
 				return new ResponseEntity<>(new UserTypeDTO(admin.isEnabled(),
 						((Authority) ((ArrayList<? extends GrantedAuthority>) admin.getAuthorities()).get(0))
 								.getName()),
 						HttpStatus.OK);
 			}
 			User user = userService.findByUsernameUser(authenticationRequest.getUsername());
-			if (user != null
-					&& user.getPassword().equals(passwordEncoder.encode(authenticationRequest.getPassword()))) {
+			if (user != null && BCrypt.checkpw(authenticationRequest.getPassword(), user.getPassword())) {
 				return new ResponseEntity<>(new UserTypeDTO(user.isEnabled(),
 						((Authority) ((ArrayList<? extends GrantedAuthority>) user.getAuthorities()).get(0)).getName()),
 						HttpStatus.OK);
@@ -370,15 +369,15 @@ public class UserController {
 
 	@RequestMapping(method = RequestMethod.PUT, value = "/updatePassword", consumes = "application/json")
 	public ResponseEntity<?> updatePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
-		
+
 		Administrator admin = userService.findByUsernameAdmin(changePasswordDTO.getUsername());
 		if (admin != null) {
-			if(admin.getPassword().equals(passwordEncoder.encode(changePasswordDTO.getOldPassword()))){
+			if (BCrypt.checkpw(changePasswordDTO.getOldPassword(), admin.getPassword())) {
 				admin.setEnabled(true);
-				admin.setPassword(changePasswordDTO.getNewPassword());
+				admin.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
 				userService.save(admin);
 				return new ResponseEntity<>(HttpStatus.OK);
-			}else{
+			} else {
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
 		} else {

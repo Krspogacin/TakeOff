@@ -44,7 +44,7 @@ export class AuthenticationService {
     if (!JSON.parse(localStorage.getItem(this.userKey))) {
       return null;
     }
-    return JSON.parse(localStorage.getItem(this.userKey)).isEnabled;
+    return JSON.parse(localStorage.getItem(this.userKey)).enabled;
   }
 
   getAuthority(): string {

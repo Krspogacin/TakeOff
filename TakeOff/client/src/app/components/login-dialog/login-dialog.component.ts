@@ -13,6 +13,7 @@ import { UserService } from 'src/app/services/user/user.service';
 export class LoginDialogComponent implements OnInit {
 
   loginForm: FormGroup;
+  disableLogin: boolean;
 
   constructor(private authenticationService: AuthenticationService,
               private dialogRef: MatDialogRef<LoginDialogComponent>,
@@ -27,28 +28,25 @@ export class LoginDialogComponent implements OnInit {
   submitForm() {
     this.userService.checkUserType(this.loginForm.value).subscribe(
       (userType: any) => {
-        if (userType.authority !== 'ROLE_USER' && !userType.isEnabled) {
+        if (userType.authority !== 'ROLE_USER' && !userType.enabled) {
           const dialogRef = this.dialog.open(ChangePasswordDialogComponent,
           {
-            data: userType.isEnabled,
+            data: {'enabled': userType.enabled},
             disableClose: true,
             autoFocus: true,
-            width: '30%'
+            width: '40%'
           });
           dialogRef.afterClosed().subscribe(
             (newPassword) => {
               if (newPassword) {
-                const user = {'username': this.loginForm.get('username'),
-                              'oldPassword': this.loginForm.get('password'),
+                this.disableLogin = true;
+                const user = {'username': this.loginForm.get('username').value,
+                              'oldPassword': this.loginForm.get('password').value,
                               'newPassword': newPassword};
                 this.userService.updatePassword(user).subscribe(
                   () => {
-                    delete user['oldPassword'];
-                    this.loginUser(user);
-                  },
-                  () => {
-                    this.loginForm.get('username').setErrors( { loginFailed: true } );
-                    this.loginForm.get('password').setErrors( { loginFailed: true } );
+                    const userToLogin = {'username': user.username,'password': user.newPassword};
+                    this.loginUser(userToLogin);
                   }
                 );
               }
