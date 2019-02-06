@@ -2,7 +2,7 @@
     <div *ngIf="companyExists">
         <h1>{{company.name}}</h1>
 
-        <div *ngIf="userRole && userRole === 'ROLE_USER'">
+        <div *ngIf="userRole && userRole === 'ROLE_AIRCOMPANY_ADMIN'">
             <button mat-raised-button color="primary" (click)="openAddFlightDialog()">
                 <mat-icon>add</mat-icon> Add flight
             </button>

@@ -18,7 +18,8 @@ public class ReservationDTO
 	}
 
 	public ReservationDTO(Reservation reservation) {
-		this(reservation.getId(), new RoomReservationDTO(reservation.getRoomReservation()), new VehicleReservationDTO(reservation.getVehicleReservation()));
+		this(reservation.getId(), reservation.getRoomReservation() != null ? new RoomReservationDTO(reservation.getRoomReservation()) : null,
+			 reservation.getVehicleReservation() != null ? new VehicleReservationDTO(reservation.getVehicleReservation()) : null);
 	}
 
 	public Long getId() {

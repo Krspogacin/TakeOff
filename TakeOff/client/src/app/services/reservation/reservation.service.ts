@@ -15,4 +15,8 @@ export class ReservationService {
   getReservations(username: string) {
     return this.http.get('/reservations/' + username);
   }
+
+  createVehicleReservation(vehicleReservation: any) {
+    return this.http.post('/reservations/vehicleReservations', vehicleReservation);
+  }
 }

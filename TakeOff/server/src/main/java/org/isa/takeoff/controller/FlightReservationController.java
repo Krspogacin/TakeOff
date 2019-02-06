@@ -7,14 +7,18 @@ import org.isa.takeoff.dto.FlightReservationDTO;
 import org.isa.takeoff.dto.ReservationDTO;
 import org.isa.takeoff.dto.TicketDTO;
 import org.isa.takeoff.dto.UserDTO;
+import org.isa.takeoff.dto.VehicleReservationDTO;
 import org.isa.takeoff.model.Flight;
 import org.isa.takeoff.model.FlightReservation;
 import org.isa.takeoff.model.Reservation;
 import org.isa.takeoff.model.Ticket;
 import org.isa.takeoff.model.User;
+import org.isa.takeoff.model.Vehicle;
+import org.isa.takeoff.model.VehicleReservation;
 import org.isa.takeoff.service.FlightReservationService;
 import org.isa.takeoff.service.FlightService;
 import org.isa.takeoff.service.UserService;
+import org.isa.takeoff.service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,6 +41,9 @@ public class FlightReservationController {
 
 	@Autowired
 	private FlightService flightService;
+	
+	@Autowired
+	private VehicleService vehicleService;
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<FlightReservationDTO>> addReservations(@RequestBody List<FlightReservationDTO> reservationsDTO) {
@@ -95,6 +102,42 @@ public class FlightReservationController {
 			return new ResponseEntity<>(reservationsDTO, HttpStatus.OK);
 
 		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value = "/vehicleReservations", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ReservationDTO> createVehicleReservation(@RequestBody VehicleReservationDTO vehicleReservationDTO) 
+	{	
+		System.out.println(vehicleReservationDTO);
+		if (vehicleReservationDTO.getReservationId() == null || vehicleReservationDTO.getReservationStartDate() == null ||
+			vehicleReservationDTO.getReservationEndDate() == null || vehicleReservationDTO.getTotalPrice() == null || vehicleReservationDTO.getVehicle() == null)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+			
+		try
+		{			
+			Reservation reservation = this.reservationService.findOneReservation(vehicleReservationDTO.getReservationId());
+			if (reservation != null)
+			{
+				VehicleReservation vehicleReservation = new VehicleReservation(vehicleReservationDTO.getReservationStartDate(),
+																			   vehicleReservationDTO.getReservationEndDate(),
+																			   vehicleReservationDTO.getTotalPrice());
+				
+				Vehicle vehicle = this.vehicleService.findOne(vehicleReservationDTO.getVehicle().getId());
+				vehicleReservation.setVehicle(vehicle);
+				reservation.setVehicleReservation(vehicleReservation);
+				reservation = this.reservationService.saveReservation(reservation);
+				return new ResponseEntity<>(new ReservationDTO(reservation), HttpStatus.OK);
+			}
+			else 
+			{
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		}
+		catch(Exception e)
+		{
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}

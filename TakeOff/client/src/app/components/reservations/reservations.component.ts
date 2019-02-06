@@ -21,6 +21,7 @@ export class ReservationsComponent implements OnInit {
     if (username) {
       this.reservationService.getReservations(username).subscribe(
         (data: []) => {
+          console.log(data);
           this.reservations = data;
           this.loading = false;
           this.exists = data.length > 0;

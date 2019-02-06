@@ -6,23 +6,34 @@ import org.isa.takeoff.model.VehicleReservation;
 
 public class VehicleReservationDTO 
 {
+	@Override
+	public String toString() {
+		return "VehicleReservationDTO [id=" + id + ", vehicle=" + vehicle + ", reservationStartDate="
+				+ reservationStartDate + ", reservationEndDate=" + reservationEndDate + ", totalPrice=" + totalPrice
+				+ ", reservationId=" + reservationId + ", getId()=" + getId() + ", getVehicle()=" + getVehicle()
+				+ ", getReservationStartDate()=" + getReservationStartDate() + ", getReservationEndDate()="
+				+ getReservationEndDate() + ", getTotalPrice()=" + getTotalPrice() + ", getReservationId()="
+				+ getReservationId() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
+				+ super.toString() + "]";
+	}
+
 	private Long id;
 	private VehicleDTO vehicle;
 	private LocalDate reservationStartDate;
 	private LocalDate reservationEndDate;
-	private Double price;
+	private Double totalPrice;
 	private Long reservationId;
 	
 	public VehicleReservationDTO() { }
 
 	public VehicleReservationDTO(Long id, VehicleDTO vehicle, LocalDate reservationStartDate,
-			LocalDate reservationEndDate, Double price) {
+			LocalDate reservationEndDate, Double totalPrice) {
 		super();
 		this.id = id;
 		this.vehicle = vehicle;
 		this.reservationStartDate = reservationStartDate;
 		this.reservationEndDate = reservationEndDate;
-		this.price = price;
+		this.totalPrice = totalPrice;
 	}
 	
 	public VehicleReservationDTO(VehicleReservation vehicleReservation) {
@@ -62,12 +73,12 @@ public class VehicleReservationDTO
 		this.reservationEndDate = reservationEndDate;
 	}
 
-	public Double getPrice() {
-		return price;
+	public Double getTotalPrice() {
+		return totalPrice;
 	}
 
-	public void setPrice(Double price) {
-		this.price = price;
+	public void setTotalPrice(Double price) {
+		this.totalPrice = price;
 	}
 
 	public Long getReservationId() {

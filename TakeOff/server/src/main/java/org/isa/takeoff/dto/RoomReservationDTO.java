@@ -11,17 +11,17 @@ public class RoomReservationDTO
 	private List<RoomDTO> rooms;
 	private LocalDate reservationStartDate;
 	private LocalDate reservationEndDate;
-	private Double price;
+	private Double totalPrice;
 	private Long reservationId;
 	
 	public RoomReservationDTO() { }
 
-	public RoomReservationDTO(Long id, LocalDate reservationStartDate, LocalDate reservationEndDate, Double price) {
+	public RoomReservationDTO(Long id, LocalDate reservationStartDate, LocalDate reservationEndDate, Double totalPrice) {
 		super();
 		this.id = id;
 		this.reservationStartDate = reservationStartDate;
 		this.reservationEndDate = reservationEndDate;
-		this.price = price;
+		this.totalPrice = totalPrice;
 	}
 	
 	public RoomReservationDTO(RoomReservation roomReservation) {
@@ -61,12 +61,12 @@ public class RoomReservationDTO
 		this.reservationEndDate = reservationEndDate;
 	}
 
-	public Double getPrice() {
-		return price;
+	public Double getTotalPrice() {
+		return totalPrice;
 	}
 
-	public void setPrice(Double price) {
-		this.price = price;
+	public void setTotalPrice(Double totalPrice) {
+		this.totalPrice = totalPrice;
 	}
 
 	public Long getReservationId() {

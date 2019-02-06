@@ -121,7 +121,10 @@ export class RentACarsComponent implements OnInit {
   openReservationDialog(rentACar: any, reservation: any) {
     const dialogRef = this.dialog.open(VehicleReservationDialogComponent,
     {
-      data: rentACar,
+      data: {
+        'rentACar': rentACar,
+        'landingDate': new Date(reservation.ticket.flight.landingDate)
+      },
       disableClose: true,
       autoFocus: true,
       width: '60%',
@@ -148,19 +151,32 @@ export class RentACarsComponent implements OnInit {
             (userReservations: any[]) => {
               const availableReservations = new Array();
               userReservations.forEach(reservation => {
-                // find all active reservations in choosen place
-                const landingDate = reservation.ticket.flight.landingDate;
-                if (landingDate.getTime() > new Date().getTime()) {
-                  availableReservations.push(reservation.reservationDTO);
+                // find all active reservations in rent a cars location (just look for country and city)
+                if (!reservation.reservationDTO.vehicleReservation) {
+                  const landingDate = new Date(reservation.ticket.flight.landingDate);
+                  const landingCountry = reservation.ticket.flight.landingLocation.country;
+                  const landingCity = reservation.ticket.flight.landingLocation.city;
+                  console.log(landingDate);
+                  console.log(landingCountry);
+                  console.log(landingCity);
+                  if (landingDate.getTime() > new Date().getTime() &&
+                      landingCountry === rentACar.location.country &&
+                      landingCity === rentACar.location.city) {
+
+                    availableReservations.push(reservation);
+                  }
                 }
               });
               if (availableReservations.length > 0) {
-                const reservation = availableReservations[0];
+                let reservation = availableReservations[0];
                 availableReservations.forEach(availableReservation => {
                   // find reservation which is nearest by the plane take off date
+                  if (availableReservation.ticket.flight.landingDate < reservation.ticket.flight.landingDate) {
+                    reservation = availableReservation;
+                  }
                 });
                 console.log(reservation);
-                // this.openReservationDialog(rentACar, reservation);
+                this.openReservationDialog(rentACar, reservation);
               } else {
                 this.appComponent.showSnackBar('You have no active flight reservation at the moment at the place you are looking for!');
               }
@@ -178,7 +194,17 @@ export class RentACarsComponent implements OnInit {
       this.appComponent.showSnackBar('Error! Something went wrong.');
       return;
     }
-    console.log(vehicleToReserve);
-    console.log(reservation);
+
+    const vehicleReservation = vehicleToReserve;
+    vehicleReservation.reservationId = reservation.reservationDTO.id;
+    console.log(vehicleReservation);
+    this.reservationService.createVehicleReservation(vehicleReservation).subscribe(
+      () => {
+        this.appComponent.showSnackBar('You have created vehicle reservation successfully!');
+      },
+      () => {
+        this.appComponent.showSnackBar('Error! Your reservation have not been made.');
+      }
+    );
   }
 }

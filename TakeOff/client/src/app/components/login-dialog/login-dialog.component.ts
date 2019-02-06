@@ -45,7 +45,7 @@ export class LoginDialogComponent implements OnInit {
                               'newPassword': newPassword};
                 this.userService.updatePassword(user).subscribe(
                   () => {
-                    const userToLogin = {'username': user.username,'password': user.newPassword};
+                    const userToLogin = {'username': user.username, 'password': user.newPassword};
                     this.loginUser(userToLogin);
                   }
                 );

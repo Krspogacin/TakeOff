@@ -31,6 +31,15 @@ public class VehicleReservation {
 	@Column(name = "price", nullable = false)
 	private Double price;
 	
+	public VehicleReservation() { } 
+	
+	public VehicleReservation(LocalDate reservationStartDate, LocalDate reservationEndDate, Double price) {
+		super();
+		this.reservationStartDate = reservationStartDate;
+		this.reservationEndDate = reservationEndDate;
+		this.price = price;
+	}
+
 	public Long getId() {
 		return id;
 	}

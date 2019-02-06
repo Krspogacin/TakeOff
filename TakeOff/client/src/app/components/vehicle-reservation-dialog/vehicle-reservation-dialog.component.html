@@ -1,6 +1,7 @@
 <h1 mat-dialog-title>Vehicle reservation</h1>
-<mat-dialog-content [formGroup]="">
-  <mat-horizontal-stepper #stepper linear labelPosition="bottom">
+<mat-dialog-content>
+  <h3 *ngIf="error">Error! Something went wrong! Please close and open dialog again.</h3>
+  <mat-horizontal-stepper #stepper linear labelPosition="bottom" *ngIf="!error">
     <mat-step [stepControl]="reservationForm" label="Enter reservation parameters" state="filter_list">
       <form [formGroup]="reservationForm">
           <div class="row d-flex justify-content-center">
@@ -8,18 +9,17 @@
                 <mat-form-field appearance="outline" class="w-100">
                   <mat-label>Start day </mat-label>
                   <input matInput #startDateInput [matDatepicker]="startDatePicker" 
-                         [min]="currentDate" formControlName="startDate" required>
+                         [min]="landingDate" formControlName="startDate" required>
                   <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
-                  <mat-datepicker #startDatePicker disabled="false" [startAt]="currentDate"></mat-datepicker>
+                  <mat-datepicker #startDatePicker disabled="false" [startAt]="landingDate"></mat-datepicker>
                 </mat-form-field>
             </div>
             <div class="col d-flex justify-content-center">
                 <mat-form-field appearance="outline" class="w-100">
                   <mat-label>End day </mat-label>
-                  <input matInput #endDateInput [matDatepicker]="endDatePicker" 
-                        min="{{startDateInput.value}}" formControlName="endDate" required>
+                  <input matInput #endDateInput [matDatepicker]="endDatePicker" formControlName="endDate" required>
                   <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
-                  <mat-datepicker #endDatePicker disabled="false" startAt="{{startDateInput.value}}"></mat-datepicker>
+                  <mat-datepicker #endDatePicker disabled="false"></mat-datepicker>
                 </mat-form-field>
             </div>
           </div>
