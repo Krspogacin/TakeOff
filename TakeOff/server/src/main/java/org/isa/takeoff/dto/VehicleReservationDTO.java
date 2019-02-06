@@ -6,23 +6,14 @@ import org.isa.takeoff.model.VehicleReservation;
 
 public class VehicleReservationDTO 
 {
-	@Override
-	public String toString() {
-		return "VehicleReservationDTO [id=" + id + ", vehicle=" + vehicle + ", reservationStartDate="
-				+ reservationStartDate + ", reservationEndDate=" + reservationEndDate + ", totalPrice=" + totalPrice
-				+ ", reservationId=" + reservationId + ", getId()=" + getId() + ", getVehicle()=" + getVehicle()
-				+ ", getReservationStartDate()=" + getReservationStartDate() + ", getReservationEndDate()="
-				+ getReservationEndDate() + ", getTotalPrice()=" + getTotalPrice() + ", getReservationId()="
-				+ getReservationId() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
-				+ super.toString() + "]";
-	}
-
 	private Long id;
 	private VehicleDTO vehicle;
 	private LocalDate reservationStartDate;
 	private LocalDate reservationEndDate;
 	private Double totalPrice;
 	private Long reservationId;
+	private Double vehicleRating;
+	private Double rentACarRating;
 	
 	public VehicleReservationDTO() { }
 
@@ -87,5 +78,21 @@ public class VehicleReservationDTO
 
 	public void setReservationId(Long reservationId) {
 		this.reservationId = reservationId;
+	}
+
+	public Double getVehicleRating() {
+		return vehicleRating;
+	}
+
+	public void setVehicleRating(Double vehicleRating) {
+		this.vehicleRating = vehicleRating;
+	}
+
+	public Double getRentACarRating() {
+		return rentACarRating;
+	}
+
+	public void setRentACarRating(Double rentACarRating) {
+		this.rentACarRating = rentACarRating;
 	}
 }

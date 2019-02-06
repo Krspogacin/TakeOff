@@ -8,11 +8,12 @@ import org.isa.takeoff.model.RoomReservation;
 public class RoomReservationDTO 
 {
 	private Long id;
-	private List<RoomDTO> rooms;
+	private List<RoomRatingDTO> roomsAndRatings;
 	private LocalDate reservationStartDate;
 	private LocalDate reservationEndDate;
 	private Double totalPrice;
 	private Long reservationId;
+	private Double hotelRating;
 	
 	public RoomReservationDTO() { }
 
@@ -36,13 +37,13 @@ public class RoomReservationDTO
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
-	public List<RoomDTO> getRooms() {
-		return rooms;
+
+	public List<RoomRatingDTO> getRoomsAndRatings() {
+		return roomsAndRatings;
 	}
 
-	public void setRooms(List<RoomDTO> rooms) {
-		this.rooms = rooms;
+	public void setRoomsAndRatings(List<RoomRatingDTO> roomsAndRatings) {
+		this.roomsAndRatings = roomsAndRatings;
 	}
 
 	public LocalDate getReservationStartDate() {
@@ -75,5 +76,13 @@ public class RoomReservationDTO
 
 	public void setReservationId(Long reservationId) {
 		this.reservationId = reservationId;
+	}
+
+	public Double getHotelRating() {
+		return hotelRating;
+	}
+
+	public void setHotelRating(Double hotelRating) {
+		this.hotelRating = hotelRating;
 	}
 }

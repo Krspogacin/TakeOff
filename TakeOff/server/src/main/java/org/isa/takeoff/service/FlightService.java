@@ -1,8 +1,12 @@
 package org.isa.takeoff.service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.isa.takeoff.model.Flight;
+import org.isa.takeoff.model.FlightRating;
+import org.isa.takeoff.model.FlightRatingId;
+import org.isa.takeoff.repository.FlightRatingRepository;
 import org.isa.takeoff.repository.FlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +19,9 @@ public class FlightService {
 
 	@Autowired
 	private FlightRepository flightRepository;
+	
+	@Autowired
+	private FlightRatingRepository flightRatingRepository;
 
 	public Flight findOne(Long id) {
 		return flightRepository.findById(id).get();
@@ -33,5 +40,14 @@ public class FlightService {
 	public void delete(Long id) {
 		flightRepository.deleteById(id);
 	}
-
+	
+	public FlightRating findOneRating(FlightRatingId id) {
+		FlightRating flightRating;
+		try {
+			flightRating = flightRatingRepository.findById(id).get();
+			return flightRating;
+		} catch(NoSuchElementException noSuchElementException) {
+			return null;
+		}
+	}
 }

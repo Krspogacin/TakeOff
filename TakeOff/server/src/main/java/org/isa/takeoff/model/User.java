@@ -78,7 +78,7 @@ public class User implements UserDetails {
 	private Set<Friend> friendsOf = new HashSet<>();
 
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<FlightReservation> reservation = new HashSet<>();
+	private Set<FlightReservation> reservations = new HashSet<>();
 
 	@OneToMany(mappedBy = "id.user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<AirCompanyRating> companyRatings = new HashSet<>();
@@ -257,12 +257,12 @@ public class User implements UserDetails {
 		this.friendsOf = new HashSet<>(friendsOf);
 	}
 
-	public List<FlightReservation> getReservation() {
-		return new ArrayList<>(reservation);
+	public List<FlightReservation> getReservations() {
+		return new ArrayList<>(reservations);
 	}
 
-	public void setReservation(List<FlightReservation> reservation) {
-		this.reservation = new HashSet<>(reservation);
+	public void setReservations(List<FlightReservation> reservations) {
+		this.reservations = new HashSet<>(reservations);
 	}
 
 	public List<AirCompanyRating> getCompanyRatings() {

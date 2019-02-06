@@ -1,10 +1,14 @@
 package org.isa.takeoff.service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.isa.takeoff.model.Vehicle;
 import org.isa.takeoff.model.VehiclePrice;
+import org.isa.takeoff.model.VehicleRating;
+import org.isa.takeoff.model.VehicleRatingId;
 import org.isa.takeoff.repository.VehiclePriceRepository;
+import org.isa.takeoff.repository.VehicleRatingRepository;
 import org.isa.takeoff.repository.VehicleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +24,9 @@ public class VehicleService
 
 	@Autowired
 	private VehiclePriceRepository vehiclePriceRepository;
+	
+	@Autowired
+	private VehicleRatingRepository vehicleRatingRepository;
 
 	public Vehicle findOne(Long id) {
 		return vehicleRepository.findById(id).get();
@@ -46,5 +53,15 @@ public class VehicleService
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public VehiclePrice saveVehiclePrice(VehiclePrice vehiclePrice) {
 		return vehiclePriceRepository.save(vehiclePrice);
+	}
+	
+	public VehicleRating findOneRating(VehicleRatingId id) {
+		VehicleRating vehicleRating;
+		try {
+			vehicleRating = vehicleRatingRepository.findById(id).get();
+			return vehicleRating;
+		} catch(NoSuchElementException noSuchElementException) {
+			return null;
+		}
 	}
 }

@@ -18,6 +18,14 @@ public class VehicleRatingId implements Serializable
 	@JoinColumn(name="user_id", referencedColumnName="id")
 	private User user;
 
+	public VehicleRatingId() { }
+	
+	public VehicleRatingId(Vehicle vehicle, User user) {
+		super();
+		this.vehicle = vehicle;
+		this.user = user;
+	}
+
 	public Vehicle getVehicle() {
 		return vehicle;
 	}

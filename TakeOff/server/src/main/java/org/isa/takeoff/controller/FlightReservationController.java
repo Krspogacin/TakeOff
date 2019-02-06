@@ -5,18 +5,38 @@ import java.util.List;
 
 import org.isa.takeoff.dto.FlightReservationDTO;
 import org.isa.takeoff.dto.ReservationDTO;
+import org.isa.takeoff.dto.RoomDTO;
+import org.isa.takeoff.dto.RoomRatingDTO;
+import org.isa.takeoff.dto.RoomReservationDTO;
 import org.isa.takeoff.dto.TicketDTO;
 import org.isa.takeoff.dto.UserDTO;
 import org.isa.takeoff.dto.VehicleReservationDTO;
+import org.isa.takeoff.model.AirCompanyRating;
+import org.isa.takeoff.model.AirCompanyRatingId;
 import org.isa.takeoff.model.Flight;
+import org.isa.takeoff.model.FlightRating;
+import org.isa.takeoff.model.FlightRatingId;
 import org.isa.takeoff.model.FlightReservation;
+import org.isa.takeoff.model.HotelRating;
+import org.isa.takeoff.model.HotelRatingId;
+import org.isa.takeoff.model.RentACarRating;
+import org.isa.takeoff.model.RentACarRatingId;
 import org.isa.takeoff.model.Reservation;
+import org.isa.takeoff.model.Room;
+import org.isa.takeoff.model.RoomRating;
+import org.isa.takeoff.model.RoomRatingId;
 import org.isa.takeoff.model.Ticket;
 import org.isa.takeoff.model.User;
 import org.isa.takeoff.model.Vehicle;
+import org.isa.takeoff.model.VehicleRating;
+import org.isa.takeoff.model.VehicleRatingId;
 import org.isa.takeoff.model.VehicleReservation;
+import org.isa.takeoff.service.AirCompanyService;
 import org.isa.takeoff.service.FlightReservationService;
 import org.isa.takeoff.service.FlightService;
+import org.isa.takeoff.service.HotelService;
+import org.isa.takeoff.service.RentACarService;
+import org.isa.takeoff.service.RoomService;
 import org.isa.takeoff.service.UserService;
 import org.isa.takeoff.service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +63,20 @@ public class FlightReservationController {
 	private FlightService flightService;
 	
 	@Autowired
+	private RoomService roomService;
+
+	@Autowired
 	private VehicleService vehicleService;
+	
+	@Autowired
+	private AirCompanyService airCompanyService;
+	
+	@Autowired
+	private HotelService hotelService;
+	
+	@Autowired
+	private RentACarService rentACarService;
+	
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<FlightReservationDTO>> addReservations(@RequestBody List<FlightReservationDTO> reservationsDTO) {
@@ -92,11 +125,58 @@ public class FlightReservationController {
 		User user = userService.findByUsernameUser(username);
 		if (user != null) {
 
-			List<FlightReservation> flightReservations = user.getReservation();
+			List<FlightReservation> flightReservations = user.getReservations();
 
 			List<FlightReservationDTO> reservationsDTO = new ArrayList<>();
 			for (FlightReservation fr : flightReservations) {
-				reservationsDTO.add(new FlightReservationDTO(new UserDTO(fr.getUser()), new TicketDTO(fr.getTicket()), new ReservationDTO(fr.getReservation())));
+				FlightReservationDTO flightReservationDTO = new FlightReservationDTO();
+				AirCompanyRating airCompanyRating = this.airCompanyService.findOneRating(new AirCompanyRatingId(fr.getTicket().getFlight().getCompany(), user));
+				if (airCompanyRating != null) {
+					flightReservationDTO.setAircompanyRating(airCompanyRating.getRating());
+				}
+				FlightRating flightRating = this.flightService.findOneRating(new FlightRatingId(fr.getTicket().getFlight(), user));
+				if (flightRating != null ) {
+					flightReservationDTO.setFlightRating(flightRating.getRating());
+				}
+				ReservationDTO reservationDTO = new ReservationDTO(fr.getReservation());
+				if (fr.getReservation().getRoomReservation() != null) {
+					RoomReservationDTO roomReservationDTO = new RoomReservationDTO(fr.getReservation().getRoomReservation());
+					HotelRating hotelRating = this.hotelService.findOneRating(
+													new HotelRatingId(fr.getReservation().getRoomReservation().getRooms().get(0).getHotel(), user));
+					if (hotelRating != null) {
+						roomReservationDTO.setHotelRating(hotelRating.getRating());						
+					}
+					List<RoomRatingDTO> roomRatingDTOs = new ArrayList<>();
+					for (Room room : fr.getReservation().getRoomReservation().getRooms()) {
+						RoomRating roomRating = this.roomService.findOneRating(new RoomRatingId(room, user));
+						if (roomRating != null) {
+							RoomRatingDTO roomRatingDTO = new RoomRatingDTO();
+							roomRatingDTO.setRoom(new RoomDTO(room));
+							roomRatingDTO.setRating(roomRating.getRating());
+							roomRatingDTOs.add(roomRatingDTO);							
+						}
+					}
+					reservationDTO.setRoomReservation(roomReservationDTO);
+				}
+				
+				if (fr.getReservation().getVehicleReservation() != null) {
+					VehicleReservationDTO vehicleReservationDTO = new VehicleReservationDTO(fr.getReservation().getVehicleReservation());
+					RentACarRating rentACarRating = this.rentACarService.findOneRating(
+														new RentACarRatingId(fr.getReservation().getVehicleReservation().getVehicle().getRentACar(), user));
+					if (rentACarRating != null) {
+						vehicleReservationDTO.setRentACarRating(rentACarRating.getRating());						
+					}
+					VehicleRating vehicleRating = this.vehicleService.findOneRating(
+														new VehicleRatingId(fr.getReservation().getVehicleReservation().getVehicle(), user));
+					if (vehicleRating != null) {
+						vehicleReservationDTO.setVehicleRating(vehicleRating.getRating());						
+					}
+					reservationDTO.setVehicleReservation(vehicleReservationDTO);
+				}
+				flightReservationDTO.setUser(new UserDTO(fr.getUser()));
+				flightReservationDTO.setTicket(new TicketDTO(fr.getTicket()));
+				flightReservationDTO.setReservationDTO(reservationDTO);
+				reservationsDTO.add(flightReservationDTO);
 			}
 
 			return new ResponseEntity<>(reservationsDTO, HttpStatus.OK);

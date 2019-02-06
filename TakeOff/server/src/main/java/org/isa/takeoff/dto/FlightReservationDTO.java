@@ -5,6 +5,8 @@ public class FlightReservationDTO {
 	private UserDTO user;
 	private TicketDTO ticket;
 	private ReservationDTO reservationDTO;
+	private Double aircompanyRating;
+	private Double flightRating;
 
 	public FlightReservationDTO() {
 
@@ -39,5 +41,21 @@ public class FlightReservationDTO {
 
 	public void setReservationDTO(ReservationDTO reservationDTO) {
 		this.reservationDTO = reservationDTO;
+	}
+
+	public Double getAircompanyRating() {
+		return aircompanyRating;
+	}
+
+	public void setAircompanyRating(Double aircompanyRating) {
+		this.aircompanyRating = aircompanyRating;
+	}
+
+	public Double getFlightRating() {
+		return flightRating;
+	}
+
+	public void setFlightRating(Double flightRating) {
+		this.flightRating = flightRating;
 	}
 }

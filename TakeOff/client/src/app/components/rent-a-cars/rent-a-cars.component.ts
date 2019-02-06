@@ -119,11 +119,13 @@ export class RentACarsComponent implements OnInit {
   }
 
   openReservationDialog(rentACar: any, reservation: any) {
+    const dayAfterLadningDate = new Date(reservation.ticket.flight.landingDate);
+    dayAfterLadningDate.setDate(dayAfterLadningDate.getDate() + 1);
     const dialogRef = this.dialog.open(VehicleReservationDialogComponent,
     {
       data: {
         'rentACar': rentACar,
-        'landingDate': new Date(reservation.ticket.flight.landingDate)
+        'landingDate': dayAfterLadningDate
       },
       disableClose: true,
       autoFocus: true,
@@ -156,10 +158,9 @@ export class RentACarsComponent implements OnInit {
                   const landingDate = new Date(reservation.ticket.flight.landingDate);
                   const landingCountry = reservation.ticket.flight.landingLocation.country;
                   const landingCity = reservation.ticket.flight.landingLocation.city;
-                  console.log(landingDate);
-                  console.log(landingCountry);
-                  console.log(landingCity);
-                  if (landingDate.getTime() > new Date().getTime() &&
+                  const tomorrow = new Date(landingDate);
+                  tomorrow.setDate(tomorrow.getDate() + 1);
+                  if (tomorrow.getTime() >=  new Date().getTime() &&
                       landingCountry === rentACar.location.country &&
                       landingCity === rentACar.location.city) {
 

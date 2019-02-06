@@ -18,6 +18,14 @@ public class RentACarRatingId implements Serializable
 	@JoinColumn(name="user_id", referencedColumnName="id")
 	private User user;
 
+	public RentACarRatingId() { }
+	
+	public RentACarRatingId(RentACar rentACar, User user) {
+		super();
+		this.rentACar = rentACar;
+		this.user = user;
+	}
+
 	public RentACar getRentACar() {
 		return rentACar;
 	}
