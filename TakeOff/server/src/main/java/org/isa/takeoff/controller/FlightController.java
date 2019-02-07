@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.isa.takeoff.dto.FlightDTO;
+import org.isa.takeoff.dto.FlightDiagramDTO;
 import org.isa.takeoff.dto.LocationDTO;
 import org.isa.takeoff.dto.TicketDTO;
 import org.isa.takeoff.model.AirCompany;
@@ -161,7 +162,7 @@ public class FlightController {
 
 				Location location = this.locationService.findOneByLatitudeAndLongitude(dest.getLatitude(),
 						dest.getLongitude());
-				
+
 				if (location == null) {
 					location = new Location(dest);
 					location = this.locationService.save(location);
@@ -200,6 +201,32 @@ public class FlightController {
 		}
 	}
 
+	@RequestMapping(value = "/tickets", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<TicketDTO>> updateFlightTickets(@RequestBody List<TicketDTO> ticketsDTO) {
+
+		try {
+			Flight flight = flightService.findOne(ticketsDTO.get(0).getFlight().getId());
+			List<Ticket> tickets = flight.getTickets();
+
+			for (TicketDTO ticketDTO : ticketsDTO) {
+				for (Ticket ticket : tickets) {
+					if (ticketDTO.getId().equals(ticket.getId())) {
+						ticket.setIsOnDiscount(ticketDTO.isOnDiscount());
+						break;
+					}
+				}
+			}
+
+			flightService.save(flight);
+
+			return new ResponseEntity<>(ticketsDTO, HttpStatus.OK);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+
+	}
+
 	@RequestMapping(value = "/{id}/rating", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Double> getFlightRating(@PathVariable Long id) {
 		try {
@@ -216,6 +243,54 @@ public class FlightController {
 			return new ResponseEntity<>(ratingsSum.get() / ratings.size(), HttpStatus.OK);
 
 		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@RequestMapping(value = "/{id}/diagram", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<FlightDiagramDTO> updateFlightDiagram(@PathVariable Long id,
+			@RequestBody FlightDiagramDTO diagramDTO) {
+
+		try {
+			Flight flight = flightService.findOne(id);
+			FlightDiagram diagram = flight.getDiagram();
+
+			List<Ticket> oldTickets = flight.getTickets();
+
+			// delete old tickets if they are in disabled rows
+			for (Ticket t : oldTickets) {
+				int number = (int) Math.floor(t.getNumber() / diagramDTO.getCols());
+				System.out.println("floor: " +number);
+				if (diagramDTO.getDisabledRows().contains(number)) {
+					if (t.getIsReserved()) {
+						return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+					}
+					System.out.println("***number: " + t.getNumber());
+					flight.removeTicket(t);
+				}
+			}
+
+			// add new tickets if there are new rows
+			for (int i = diagram.getRows(); i < diagramDTO.getRows(); i++) {
+				for (int j = 0; j < diagram.getCols(); j++) {
+					Ticket t = new Ticket();
+					t.setNumber(i * diagramDTO.getRows() + j);
+					t.setFlight(flight);
+					flight.addTicket(t);
+				}
+			}
+
+			diagram.setRows(diagramDTO.getRows());
+			diagram.setCols(diagramDTO.getCols());
+			diagram.setDisabledRows(diagramDTO.getDisabledRows());
+			diagram.setDisabledCols(diagramDTO.getDisabledCols());
+
+			flightService.save(flight);
+
+			return new ResponseEntity<>(diagramDTO, HttpStatus.OK);
+
+		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}

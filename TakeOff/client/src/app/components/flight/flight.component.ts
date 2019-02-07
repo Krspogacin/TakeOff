@@ -8,7 +8,7 @@ import { FlightDialogComponent } from '../flight-dialog/flight-dialog.component'
 import { FlightReservationComponent } from '../flight-reservation/flight-reservation.component';
 import { AppComponent } from 'src/app/app.component';
 
-declare let SeatchartJS: any;
+declare const SeatchartJS: any;
 
 @Component({
   selector: 'app-flight',
@@ -33,7 +33,8 @@ export class FlightComponent implements OnInit {
     reserved: [],
     disabled: [0, 8],
     disabledRows: [],
-    disabledCols: []
+    disabledCols: [],
+    onDiscount: []
   };
   types = [
     { type: 'first_class', color: 'orange', price: 10, selected: [] },
@@ -60,6 +61,32 @@ export class FlightComponent implements OnInit {
           this.flightExists = true;
           this.loadingFlight = false;
           this.userRole = this.authService.getAuthority();
+
+          this.flightService.getFlightTickets(id).subscribe(
+            (tickets: []) => {
+              this.tickets = tickets;
+              this.loadingTickets = false;
+              for (let i = 0; i < tickets.length; i++) {
+                const ticket: any = tickets[i];
+                if (ticket.reserved) {
+                  this.map.reserved.push(ticket.number);
+                }
+                if (ticket.onDiscount) {
+                  if (this.userRole === 'ROLE_USER') {
+                    this.map.reserved.push(ticket.number);
+                  } else if (this.userRole === 'ROLE_AIRCOMPANY_ADMIN') {
+                    this.map.onDiscount.push(ticket.number);
+                  }
+                }
+              }
+              this.createSeatChart();
+            },
+            error => {
+
+            }
+          );
+
+          // this.createFlyingMap();
         },
         error => {
           this.loadingFlight = false;
@@ -74,23 +101,6 @@ export class FlightComponent implements OnInit {
           this.loadingDestinations = false;
         }
       );
-
-      this.flightService.getFlightTickets(id).subscribe(
-        (data: []) => {
-          this.tickets = data;
-          this.loadingTickets = false;
-          for (let i = 0; i < data.length; i++) {
-            const ticket: any = data[i];
-            if (ticket.reserved) {
-              this.map.reserved.push(ticket.number);
-            }
-          }
-          this.createSeatChart();
-        },
-        error => {
-
-        }
-      );
     } else {
 
     }
@@ -99,34 +109,21 @@ export class FlightComponent implements OnInit {
   addRow() {
     if (this.sc) {
       if (!this.sc.addRow()) {
-        alert('ne moze vise');
+        alert('You can have maximum 26 rows!');
       }
-    }
-  }
-
-  addColumn() {
-    if (this.sc) {
-      if (!this.sc.addColumn()) {
-        alert('dosta ti je 30');
-      }
-    }
-  }
-
-  getCart() {
-    if (this.sc) {
-      console.log(this.sc.getShoppingCart());
-      console.log(this.sc.getTotal());
     }
   }
 
   createSeatChart() {
-    this.sc = new SeatchartJS(this.map, this.types);
+    this.sc = new SeatchartJS(this.map, this.types, this.userRole);
     this.sc.setAssetsSrc('assets/seatchart');
 
     // (1) Create functions
     this.sc.createMap('map-container');
     this.sc.createLegend('legend-container');
-    this.sc.createShoppingCart('shoppingCart-container');
+    if (this.userRole === 'ROLE_USER') {
+      this.sc.createShoppingCart('shoppingCart-container');
+    }
   }
 
   openUpdateDialog() {
@@ -217,7 +214,7 @@ export class FlightComponent implements OnInit {
             friendIndex++;
           }
         }
-        console.log(reservations);
+
         this.reservationService.createReservations(reservations).subscribe(
           () => {
             this.appComponent.showSnackBar('Reservation successfull!');
@@ -231,6 +228,48 @@ export class FlightComponent implements OnInit {
         );
       }
     );
+  }
+
+  saveDiagram() {
+    if (this.sc) {
+      const map = this.sc.getSeatMap();
+
+      this.flight.diagram.rows = map.rows;
+      this.flight.diagram.cols = map.cols;
+      this.flight.diagram.disabledRows = map.disabledRows;
+      this.flight.diagram.disabledCols = map.disabledCols;
+
+      for (const ticket of this.tickets) {
+        for (const ticketOnD of map.onDiscount) {
+          if (ticket.number === ticketOnD) {
+            ticket.onDiscount = true;
+            break;
+          } else {
+            ticket.onDiscount = false;
+          }
+        }
+      }
+
+      this.flightService.updateFlightDiagram(this.flight.id, this.flight.diagram).subscribe(
+        () => {
+          this.flightService.updateFlightTickets(this.tickets).subscribe(
+            () => {
+              this.appComponent.showSnackBar('Updated successfully!');
+            },
+            () => {
+              this.appComponent.showSnackBar('Error while updating seats!');
+            }
+          );
+        },
+        () => {
+          this.appComponent.showSnackBar('Error while updating diagram!');
+        },
+        () => {
+          this.appComponent.showSnackBar(this.message);
+          // setTimeout(function () { location.reload(); }, 3000);
+        }
+      );
+    }
   }
 
 }
