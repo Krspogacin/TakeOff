@@ -60,4 +60,12 @@ export class HotelService {
   getAvailableRooms(object: any){
     return this.http.get('/hotels/getAvailableRooms?parameters='+ encodeURI(JSON.stringify(object)));
   }
+
+  roomsNotOnDiscount(id: number) {
+    return this.http.get('/hotels/' + id + '/roomsNotOnDiscount');
+  }
+
+  getRoomsOnDiscount(id: number) {
+    return this.http.get('/hotels/' + id + '/roomsOnDiscount');
+  }
 }

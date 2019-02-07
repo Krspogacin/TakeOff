@@ -71,9 +71,11 @@ export class RegistrationDialogComponent implements OnInit {
     if (this.registrationForm.valid) {
       const userToRegister = this.registrationForm.value;
       userToRegister.image = this.imgSrc;
+      if(userToRegister.dateOfBirth && userToRegister.dateOfBirth instanceof Date){
       userToRegister.dateOfBirth = new Date(Date.UTC(userToRegister.dateOfBirth.getFullYear(),
                                                      userToRegister.dateOfBirth.endDate.getMonth(),
                                                      userToRegister.dateOfBirth.endDate.getDate()));
+      }
       delete userToRegister['confirmPassword'];
       this.dialogRef.close(userToRegister);
     }

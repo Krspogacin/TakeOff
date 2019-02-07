@@ -5,10 +5,10 @@
 <br>
 <div align="center">
     <input matInput [(ngModel)]="nameLocation" style="height:40px; width:20%; border: 2px solid orange;" type="text" placeholder="Hotel name or location">
-    <input autocomplete="off" matInput style="height:40px; width:20%; border: 2px solid orange;" [matDatepicker]="picker" placeholder="Check in date">
+    <input style="height:40px; width:20%; border: 2px solid orange;" autocomplete="off" matInput [matDatepicker]="picker" placeholder="Check in date">
     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
     <mat-datepicker #picker disabled="false"></mat-datepicker>
-    <input autocomplete="off" matInput style="height:40px; width:20%; border: 2px solid orange;" [matDatepicker]="picker2" placeholder="Check out date">
+    <input style="height:40px; width:20%; border: 2px solid orange;" autocomplete="off" matInput [matDatepicker]="picker2" placeholder="Check out date">
     <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
     <mat-datepicker #picker2 disabled="false"></mat-datepicker>&nbsp;&nbsp;
     <button mat-raised-button style="background-color: orange; color: white;" (click)="search()"><mat-icon>search</mat-icon>Search</button>
@@ -40,7 +40,7 @@
         </span>
     </mat-card-content>
     <mat-card-actions style="float:right;"> 
-        <button *ngIf="userRole && userRole === 'ROLE_USER'" mat-raised-button color="primary" (click)="openReserveDialog(h.id)">Reserve<mat-icon>today</mat-icon></button>
+        <button *ngIf="userRole && userRole === 'ROLE_USER'" mat-raised-button color="primary" (click)="beginReservation(h)">Reserve<mat-icon>today</mat-icon></button>
         <button mat-raised-button color="primary" [routerLink]="'/hotels/' + h.id">Details<mat-icon>arrow_forward</mat-icon></button>
     </mat-card-actions>
 </mat-card>

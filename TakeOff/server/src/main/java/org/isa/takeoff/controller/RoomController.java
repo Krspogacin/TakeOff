@@ -78,6 +78,7 @@ public class RoomController {
 			room.setType(roomDTO.getType());
 			room.setHasBalcony(roomDTO.isHasBalcony());
 			room.setHasAirCondition(roomDTO.isHasAirCondition());
+			room.setNumberOfRooms(roomDTO.getNumberOfRooms());
 			room = roomService.save(room);
 			return new ResponseEntity<>(new RoomDTO(room), HttpStatus.OK);
 		}

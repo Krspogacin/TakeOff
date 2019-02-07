@@ -19,4 +19,8 @@ export class ReservationService {
   createVehicleReservation(vehicleReservation: any) {
     return this.http.post('/reservations/vehicleReservations', vehicleReservation);
   }
+
+  createRoomReservation(roomReservation: any) {
+    return this.http.post('/reservations/roomReservations', roomReservation);
+  }
 }

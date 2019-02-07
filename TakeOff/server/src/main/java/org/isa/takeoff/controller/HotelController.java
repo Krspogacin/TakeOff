@@ -20,6 +20,7 @@ import org.isa.takeoff.model.Room;
 import org.isa.takeoff.model.RoomPrice;
 import org.isa.takeoff.model.RoomRating;
 import org.isa.takeoff.model.RoomReservation;
+import org.isa.takeoff.model.RoomReservationRooms;
 import org.isa.takeoff.model.Service;
 import org.isa.takeoff.model.ServiceHotel;
 import org.isa.takeoff.service.HotelService;
@@ -342,16 +343,17 @@ public class HotelController {
 			boolean flag = false;
 			int allRooms = 0;
 			for (Room room : rooms){
-				
+				flag = false;
+				counter = 0;
 				if(room.getDiscount() != null && room.getDiscount() > 0){
 					continue;
 				}
 				
-				List<RoomReservation> reservations = room.getRoomReservations();
+				List<RoomReservationRooms> reservations = room.getRoomReservations();
 				LocalDate endingDate = roomSearch.getCheckIn().plusDays(roomSearch.getNumberOfDays());
-				for(RoomReservation reservation: reservations){
-					if((roomSearch.getCheckIn().isBefore(reservation.getReservationEndDate()) && roomSearch.getCheckIn().isAfter(reservation.getReservationStartDate())) ||
-					   (endingDate.isBefore(reservation.getReservationEndDate()) && endingDate.isAfter(reservation.getReservationStartDate()))){
+				for(RoomReservationRooms reservation: reservations){
+					if((roomSearch.getCheckIn().isBefore(reservation.getRoomReservation().getReservationEndDate()) && roomSearch.getCheckIn().isAfter(reservation.getRoomReservation().getReservationStartDate())) ||
+					   (endingDate.isBefore(reservation.getRoomReservation().getReservationEndDate()) && endingDate.isAfter(reservation.getRoomReservation().getReservationStartDate()))){
 						counter++;
 					}
 				}
@@ -406,8 +408,11 @@ public class HotelController {
 				for(RoomRating rr: room.getRoomRatings()){
 					sum += rr.getRating();
 				}
-				Double rating = sum/room.getRoomRatings().size();
-				roomsDTO.add(new AvailableRoomsDTO(new RoomDTO(room), totalPrice,rating, availableRooms));
+				Double rating = 0.0;
+				if(sum != 0.0){
+					rating = sum/room.getRoomRatings().size();
+				}
+				roomsDTO.add(new AvailableRoomsDTO(new RoomDTO(room), totalPrice, rating, availableRooms, endingDate));
 			}
 			if(allRooms < roomSearch.getNumberOfRooms()){
 				roomsDTO = new ArrayList<>();
@@ -416,6 +421,54 @@ public class HotelController {
 			return new ResponseEntity<>(roomsDTO,HttpStatus.OK);
 		} catch (IOException e) {
 			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@RequestMapping(value = "/{id}/roomsOnDiscount", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<RoomDTO>> roomsOnDiscount(@PathVariable Long id) 
+	{
+		try 
+		{
+			Hotel hotel = hotelService.findOne(id);
+			List<Room> rooms = hotel.getRooms();
+		
+			List<RoomDTO> roomDTO = new ArrayList<>();
+			for (Room room : rooms)
+			{
+				if (room.getDiscount() != null && room.getDiscount() > 0)
+				{
+					roomDTO.add(new RoomDTO(room));					
+				}
+			}
+			return new ResponseEntity<>(roomDTO, HttpStatus.OK);
+		}
+		catch (Exception e) 
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value = "/{id}/roomsNotOnDiscount", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Boolean> roomsNotOnDiscount(@PathVariable Long id) 
+	{
+		try 
+		{
+			Hotel hotel = hotelService.findOne(id);
+			List<Room> rooms = hotel.getRooms();
+		
+			for (Room room : rooms)
+			{
+				if (room.getDiscount() == null || room.getDiscount() == 0)
+				{
+					return new ResponseEntity<>(true, HttpStatus.OK);
+				}
+			}
+			
+			return new ResponseEntity<>(false, HttpStatus.OK);
+		}
+		catch (Exception e) 
+		{
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}

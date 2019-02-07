@@ -25,6 +25,8 @@ import org.isa.takeoff.model.Reservation;
 import org.isa.takeoff.model.Room;
 import org.isa.takeoff.model.RoomRating;
 import org.isa.takeoff.model.RoomRatingId;
+import org.isa.takeoff.model.RoomReservation;
+import org.isa.takeoff.model.RoomReservationRooms;
 import org.isa.takeoff.model.Ticket;
 import org.isa.takeoff.model.User;
 import org.isa.takeoff.model.Vehicle;
@@ -142,16 +144,16 @@ public class FlightReservationController {
 				if (fr.getReservation().getRoomReservation() != null) {
 					RoomReservationDTO roomReservationDTO = new RoomReservationDTO(fr.getReservation().getRoomReservation());
 					HotelRating hotelRating = this.hotelService.findOneRating(
-													new HotelRatingId(fr.getReservation().getRoomReservation().getRooms().get(0).getHotel(), user));
+													new HotelRatingId(fr.getReservation().getRoomReservation().getRooms().get(0).getRoom().getHotel(), user));
 					if (hotelRating != null) {
 						roomReservationDTO.setHotelRating(hotelRating.getRating());						
 					}
 					List<RoomRatingDTO> roomRatingDTOs = new ArrayList<>();
-					for (Room room : fr.getReservation().getRoomReservation().getRooms()) {
-						RoomRating roomRating = this.roomService.findOneRating(new RoomRatingId(room, user));
+					for (RoomReservationRooms room : fr.getReservation().getRoomReservation().getRooms()) {
+						RoomRating roomRating = this.roomService.findOneRating(new RoomRatingId(room.getRoom(), user));
 						if (roomRating != null) {
 							RoomRatingDTO roomRatingDTO = new RoomRatingDTO();
-							roomRatingDTO.setRoom(new RoomDTO(room));
+							roomRatingDTO.setRoom(new RoomDTO(room.getRoom()));
 							roomRatingDTO.setRating(roomRating.getRating());
 							roomRatingDTOs.add(roomRatingDTO);							
 						}
@@ -218,6 +220,41 @@ public class FlightReservationController {
 		}
 		catch(Exception e)
 		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value = "/roomReservations", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ReservationDTO> createVehicleReservation(@RequestBody RoomReservationDTO roomReservationDTO){
+		if (roomReservationDTO.getReservationId() == null || roomReservationDTO.getReservationStartDate() == null ||
+			roomReservationDTO.getReservationEndDate() == null || roomReservationDTO.getTotalPrice() == null ||  roomReservationDTO.getRoomsAndRatings() == null){
+			
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		try{
+			Reservation reservation = this.reservationService.findOneReservation(roomReservationDTO.getReservationId());
+			if(reservation != null){
+				RoomReservation roomReservation = new RoomReservation();
+				roomReservation.setReservationStartDate(roomReservationDTO.getReservationStartDate());
+				roomReservation.setReservationEndDate(roomReservationDTO.getReservationEndDate());
+				roomReservation.setPrice(roomReservationDTO.getTotalPrice());
+				
+				List<RoomReservationRooms> rrrs = new ArrayList<>();
+				for(RoomRatingDTO roomRating: roomReservationDTO.getRoomsAndRatings()){
+					Room room = roomService.findOne(roomRating.getRoom().getId());
+					RoomReservationRooms rrr = new RoomReservationRooms();
+					rrr.setRoomReservation(roomReservation);
+					rrr.setRoom(room);
+					rrrs.add(rrr);
+				}
+				roomReservation.setRooms(rrrs);
+				reservation.setRoomReservation(roomReservation);
+				reservation = this.reservationService.saveReservation(reservation);
+				return new ResponseEntity<>(new ReservationDTO(reservation),HttpStatus.OK);
+			}else{
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		}catch(Exception e){
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}

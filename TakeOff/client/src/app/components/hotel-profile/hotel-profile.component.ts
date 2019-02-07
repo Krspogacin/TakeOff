@@ -88,7 +88,6 @@ export class HotelProfileComponent implements OnInit {
             (services) => {
               this.selectedServices = services;
               this.loadingHotel = false;
-              console.log(this.selectedServices);
               if(this.selectedServices.length != 0){
                 this.selectedServices.forEach(service => {
                   //1
@@ -329,9 +328,11 @@ export class HotelProfileComponent implements OnInit {
     dialogRef.afterClosed().subscribe(
       (data) => {
         if (data) {
+          console.log(data);
           let updRoom = data.room;
           this.roomService.updateRoom(updRoom).subscribe(
             (updatedRoom) => {
+              console.log(updatedRoom);
               for (let i = 0; i < this.rooms.length; i++) {
                 if (this.rooms[i].id == updRoom.id) {
                   this.rooms.splice(i, 1, updatedRoom);

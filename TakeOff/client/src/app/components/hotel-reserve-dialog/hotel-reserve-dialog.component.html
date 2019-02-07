@@ -1,15 +1,16 @@
 <h5 mat-dialog-title>Room reservation</h5>
 <mat-dialog-content>
-  <mat-horizontal-stepper linear labelPosition="bottom">
+  <h3 *ngIf="error">Error! Something went wrong! Please close and open dialog again.</h3>
+  <mat-horizontal-stepper linear labelPosition="bottom" *ngIf="!error">
     <mat-step [stepControl]="parametersForm" label="Reservation parameters" state="filter_list">
       <form [formGroup]="parametersForm">
         <div class="row">
           <div class="col">
             <mat-form-field appearance="outline">
               <mat-label>Check in date</mat-label>
-              <input autocomplete="off" matInput [matDatepicker]="picker" formControlName="checkInDate" required>
+              <input autocomplete="off" matInput [matDatepicker]="picker" [min]="landingDate" formControlName="checkInDate" required>
               <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-              <mat-datepicker #picker disabled="false"></mat-datepicker>
+              <mat-datepicker #picker disabled="false" [startAt]="landingDate"></mat-datepicker>
             </mat-form-field>
           </div>
           <div class="col">
@@ -26,12 +27,29 @@
         <br>
         <div class="row">
           <div class="col">
+            <mat-form-field appearance="outline">
+              <mat-label>Min price</mat-label>
+              <input matInput autocomplete="off" type="number" formControlName="minPrice">
+            </mat-form-field>
+          </div>
+          <div class="col">
+            <mat-form-field appearance="outline">
+              <mat-label>Max price</mat-label>
+              <input matInput autocomplete="off" type="number" formControlName="maxPrice">
+            </mat-form-field>
+          </div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col">
               <mat-form-field appearance="outline">
                 <mat-label>Number of guests</mat-label>
                 <input matInput autocomplete="off" type="number" formControlName="guestsNumber" step="1" required>
                 <mat-error *ngIf="parametersForm.get('guestsNumber').invalid && (parametersForm.get('guestsNumber').dirty || parametersForm.get('guestsNumber').touched)">
                   <div *ngIf="parametersForm.get('guestsNumber').errors.min">
                                 Minimum {{nightsNumberMin}} guest </div>
+                  <div *ngIf="parametersForm.get('guestsNumber').errors.sameNumber">
+                             Number of guests and number of beds must match </div>
               </mat-error>
               </mat-form-field>
           </div>
@@ -46,25 +64,12 @@
               </mat-form-field>
           </div>
         </div>
+        <br>
         <div class="row" *ngIf="rooms != 0">
           <div class="col" *ngFor="let bed of beds">
             <mat-form-field appearance="outline">
               <mat-label>Number of beds in each room</mat-label>
-              <input matInput autocomplete="off" type="number" [formControlName]="'Bed'+bed" step="1" required>
-            </mat-form-field>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <mat-form-field appearance="outline">
-              <mat-label>Min price</mat-label>
-              <input matInput autocomplete="off" type="number" formControlName="minPrice">
-            </mat-form-field>
-          </div>
-          <div class="col">
-            <mat-form-field appearance="outline">
-              <mat-label>Max price</mat-label>
-              <input matInput autocomplete="off" type="number" formControlName="maxPrice">
+              <input matInput (change)="validation()" autocomplete="off" type="number" [formControlName]="'Bed'+bed" step="1" required>
             </mat-form-field>
           </div>
         </div>
@@ -76,7 +81,10 @@
       </div>
     </mat-step>
     <mat-step [stepControl]="selectionForm" label="Available rooms" state="hotel">
-    <mat-hint>Need to select {{numberOfRooms-selectedRooms}} rooms</mat-hint>
+    <mat-hint *ngIf="availableRooms.length != 0 && numberOfRooms-selectedRooms >= numberOfRooms">Need to select {{numberOfRooms}} rooms</mat-hint>
+    <mat-hint *ngIf="availableRooms.length != 0 && numberOfRooms-selectedRooms >= 0 && numberOfRooms-selectedRooms < numberOfRooms">Need to select {{numberOfRooms-selectedRooms}} rooms</mat-hint>
+    <mat-hint *ngIf="numberOfRooms-selectedRooms < 0">Invalid number of selected rooms</mat-hint>
+    <h3 *ngIf="availableRooms.length == 0">No rooms for this parameters</h3>
       <ul class="list-group">
         <form [formGroup]="selectionForm">
         <li *ngFor="let room of availableRooms" class="list-group-item list-group-item-primary flex-column align-items-start">
@@ -91,13 +99,22 @@
               <span *ngIf="!room.room.hasBalcony"> ✗ </span> <br>
               <b>Has air condition: </b> <span *ngIf="room.room.hasAirCondition"> ✓ </span>
               <span *ngIf="!room.room.hasAirCondition"> ✗ </span> <br>
-              <b>Rating: </b> {{room.rating}} <br>
+              <b>Rating: </b> 
+              <div class="star-ratings-css mx-2">
+                  <div class="star-ratings-css-top">
+                      <span [ngStyle]="{'width': ((room.rating * 100) / 5) + '%'}">
+                      ★★★★★
+                      </span>
+                  </div>
+                  <div>★★★★★</div>
+              </div>
+              <span class="badge badge-pill badge-info align-middle">{{room.rating | ratingRound }}/5</span> <br>
               <b>Number of available rooms: </b> <span style="color:red">{{room.number}}</span> <br>
             </div>
             <div class="col">
-              <font size="5"><b>Room price:</b> {{room.totalPrice}} </font>
+              <font size="5"><b>Room price:</b> {{room.totalPrice}} € </font>
               <span class="d-flex justify-content-end">
-                  <mat-form-field><input matInput type="number" step="1" [formControlName]="'Room'+room.room.id" (input)="selectRoom($event.target.value)">
+                  <mat-form-field><input autocomplete="off" matInput type="number" step="1" [formControlName]="'Room'+room.room.id" (input)="selectRoom(room.room.id,$event.target.value)">
                 <mat-hint>Enter number of rooms you want to reserve</mat-hint></mat-form-field>
               </span> 
             </div>
@@ -109,7 +126,7 @@
       <div class="d-flex justify-content-center">
         <button mat-raised-button matStepperPrevious>Back</button>&nbsp;
         <button mat-raised-button [mat-dialog-close]>Cancel</button>&nbsp;
-        <button mat-raised-button color="primary" matStepperNext>Next</button>
+        <button mat-raised-button color="primary" (click)="tp()" [disabled]="numberOfRooms-selectedRooms != 0" matStepperNext>Next</button>
       </div>
     </mat-step>
 
@@ -131,19 +148,20 @@
             <ng-container matColumnDef="select">
               <th mat-header-cell *matHeaderCellDef> Select </th>
               <td mat-cell *matCellDef="let element">
-                <mat-checkbox [formControlName]="'CB'+element.id" color="primary"></mat-checkbox>
+                <mat-checkbox [formControlName]="'CB'+element.id" color="primary" (change)="totalPrice(element.id)"></mat-checkbox>
               </td>
             </ng-container>
-          
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
           </table> 
+          <br>
+          <font size="5"><b>Total price: </b> {{totalPricee}} € </font> 
       </form>
       <br>
       <div class="d-flex justify-content-center">
         <button mat-raised-button matStepperPrevious>Back</button>&nbsp;
         <button mat-raised-button [mat-dialog-close]>Cancel</button>&nbsp;         
-        <button mat-raised-button color="primary" color="primary" type="submit">Finish</button>
+        <button mat-raised-button color="primary" color="primary" type="submit" (click)="reservation()" [disabled]="numberOfRooms-selectedRooms != 0">Finish</button>
       </div>
     </mat-step>
   </mat-horizontal-stepper>

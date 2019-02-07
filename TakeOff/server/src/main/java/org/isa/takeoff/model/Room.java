@@ -15,7 +15,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
@@ -67,8 +66,8 @@ public class Room {
 	@OneToMany(mappedBy = "id.room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<RoomRating> roomRatings = new HashSet<>();
 	
-	@ManyToMany(mappedBy = "rooms", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<RoomReservation> roomReservations = new HashSet<>();
+	@OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<RoomReservationRooms> roomReservations = new HashSet<>();
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Hotel hotel;
@@ -210,7 +209,7 @@ public class Room {
 		this.roomRatings = new HashSet<>(roomRatings);
 	}
 	
-	public boolean addRoomReservation(RoomReservation e) {
+	public boolean addRoomReservation(RoomReservationRooms e) {
 		return roomReservations.add(e);
 	}
 
@@ -218,11 +217,11 @@ public class Room {
 		return roomReservations.remove(o);
 	}
 	
-	public List<RoomReservation> getRoomReservations() {
+	public List<RoomReservationRooms> getRoomReservations() {
 		return new ArrayList<>(roomReservations);
 	}
 
-	public void setRoomReservations(List<RoomReservation> roomReservations) {
+	public void setRoomReservations(List<RoomReservationRooms> roomReservations) {
 		this.roomReservations = new HashSet<>(roomReservations);
 	}
 	

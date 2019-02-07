@@ -1,19 +1,24 @@
 package org.isa.takeoff.dto;
 
+import java.time.LocalDate;
+
 public class AvailableRoomsDTO {
 
 	private RoomDTO room;
 	private Double totalPrice;
 	private Double rating;
 	private Integer number;
+	private LocalDate endingDate;
 	
+
 	public AvailableRoomsDTO() {}
 	
-	public AvailableRoomsDTO(RoomDTO room, Double totalPrice, Double rating, Integer number) {
+	public AvailableRoomsDTO(RoomDTO room, Double totalPrice, Double rating, Integer number, LocalDate endingDate) {
 		this.room = room;
 		this.totalPrice = totalPrice;
 		this.rating = rating;
 		this.number = number;
+		this.endingDate = endingDate;
 	}
 	
 	public Integer getNumber() {
@@ -41,5 +46,12 @@ public class AvailableRoomsDTO {
 	}
 	public void setRating(Double rating) {
 		this.rating = rating;
+	}
+	public LocalDate getEndingDate() {
+		return endingDate;
+	}
+	
+	public void setEndingDate(LocalDate endingDate) {
+		this.endingDate = endingDate;
 	}
 }

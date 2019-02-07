@@ -6,6 +6,7 @@ import { AuthenticationService } from 'src/app/services/authentication/authentic
 import { HotelReserveDialogComponent } from '../hotel-reserve-dialog/hotel-reserve-dialog.component';
 import { AddEntityDialogComponent } from '../add-entity-dialog/add-entity-dialog.component';
 import { AppComponent } from 'src/app/app.component';
+import { ReservationService } from 'src/app/services/reservation/reservation.service';
 
 @Component({
   selector: 'app-hotel',
@@ -14,7 +15,6 @@ import { AppComponent } from 'src/app/app.component';
 })
 export class HotelComponent implements OnInit {
 
-  hotel = {};
   hotels = [];
   filteredHotels = [];
   pageSize = 10;
@@ -29,6 +29,7 @@ export class HotelComponent implements OnInit {
   constructor(private HotelService: HotelService,
              private authService: AuthenticationService,
              public dialog: MatDialog,
+             private reservationService: ReservationService,
              public appComponent: AppComponent) { }
 
   ngOnInit() {
@@ -83,16 +84,91 @@ export class HotelComponent implements OnInit {
     });
     this.hotels = this.filteredHotels;
   }
-
-  openReserveDialog(id: number){
-    const dialogRef = this.dialog.open(HotelReserveDialogComponent,
-      {
-        data: id,
-        disableClose: true,
-        autoFocus: true,
-        height: '90%',
-        width: '50%',
-      });
+  openReservationDialog(hotel: any, reservation: any){
+  const ladningDate = new Date(reservation.ticket.flight.landingDate);
+  const dialogRef = this.dialog.open(HotelReserveDialogComponent,
+    {
+      data: {
+        'hotel': hotel,
+        'landingDate': ladningDate
+      },
+      disableClose: true,
+      autoFocus: true,
+      height: '90%',
+      width: '50%',
+    });
+    dialogRef.afterClosed().subscribe(
+      (sendingObject) => {
+        if (sendingObject) {
+          this.finishReservationProcess(sendingObject, reservation);
+        }
+      }
+    )
   }
 
+  beginReservation(hotel){
+    if (!this.authService.getUsername() || this.userRole !== 'ROLE_USER') {
+      this.appComponent.showSnackBar('Error! You have no right to make any reservation.');
+      return;
+    }
+    this.HotelService.roomsNotOnDiscount(hotel.id).subscribe(
+      (flag) => {
+        if (flag) {
+          this.reservationService.getReservations(this.authService.getUsername()).subscribe(
+            (userReservations: any[]) => {
+              const availableReservations = new Array();
+              userReservations.forEach(reservation => {
+                if (!reservation.reservationDTO.roomReservation) {
+                  const landingDate = new Date(reservation.ticket.flight.landingDate);
+                  const landingCountry = reservation.ticket.flight.landingLocation.country;
+                  const landingCity = reservation.ticket.flight.landingLocation.city;
+                  const tomorrow = new Date(landingDate);
+                  tomorrow.setDate(tomorrow.getDate() + 1);
+                  if (tomorrow.getTime() >=  new Date().getTime() &&
+                      landingCountry === hotel.location.country &&
+                      landingCity === hotel.location.city) {
+
+                    availableReservations.push(reservation);
+                  }
+                }
+              });
+              if (availableReservations.length > 0) {
+                let reservation = availableReservations[0];
+                availableReservations.forEach(availableReservation => {
+                  if (availableReservation.ticket.flight.landingDate < reservation.ticket.flight.landingDate) {
+                    reservation = availableReservation;
+                  }
+                });
+                console.log(reservation);
+                this.openReservationDialog(hotel, reservation);
+              } else {
+                this.appComponent.showSnackBar('You have no active flight reservation at the moment at the place you are looking for!');
+              }
+            }
+          );
+        } else  {
+          this.appComponent.showSnackBar('There are no available any rooms at the moment.');
+        }
+      }
+    );
+  }
+
+  finishReservationProcess(roomToReserve: any, reservation: any) {
+    if (!roomToReserve || !reservation) {
+      this.appComponent.showSnackBar('Error! Something went wrong.');
+      return;
+    }
+
+    const roomReservation = roomToReserve;
+    roomReservation.reservationId = reservation.reservationDTO.id;
+    console.log(roomReservation);
+    this.reservationService.createRoomReservation(roomReservation).subscribe(
+      () => {
+        this.appComponent.showSnackBar('You have created room reservation successfully!');
+      },
+      () => {
+        this.appComponent.showSnackBar('Error! Your reservation have not been made.');
+      }
+    );
+  }
 }
