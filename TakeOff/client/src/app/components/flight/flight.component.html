@@ -25,10 +25,9 @@
       </mat-chip-list>
     </mat-form-field>
     <br>
-    <button mat-stroked-button color="primary" (click)="addRow()">Add Row</button>
-    <button mat-stroked-button color="primary" (click)="addColumn()">Add Column</button>
-    <button mat-stroked-button color="primary" (click)="getCart()">Get Cart</button>
 
+    <button mat-stroked-button color="primary" (click)="addRow()">Add Row</button>
+    
   </div>
 
   <div *ngIf="!flightExists">
@@ -39,10 +38,13 @@
 
 </div>
 
+<!-- <div id="chartdiv"></div> -->
+
 <div id="map-container"></div>
 <div id="legend-container"></div>
 <div id="shoppingCart-container"></div>
 
 <div *ngIf="flightExists">
-  <button mat-stroked-button color="primary" (click)="bookFlight()">Book flight</button>
+  <button mat-stroked-button color="primary" (click)="bookFlight()" *ngIf="userRole === 'ROLE_USER'">Book flight</button>
+  <button mat-stroked-button color="primary" (click)="saveDiagram()" *ngIf="userRole === 'ROLE_AIRCOMPANY_ADMIN'">Save diagram</button>
 </div>

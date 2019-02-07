@@ -4,7 +4,7 @@
  * @param {Object.<{rows: number, cols: number, reserved: Array.<number>, disabled: Array.<number>, disabledRows: Array.<number>, disabledCols: Array.<number>}>} seatMap - Info to generate the seatmap.
  * @param {Array.<Object.<{type: string, color: string, price: number, selected: Array.<number>}>>} seatTypes - Seat types and their colors to be represented.
  */
-function SeatchartJS(seatMap, seatTypes) { // eslint-disable-line no-unused-vars
+function SeatchartJS(seatMap, seatTypes, userRole) { // eslint-disable-line no-unused-vars
     /**
      * @private
      * .NET equivalent of string.Format() method
@@ -390,14 +390,15 @@ function SeatchartJS(seatMap, seatTypes) { // eslint-disable-line no-unused-vars
             const array = shoppingCartDict[key];
             cart[key] = [];
             for (let n of array) {
-                const parts = n.split('_');
-                const i = parseInt(parts[0]);
-                const j = parseInt(parts[1]);
-                cart[key].push(i* seatMap.rows + j);
+                cart[key].push(mapShoppingCartValue(n));
             }
         }
         return cart;
     };
+
+    this.getSeatMap = function getSeatMap() {
+        return seatMap;
+    }
 
     /**
      * @private
@@ -601,16 +602,20 @@ function SeatchartJS(seatMap, seatTypes) { // eslint-disable-line no-unused-vars
      * @returns {string} The type.
      */
     var getSeatType = function getSeatType(id) {
+        let length = 0;
         for (var key in shoppingCartDict) {
             if ({}.hasOwnProperty.call(shoppingCartDict, key)) {
+                length += shoppingCartDict[key].length;
                 if (shoppingCartDict[key].indexOf(id) > -1) {
                     return key;
                 }
             }
         }
 
-        throw new Error("Invalid parameter 'id' supplied to SeatchartJS.getSeatType(). " +
-            "'id' is not defined in shoppingCartDict.");
+        // makes no sense to throw an error, return value stays undefined and it's all ok...
+
+        // throw new Error("Invalid parameter 'id' supplied to SeatchartJS.getSeatType(). " +
+        //     "'id' is not defined in shoppingCartDict.");
     };
 
     /**
@@ -945,6 +950,27 @@ function SeatchartJS(seatMap, seatTypes) { // eslint-disable-line no-unused-vars
         return false;
     };
 
+    var adminSeatClick = function adminSeatClick(e) {
+
+        // do nothing for blank seats
+        if (!this.classList.contains("blank")) {
+            const number = mapShoppingCartValue(this.id);
+
+            if (seatMap.onDiscount.includes(number)) {
+                var index = seatMap.onDiscount.indexOf(number);
+                if (index > -1) {
+                    seatMap.onDiscount.splice(index, 1);
+                }
+                this.style.backgroundColor = '';
+            } else {
+                seatMap.onDiscount.push(number);
+                this.style.backgroundColor = seatTypes[0].color;
+            }
+
+            playAsyncClick();
+        }
+    }
+
     /**
      * @private
      * Creates a new seat.
@@ -962,11 +988,17 @@ function SeatchartJS(seatMap, seatTypes) { // eslint-disable-line no-unused-vars
         if (seatId !== undefined) {
             seat.setAttribute('id', seatId);
 
-            // add click event just if it's a real seats (when it has and id)
-            seat.addEventListener('click', seatClick);
-            // seat.addEventListener('mousedown', mouseDownSeat);
             seat.addEventListener('mouseup', mouseUpSeat);
-            seat.addEventListener('contextmenu', rightClickDelete, false);
+
+            if (userRole == 'ROLE_USER') {
+                // add click event just if it's a real seats (when it has and id)
+                seat.addEventListener('click', seatClick);
+                // seat.addEventListener('mousedown', mouseDownSeat);
+                seat.addEventListener('contextmenu', rightClickDelete, false);
+
+            } else if (userRole == 'ROLE_AIRCOMPANY_ADMIN') {
+                seat.addEventListener('click', adminSeatClick);
+            }
         }
 
         return seat;
@@ -1142,6 +1174,14 @@ function SeatchartJS(seatMap, seatTypes) { // eslint-disable-line no-unused-vars
         }
     };
 
+    var preselectOnDiscount = function preselectOnDiscount() {
+        for (let number of seatMap.onDiscount) {
+            var id = '{0}_{1}'.format(Math.floor(number / seatMap.cols), number % seatMap.cols);
+            var seat = document.getElementById(id);
+            seat.style.backgroundColor = seatTypes[0].color;
+        }
+    }
+
     /**
      * Gets the price for a specific type of seat.
      * @param {string} type - The type of the seat.
@@ -1194,36 +1234,43 @@ function SeatchartJS(seatMap, seatTypes) { // eslint-disable-line no-unused-vars
     var seatMapContainer = null;
 
     var removeRowEvent = function () {
-        var index = -1;
-        var disabledRow = this.id;
-        console.log(disabledRow);
 
-        for (var i = 0; i < seatMapContainer.childNodes.length; i++) {
-            const row = seatMapContainer.childNodes[i];
-            if (row.id === disabledRow) {
-                index = i - 2;
-                for (var j = 0; j < row.childNodes.length; j++) {
-                    const seat = row.childNodes[j];
-                    if (seat.classList.contains('unavailable')) {
-                        alert('contains reserved seats, can\'t be deleted!')
-                        return;
-                    }
-                }
+        if (userRole == 'ROLE_AIRCOMPANY_ADMIN') {
+            var index = -1;
+            var disabledRow = this.id;
+
+            if (seatMap.rows - seatMap.disabledRows.length === 2) {
+                alert('You can\'t remove them all!')
+                return;
             }
 
+            for (var i = 0; i < seatMapContainer.childNodes.length; i++) {
+                const row = seatMapContainer.childNodes[i];
+                if (row.id === disabledRow) {
+                    index = i - 2;
+                    for (var j = 0; j < row.childNodes.length; j++) {
+                        const seat = row.childNodes[j];
+                        if (seat.classList.contains('unavailable') || seatMap.onDiscount.includes(mapShoppingCartValue(seat.id))) {
+                            alert('Contains reserved or on discount seats, can\'t be removed!')
+                            return;
+                        }
+                    }
+                }
+
+            }
+
+            for (var c = 0; c < seatMap.cols; c += 1) {
+                seatMap.disabled.push((seatMap.cols * index) + c);
+            }
+
+            seatMap.disabledRows.push(index);
+
+            setSeat('disabled');
+
+            //remove the X button
+            const row = seatMapContainer.childNodes[index + 2];
+            row.removeChild(row.childNodes[row.childNodes.length - 1]);
         }
-
-        for (var c = 0; c < seatMap.cols; c += 1) {
-            seatMap.disabled.push((seatMap.cols * index) + c);
-        }
-
-        seatMap.disabledRows.push(index);
-
-        setSeat('disabled');
-
-        //remove the X button
-        const row = seatMapContainer.childNodes[index + 2];
-        row.removeChild(row.childNodes[row.childNodes.length - 1]);
     }
 
     this.addRow = function () {
@@ -1242,18 +1289,22 @@ function SeatchartJS(seatMap, seatTypes) { // eslint-disable-line no-unused-vars
         var icon = document.createElement('img');
         icon.src = '{0}/icons/remove.svg'.format(self.assetsSrc);
 
-        var removeBtn = document.createElement('div');
-        removeBtn.setAttribute('id', rowIndex);
-        removeBtn.className = 'seatChart-sc-delete';
-        removeBtn.appendChild(icon);
+        // var removeBtn = document.createElement('div');
+        // removeBtn.setAttribute('id', rowIndex);
+        // removeBtn.className = 'seatChart-sc-remove';
+        // removeBtn.appendChild(icon);
 
-        removeBtn.addEventListener('click', removeRowEvent);
+        // removeBtn.addEventListener('click', removeRowEvent);
 
-        row.appendChild(removeBtn);
+        // row.appendChild(removeBtn);
+
+        icon.setAttribute('id', rowIndex);
+        icon.className = 'seatChart-sc-remove';
+        icon.addEventListener('click', removeRowEvent);
+
+        row.appendChild(icon);
 
         seatMapContainer.appendChild(row);
-
-        seatMap.rows++;
 
         if (seatMap.disabledCols) {
             for (var k = 0; k < seatMap.disabledCols.length; k += 1) {
@@ -1262,71 +1313,73 @@ function SeatchartJS(seatMap, seatTypes) { // eslint-disable-line no-unused-vars
             }
         }
 
+        seatMap.rows++;
+
         setSeat('disabled');
 
         return true;
     }
 
-    this.addColumn = function () {
+    // this.addColumn = function () {
 
-        if (seatMap.cols == 30) {
-            return false;
-        }
+    //     if (seatMap.cols == 30) {
+    //         return false;
+    //     }
 
-        for (var j = 0; j < seatMap.rows + 2; j += 1) {
-            var row = seatMapContainer.childNodes[j];
-            var id = row.getAttribute('id');
-            if (id !== 'undefined') {
-                var columnIndex = row.childNodes.length;
-                // row.appendChild(createSeat('available', id + columnIndex, j - 2 + '_' + (columnIndex - 1)));
-                row.insertBefore(createSeat('available', id + (columnIndex - 1), j - 2 + '_' + (columnIndex - 2)), row.childNodes[row.childNodes.length - 1]);
-            }
-        }
+    //     for (var j = 0; j < seatMap.rows + 2; j += 1) {
+    //         var row = seatMapContainer.childNodes[j];
+    //         var id = row.getAttribute('id');
+    //         if (id !== 'undefined') {
+    //             var columnIndex = row.childNodes.length;
+    //             // row.appendChild(createSeat('available', id + columnIndex, j - 2 + '_' + (columnIndex - 1)));
+    //             row.insertBefore(createSeat('available', id + (columnIndex - 1), j - 2 + '_' + (columnIndex - 2)), row.childNodes[row.childNodes.length - 1]);
+    //         }
+    //     }
 
-        seatMap.cols++;
+    //     seatMap.cols++;
 
-        if (seatMap.disabledRows) {
-            var index = 0;
-            for (var m = 0; m < seatMap.disabledRows.length; m += 1) {
-                var disabledRow = seatMap.disabledRows[m];
+    //     if (seatMap.disabledRows) {
+    //         var index = 0;
+    //         for (var m = 0; m < seatMap.disabledRows.length; m += 1) {
+    //             var disabledRow = seatMap.disabledRows[m];
 
-                // update existing 
-                for (; index < seatMap.disabled.length; index++) {
-                    if (index == seatMap.cols * (m + 1) - (m + 1)) {
-                        break;
-                    }
-                    seatMap.disabled[index] += disabledRow;
-                }
+    //             // update existing 
+    //             for (; index < seatMap.disabled.length; index++) {
+    //                 if (index == seatMap.cols * (m + 1) - (m + 1)) {
+    //                     break;
+    //                 }
+    //                 seatMap.disabled[index] += disabledRow;
+    //             }
 
-                // add new disabled seat
-                seatMap.disabled.push((seatMap.cols * disabledRow) + seatMap.cols - 1);
-            }
-        }
+    //             // add new disabled seat
+    //             seatMap.disabled.push((seatMap.cols * disabledRow) + seatMap.cols - 1);
+    //         }
+    //     }
 
-        setSeat('disabled');
+    //     setSeat('disabled');
 
-        var seat = document.getElementsByClassName('seatChart-seat')[0];
-        var width = seat.offsetWidth;
+    //     var seat = document.getElementsByClassName('seatChart-seat')[0];
+    //     var width = seat.offsetWidth;
 
-        var computedStyle = getStyle(seat);
-        var margins = parseInt(computedStyle.marginLeft, 10) +
-            parseInt(computedStyle.marginRight, 10);
+    //     var computedStyle = getStyle(seat);
+    //     var margins = parseInt(computedStyle.marginLeft, 10) +
+    //         parseInt(computedStyle.marginRight, 10);
 
-        // set seatmap width
-        // +1 because of the row indexer
-        seatMapContainer.style.width = '{0}px'.format(((width + margins) * (seatMap.cols + 2)) +
-            margins);
+    //     // set seatmap width
+    //     // +1 because of the row indexer
+    //     seatMapContainer.style.width = '{0}px'.format(((width + margins) * (seatMap.cols + 2)) +
+    //         margins);
 
-        //front header
-        var header = seatMapContainer.childNodes[0];
-        var front = header.childNodes[1];
-        front.style.width = '{0}px'.format(((width + margins) * seatMap.cols) - margins);
+    //     //front header
+    //     var header = seatMapContainer.childNodes[0];
+    //     var front = header.childNodes[1];
+    //     front.style.width = '{0}px'.format(((width + margins) * seatMap.cols) - margins);
 
-        // indexer
-        seatMapContainer.childNodes[1].appendChild(createSeat('index', seatMap.cols));
+    //     // indexer
+    //     seatMapContainer.childNodes[1].appendChild(createSeat('index', seatMap.cols));
 
-        return true;
-    }
+    //     return true;
+    // }
 
     /**
      * Creates the seatmap.
@@ -1349,17 +1402,23 @@ function SeatchartJS(seatMap, seatTypes) { // eslint-disable-line no-unused-vars
                 row.appendChild(createSeat('available', rowIndex + (j + 1), i + '_' + j));
             }
 
-            var icon = document.createElement('img');
-            icon.src = '{0}/icons/remove.svg'.format(self.assetsSrc);
+            if (userRole == 'ROLE_AIRCOMPANY_ADMIN' && !seatMap.disabledRows.includes(i)) {
 
-            var removeBtn = document.createElement('div');
-            removeBtn.setAttribute('id', rowIndex);
-            removeBtn.className = 'seatChart-sc-remove';
-            removeBtn.appendChild(icon);
+                var icon = document.createElement('img');
+                icon.src = '{0}/icons/remove.svg'.format(self.assetsSrc);
 
-            removeBtn.addEventListener('click', removeRowEvent);
+                // var removeBtn = document.createElement('div');
+                // removeBtn.setAttribute('id', rowIndex);
+                // removeBtn.className = 'seatChart-sc-remove';
+                // removeBtn.appendChild(icon);
 
-            row.appendChild(removeBtn);
+                icon.setAttribute('id', rowIndex);
+                icon.className = 'seatChart-sc-remove';
+                icon.addEventListener('click', removeRowEvent);
+
+                row.appendChild(icon);
+
+            }
 
             seatMapContainer.appendChild(row);
         }
@@ -1408,6 +1467,7 @@ function SeatchartJS(seatMap, seatTypes) { // eslint-disable-line no-unused-vars
         setSeat('reserved');
         setSeat('disabled');
         preselectSeats();
+        preselectOnDiscount();
     };
 
     /**
@@ -1476,26 +1536,40 @@ function SeatchartJS(seatMap, seatTypes) { // eslint-disable-line no-unused-vars
 
         var seatsListTitle = createSmallTitle('Seats:');
         var seatsList = createLegendList();
-        seatsList.appendChild(createLegendItem('Available', 'available'));
-        seatsList.appendChild(createLegendItem('Unavailable', 'unavailable'));
 
-        var yourSeatsListTitle = createSmallTitle('Your seat(s):');
-        var yourSeatsList = createLegendList();
-        for (var i = 0; i < seatTypes.length; i += 1) {
-            var description = '{0} {1}{2}'.format(
-                seatTypes[i].type.capitalizeFirstLetter(),
-                seatTypes[i].price,
-                self.currency
-            );
-            var item = createLegendItem(description, '', seatTypes[i].color);
-            yourSeatsList.appendChild(item);
+        if (userRole == 'ROLE_USER') {
+            seatsList.appendChild(createLegendItem('Available', 'available'));
+            seatsList.appendChild(createLegendItem('Unavailable', 'unavailable'));
+
+        } else if (userRole == 'ROLE_AIRCOMPANY_ADMIN') {
+            seatsList.appendChild(createLegendItem('Available', 'available'));
+            seatsList.appendChild(createLegendItem('Reserved', 'unavailable'));
+            seatsList.appendChild(createLegendItem('On Discount', '', seatTypes[0].color));
+        }
+
+        if (userRole == 'ROLE_USER') {
+
+            var yourSeatsListTitle = createSmallTitle('Your seat(s):');
+            var yourSeatsList = createLegendList();
+            for (var i = 0; i < seatTypes.length; i += 1) {
+                var description = '{0} {1}{2}'.format(
+                    seatTypes[i].type.capitalizeFirstLetter(),
+                    seatTypes[i].price,
+                    self.currency
+                );
+                var item = createLegendItem(description, '', seatTypes[i].color);
+                yourSeatsList.appendChild(item);
+            }
         }
 
         seatLegendContainer.appendChild(legendTitle);
         seatLegendContainer.appendChild(seatsListTitle);
         seatLegendContainer.appendChild(seatsList);
-        seatLegendContainer.appendChild(yourSeatsListTitle);
-        seatLegendContainer.appendChild(yourSeatsList);
+
+        if (userRole == 'ROLE_USER') {
+            seatLegendContainer.appendChild(yourSeatsListTitle);
+            seatLegendContainer.appendChild(yourSeatsList);
+        }
 
         var container = document.getElementById(containerId);
         container.appendChild(seatLegendContainer);

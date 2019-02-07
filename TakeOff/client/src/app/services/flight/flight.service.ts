@@ -16,7 +16,7 @@ export class FlightService {
     return this.http.get('/flights/' + id + '/destinations');
   }
 
-  setFlightDestinations(id, destinations) {
+  setFlightDestinations(id: number, destinations: any) {
     return this.http.put('/flights/' + id + '/destinations', destinations);
   }
 
@@ -24,11 +24,19 @@ export class FlightService {
     return this.http.get('/flights/' + id + '/tickets');
   }
 
-  addFlight(flight) {
+  updateFlightTickets(tickets: any) {
+    return this.http.put('/flights/tickets', tickets);
+  }
+
+  updateFlightDiagram(id: number, diagram: any) {
+    return this.http.put('/flights/' + id + '/diagram', diagram);
+  }
+
+  addFlight(flight: any) {
     return this.http.post('/flights', flight);
   }
 
-  updateFlight(flight) {
+  updateFlight(flight: any) {
     return this.http.put('/flights', flight);
   }
 }

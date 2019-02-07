@@ -45,7 +45,7 @@ public class Flight {
 	@JoinTable(name = "flight_destination", joinColumns = @JoinColumn(name = "flight_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "dest_id", referencedColumnName = "id"))
 	private Set<Location> transferDestinations = new HashSet<>();
 
-	@OneToMany(mappedBy = "flight", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "flight", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Ticket> tickets = new HashSet<>();
 
 	@Column(name = "ticketPrice", nullable = false)
@@ -126,6 +126,14 @@ public class Flight {
 
 	public void setTickets(List<Ticket> tickets) {
 		this.tickets = new HashSet<>(tickets);
+	}
+	
+	public void addTicket(Ticket ticket) {
+		this.tickets.add(ticket);
+	}
+	
+	public void removeTicket(Ticket ticket) {
+		this.tickets.remove(ticket);
 	}
 
 	public List<FlightRating> getFlightRatings() {
