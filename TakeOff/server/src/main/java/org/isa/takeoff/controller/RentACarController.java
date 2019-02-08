@@ -12,6 +12,7 @@ import org.isa.takeoff.dto.AvailableVehiclesDTO;
 import org.isa.takeoff.dto.OfficeDTO;
 import org.isa.takeoff.dto.RentACarDTO;
 import org.isa.takeoff.dto.RentACarMainServiceDTO;
+import org.isa.takeoff.dto.UserRatingRentACarDTO;
 import org.isa.takeoff.dto.RoomOnDiscountDTO;
 import org.isa.takeoff.dto.VehicleDTO;
 import org.isa.takeoff.dto.VehicleOnDiscountDTO;
@@ -22,6 +23,8 @@ import org.isa.takeoff.model.Office;
 import org.isa.takeoff.model.RentACar;
 import org.isa.takeoff.model.RentACarMainService;
 import org.isa.takeoff.model.RentACarRating;
+import org.isa.takeoff.model.RentACarRatingId;
+import org.isa.takeoff.model.User;
 import org.isa.takeoff.model.Vehicle;
 import org.isa.takeoff.model.VehiclePrice;
 import org.isa.takeoff.model.VehicleRating;
@@ -30,6 +33,7 @@ import org.isa.takeoff.service.LocationService;
 import org.isa.takeoff.service.OfficeService;
 import org.isa.takeoff.service.RentACarMainServiceService;
 import org.isa.takeoff.service.RentACarService;
+import org.isa.takeoff.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -61,6 +65,9 @@ public class RentACarController
 	
 	@Autowired
 	private ObjectMapper objectMapper;
+	
+	@Autowired
+	private UserService userService;
 	
 	@RequestMapping(method = GET, value = "/checkMainServiceName/{id}/{name}")
 	public ResponseEntity<?> checkMainServiceName(@PathVariable("id") Long id, @PathVariable("name") String name)
@@ -329,7 +336,6 @@ public class RentACarController
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		System.out.println(parameters);
 		if (parameters.getStartDate() == null || parameters.getEndDate() == null || parameters.getNumOfPassengers() == null)
 		{
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -710,6 +716,43 @@ public class RentACarController
 		catch (Exception e) 
 		{
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value="/rateRentACar", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> rateRentACar(@RequestBody UserRatingRentACarDTO userRatingRentACarDTO) 
+	{
+		if (userRatingRentACarDTO.getRentACar() == null || userRatingRentACarDTO.getRating() == null || userRatingRentACarDTO.getUsername() == null)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		User user = null;
+		try
+		{
+			user = this.userService.findByUsernameUser(userRatingRentACarDTO.getUsername());
+		}
+		catch(Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+		try
+		{
+			RentACar rentACar = this.rentACarService.findOne(userRatingRentACarDTO.getRentACar().getId());
+			RentACarRating rentACarRating = this.rentACarService.findOneRating(new RentACarRatingId(rentACar, user));
+			if (rentACarRating == null )
+			{				
+				rentACarRating = new RentACarRating();
+				rentACarRating.setId(new RentACarRatingId(rentACar, user));
+			}
+			rentACarRating.setRating(userRatingRentACarDTO.getRating());
+			this.rentACarService.saveRating(rentACarRating);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		catch(Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
 }

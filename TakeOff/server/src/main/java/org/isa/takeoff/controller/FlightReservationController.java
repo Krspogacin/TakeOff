@@ -178,13 +178,14 @@ public class FlightReservationController {
 					List<RoomRatingDTO> roomRatingDTOs = new ArrayList<>();
 					for (RoomReservationRooms room : fr.getReservation().getRoomReservation().getRooms()) {
 						RoomRating roomRating = this.roomService.findOneRating(new RoomRatingId(room.getRoom(), user));
+						RoomRatingDTO roomRatingDTO = new RoomRatingDTO();
+						roomRatingDTO.setRoom(new RoomDTO(room.getRoom()));
 						if (roomRating != null) {
-							RoomRatingDTO roomRatingDTO = new RoomRatingDTO();
-							roomRatingDTO.setRoom(new RoomDTO(room.getRoom()));
 							roomRatingDTO.setRating(roomRating.getRating());
-							roomRatingDTOs.add(roomRatingDTO);							
 						}
+						roomRatingDTOs.add(roomRatingDTO);							
 					}
+					roomReservationDTO.setRoomsAndRatings(roomRatingDTOs);
 					reservationDTO.setRoomReservation(roomReservationDTO);
 				}
 				
@@ -218,7 +219,6 @@ public class FlightReservationController {
 	@RequestMapping(value = "/vehicleReservations", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ReservationDTO> createVehicleReservation(@RequestBody VehicleReservationDTO vehicleReservationDTO) 
 	{	
-		System.out.println(vehicleReservationDTO);
 		if (vehicleReservationDTO.getReservationId() == null || vehicleReservationDTO.getReservationStartDate() == null ||
 			vehicleReservationDTO.getReservationEndDate() == null || vehicleReservationDTO.getTotalPrice() == null || vehicleReservationDTO.getVehicle() == null)
 		{

@@ -5,11 +5,16 @@ import java.util.List;
 
 import org.isa.takeoff.dto.RoomDTO;
 import org.isa.takeoff.dto.RoomPriceDTO;
+import org.isa.takeoff.dto.UserRatingRoomDTO;
 import org.isa.takeoff.model.Hotel;
 import org.isa.takeoff.model.Room;
 import org.isa.takeoff.model.RoomPrice;
+import org.isa.takeoff.model.RoomRating;
+import org.isa.takeoff.model.RoomRatingId;
+import org.isa.takeoff.model.User;
 import org.isa.takeoff.service.HotelService;
 import org.isa.takeoff.service.RoomService;
+import org.isa.takeoff.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,6 +34,9 @@ public class RoomController {
 	
 	@Autowired
 	private RoomService roomService;
+	
+	@Autowired
+	private UserService userService;
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE )
 	public ResponseEntity<RoomDTO> getRoom(@PathVariable Long id){
@@ -161,6 +169,43 @@ public class RoomController {
 		}catch (Exception e)
 		{
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value="/rateRoom", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> rateRoom(@RequestBody UserRatingRoomDTO userRatingRoomDTO) 
+	{
+		if (userRatingRoomDTO.getRoom() == null || userRatingRoomDTO.getRating() == null || userRatingRoomDTO.getUsername() == null)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		User user = null;
+		try
+		{
+			user = this.userService.findByUsernameUser(userRatingRoomDTO.getUsername());
+		}
+		catch(Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+		try
+		{
+			Room room = this.roomService.findOne(userRatingRoomDTO.getRoom().getId());
+			RoomRating roomRating = this.roomService.findOneRating(new RoomRatingId(room, user));
+			if (roomRating == null )
+			{				
+				roomRating = new RoomRating();
+				roomRating.setId(new RoomRatingId(room, user));
+			}
+			roomRating.setRating(userRatingRoomDTO.getRating());
+			this.roomService.saveRating(roomRating);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		catch(Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
 }

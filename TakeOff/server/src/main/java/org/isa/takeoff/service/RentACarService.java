@@ -54,4 +54,9 @@ public class RentACarService
 			return null;
 		}
 	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public RentACarRating saveRating(RentACarRating rentACarRating) {
+		return rentACarRatingRepository.save(rentACarRating);
+	}
 }

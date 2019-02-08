@@ -50,4 +50,9 @@ public class FlightService {
 			return null;
 		}
 	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public FlightRating saveRating(FlightRating flightRating) {
+		return flightRatingRepository.save(flightRating);
+	}
 }

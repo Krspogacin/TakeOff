@@ -14,8 +14,10 @@ import org.isa.takeoff.dto.RoomRatingDTO;
 import org.isa.takeoff.dto.RoomSearchDTO;
 import org.isa.takeoff.dto.ServiceDTO;
 import org.isa.takeoff.dto.ServiceHotelDTO;
+import org.isa.takeoff.dto.UserRatingHotelDTO;
 import org.isa.takeoff.model.Hotel;
 import org.isa.takeoff.model.HotelRating;
+import org.isa.takeoff.model.HotelRatingId;
 import org.isa.takeoff.model.Location;
 import org.isa.takeoff.model.Room;
 import org.isa.takeoff.model.RoomPrice;
@@ -23,9 +25,11 @@ import org.isa.takeoff.model.RoomRating;
 import org.isa.takeoff.model.RoomReservationRooms;
 import org.isa.takeoff.model.Service;
 import org.isa.takeoff.model.ServiceHotel;
+import org.isa.takeoff.model.User;
 import org.isa.takeoff.service.HotelService;
 import org.isa.takeoff.service.LocationService;
 import org.isa.takeoff.service.ServiceService;
+import org.isa.takeoff.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -54,6 +58,9 @@ public class HotelController {
 	
 	@Autowired 
 	private ObjectMapper objectMapper;
+	
+	@Autowired
+	private UserService userService;
 
 	@RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<HotelDTO>> getHotels() {
@@ -496,6 +503,43 @@ public class HotelController {
 		catch (Exception e) 
 		{
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value="/rateHotel", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> rateHotel(@RequestBody UserRatingHotelDTO userRatingHotelDTO) 
+	{
+		if (userRatingHotelDTO.getHotel() == null || userRatingHotelDTO.getRating() == null || userRatingHotelDTO.getUsername() == null)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		User user = null;
+		try
+		{
+			user = this.userService.findByUsernameUser(userRatingHotelDTO.getUsername());
+		}
+		catch(Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+		try
+		{
+			Hotel hotel = this.hotelService.findOne(userRatingHotelDTO.getHotel().getId());
+			HotelRating hotelRating = this.hotelService.findOneRating(new HotelRatingId(hotel, user));
+			if (hotelRating == null )
+			{				
+				hotelRating = new HotelRating();
+				hotelRating.setId(new HotelRatingId(hotel, user));
+			}
+			hotelRating.setRating(userRatingHotelDTO.getRating());
+			this.hotelService.saveRating(hotelRating);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		catch(Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
 }

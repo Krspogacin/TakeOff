@@ -64,4 +64,9 @@ public class VehicleService
 			return null;
 		}
 	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public VehicleRating saveRating(VehicleRating vehicleRating) {
+		return vehicleRatingRepository.save(vehicleRating);
+	}
 }

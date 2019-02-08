@@ -4,16 +4,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.isa.takeoff.dto.UserRatingVehicleDTO;
 import org.isa.takeoff.dto.VehicleDTO;
 import org.isa.takeoff.dto.VehiclePriceDTO;
 import org.isa.takeoff.model.FuelType;
 import org.isa.takeoff.model.RentACar;
 import org.isa.takeoff.model.RentACarMainService;
 import org.isa.takeoff.model.TransmissionType;
+import org.isa.takeoff.model.User;
 import org.isa.takeoff.model.Vehicle;
 import org.isa.takeoff.model.VehiclePrice;
+import org.isa.takeoff.model.VehicleRating;
+import org.isa.takeoff.model.VehicleRatingId;
 import org.isa.takeoff.service.RentACarMainServiceService;
 import org.isa.takeoff.service.RentACarService;
+import org.isa.takeoff.service.UserService;
 import org.isa.takeoff.service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,6 +42,9 @@ public class VehicleController
 	
 	@Autowired
 	private RentACarMainServiceService rentACarMainServiceService;
+	
+	@Autowired
+	private UserService userService;
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<VehicleDTO> getVehicle(@PathVariable Long id) 
@@ -183,5 +191,42 @@ public class VehicleController
 	public ResponseEntity<List<TransmissionType>> getTransmissionTypes() 
 	{
 		return new ResponseEntity<>(Arrays.asList(TransmissionType.values()), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/rateVehicle", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> rateVehicle(@RequestBody UserRatingVehicleDTO userRatingVehicleDTO) 
+	{
+		if (userRatingVehicleDTO.getVehicle() == null || userRatingVehicleDTO.getRating() == null || userRatingVehicleDTO.getUsername() == null)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		User user = null;
+		try
+		{
+			user = this.userService.findByUsernameUser(userRatingVehicleDTO.getUsername());
+		}
+		catch(Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+		try
+		{
+			Vehicle vehicle = this.vehicleService.findOne(userRatingVehicleDTO.getVehicle().getId());
+			VehicleRating vehicleRating = this.vehicleService.findOneRating(new VehicleRatingId(vehicle, user));
+			if (vehicleRating == null )
+			{				
+				vehicleRating = new VehicleRating();
+				vehicleRating.setId(new VehicleRatingId(vehicle, user));
+			}
+			vehicleRating.setRating(userRatingVehicleDTO.getRating());
+			this.vehicleService.saveRating(vehicleRating);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		catch(Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 }

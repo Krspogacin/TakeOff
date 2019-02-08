@@ -9,15 +9,19 @@ import org.isa.takeoff.dto.FlightDTO;
 import org.isa.takeoff.dto.FlightDiagramDTO;
 import org.isa.takeoff.dto.LocationDTO;
 import org.isa.takeoff.dto.TicketDTO;
+import org.isa.takeoff.dto.UserRatingFlightDTO;
 import org.isa.takeoff.model.AirCompany;
 import org.isa.takeoff.model.Flight;
 import org.isa.takeoff.model.FlightDiagram;
 import org.isa.takeoff.model.FlightRating;
+import org.isa.takeoff.model.FlightRatingId;
 import org.isa.takeoff.model.Location;
 import org.isa.takeoff.model.Ticket;
+import org.isa.takeoff.model.User;
 import org.isa.takeoff.service.AirCompanyService;
 import org.isa.takeoff.service.FlightService;
 import org.isa.takeoff.service.LocationService;
+import org.isa.takeoff.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -41,6 +45,9 @@ public class FlightController {
 	@Autowired
 	private LocationService locationService;
 
+	@Autowired
+	private UserService userService;
+	
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<FlightDTO> getFlight(@PathVariable Long id) {
 
@@ -294,5 +301,41 @@ public class FlightController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
-
+	
+	@RequestMapping(value="/rateFlight", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> rateFlight(@RequestBody UserRatingFlightDTO userRatingFlightDTO) 
+	{
+		if (userRatingFlightDTO.getFlight() == null || userRatingFlightDTO.getRating() == null || userRatingFlightDTO.getUsername() == null)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		User user = null;
+		try
+		{
+			user = this.userService.findByUsernameUser(userRatingFlightDTO.getUsername());
+		}
+		catch(Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+		try
+		{
+			Flight flight = this.flightService.findOne(userRatingFlightDTO.getFlight().getId());
+			FlightRating flightRating = this.flightService.findOneRating(new FlightRatingId(flight, user));
+			if (flightRating == null )
+			{				
+				flightRating = new FlightRating();
+				flightRating.setId(new FlightRatingId(flight, user));
+			}
+			flightRating.setRating(userRatingFlightDTO.getRating());
+			this.flightService.saveRating(flightRating);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		catch(Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
 }
