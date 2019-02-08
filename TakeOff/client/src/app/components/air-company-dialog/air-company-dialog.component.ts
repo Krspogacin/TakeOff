@@ -21,9 +21,6 @@ export class AirCompanyDialogComponent implements OnInit {
   location: any = {};
   destinations = [];
 
-  // @ViewChild('destInput') destInput: ElementRef<HTMLInputElement>;
-  // @ViewChild('auto') matAutocomplete: MatAutocomplete;
-
   constructor(private dialogRef: MatDialogRef<AirCompanyDialogComponent>,
     private formBuilder: FormBuilder, @Inject(MAT_DIALOG_DATA) private data: any) { }
 
@@ -95,12 +92,6 @@ export class AirCompanyDialogComponent implements OnInit {
 
   }
 
-  // filterDestinations(value: string): Destination[] {
-  //   const filterValue = value.toLowerCase();
-  //   return this.allDestinations.filter(dest => dest.city.toLowerCase().indexOf(filterValue) === 0 ||
-  //     dest.country.toLowerCase().indexOf(filterValue) === 0);
-  // }
-
   removeDestination(destination): void {
     const index = this.destinations.indexOf(destination);
 
@@ -108,24 +99,6 @@ export class AirCompanyDialogComponent implements OnInit {
       this.destinations.splice(index, 1);
     }
   }
-
-  // selectDestination(event: MatAutocompleteSelectedEvent): void {
-  //   const destination = event.option.value;
-  //   this.destInput.nativeElement.value = '';
-  //   this.companyUpdateForm.controls.destinations.setValue('');
-
-  //   let index = -1;
-  //   for (let i = 0; i < this.destinations.length; i++) {
-  //     if (destination.id === this.destinations[i].id) {
-  //       index = i;
-  //       break;
-  //     }
-  //   }
-
-  //   if (index < 0) {
-  //     this.destinations.push(destination);
-  //   }
-  // }
 
   submitForm() {
     const company = this.companyUpdateForm.value;

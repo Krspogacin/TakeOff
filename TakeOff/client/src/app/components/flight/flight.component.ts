@@ -37,7 +37,7 @@ export class FlightComponent implements OnInit {
     onDiscount: []
   };
   types = [
-    { type: 'first_class', color: 'orange', price: 10, selected: [] },
+    { type: 'first-class', color: 'orange', price: 10, selected: [] },
     { type: 'business', color: '#af0000', price: 7.5, selected: [] },
     { type: 'regular', color: 'red', price: 7, selected: [] }
   ];
@@ -58,9 +58,15 @@ export class FlightComponent implements OnInit {
           this.map.disabledRows = this.flight.diagram.disabledRows;
           this.map.disabledCols = this.flight.diagram.disabledCols;
 
+          this.types[0].price = this.flight.ticketPrice * 2;
+          this.types[1].price = this.flight.ticketPrice * 1.5;
+          this.types[2].price = this.flight.ticketPrice;
+
           this.flightExists = true;
           this.loadingFlight = false;
           this.userRole = this.authService.getAuthority();
+
+          this.flight.distance = this.appComponent.calculateDistance(this.flight);
 
           this.flightService.getFlightTickets(id).subscribe(
             (tickets: []) => {
@@ -204,7 +210,7 @@ export class FlightComponent implements OnInit {
         const cart = this.sc.getShoppingCart();
         const reservations = [];
         let friendIndex = 0;
-        const reservationDTO = {'roomReservation': data.roomReservation, 'vehicleReservation': data.vehicleReservation};
+        const reservationDTO = { 'roomReservation': data.roomReservation, 'vehicleReservation': data.vehicleReservation };
         for (const key of Object.keys(cart)) {
           for (const n of cart[key]) {
             const ticket = this.tickets.find(t => {
@@ -213,7 +219,7 @@ export class FlightComponent implements OnInit {
             ticket['reserved'] = true; // optional
             ticket['type'] = key; // seat class
             const user = data.friends[friendIndex];
-            reservations.push({ 'user': user, 'ticket': ticket, 'reservationDTO': reservationDTO});
+            reservations.push({ 'user': user, 'ticket': ticket, 'reservationDTO': reservationDTO });
             friendIndex++;
           }
         }

@@ -14,7 +14,8 @@
     <p><b>To:</b> {{flight.landingLocation.city}} </p>
     <p><b>Take off date:</b> {{flight.takeOffDate | date:'short'}} </p>
     <p><b>Landing date:</b> {{flight.landingDate | date:'short'}} </p>
-    <p><b>Distance:</b> calculating... </p>
+    <p><b>Distance:</b> {{flight.distance | ratingRound}} km</p>
+    <p><b>Stops:</b> {{destinations.length}}</p>
     <p><b>Ticket price:</b> {{flight.ticketPrice | currency}} </p>
     <div *ngIf="destinations.length > 0">
       <h3>Transfer destinations:</h3>

@@ -15,7 +15,8 @@ export class FriendsFilterPipe implements PipeTransform {
       return [];
     }
 
-    return users.filter((element: any) => (element.firstName + ' ' + element.lastName).toLowerCase().indexOf(searchValue) === 0);
+    return users.filter((element: any) => (element.firstName + ' ' + element.lastName).toLowerCase().indexOf(searchValue) === 0
+    || element.firstName.toLowerCase().indexOf(searchValue) === 0 || element.lastName.toLowerCase().indexOf(searchValue) === 0);
   }
 
 }

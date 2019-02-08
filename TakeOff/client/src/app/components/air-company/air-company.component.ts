@@ -81,6 +81,8 @@ export class AirCompanyComponent implements OnInit {
               }
             );
 
+            flight.distance = this.appComponent.calculateDistance(flight);
+
             // get tickets on discount for fast reservation
             this.flightService.getFlightTickets(flight.id).subscribe(
               (tickets: []) => {

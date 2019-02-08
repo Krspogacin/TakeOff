@@ -79,11 +79,11 @@
                         <h5 class="mb-1">
                             <mat-icon>flight_takeoff</mat-icon>
                             <span style="margin-left: 10px">
-                                {{flight.takeOffLocation.city}}
+                                {{flight.takeOffLocation.city}}, {{flight.takeOffLocation.country}}
                             </span>
                             <mat-icon style="margin-left: 100px">flight_land</mat-icon>
                             <span style="margin-left: 10px">
-                                {{flight.landingLocation.city}}
+                                {{flight.landingLocation.city}}, {{flight.takeOffLocation.country}}
                             </span>
                         </h5>
                         <small>from {{flight.ticketPrice | currency}}</small>
@@ -92,6 +92,12 @@
                         <span style="margin-left: 10px">{{flight.takeOffDate | date:'short'}}</span>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         <span style="margin-left: 110px">{{flight.landingDate | date:'short'}}</span>
+                        <span style="float: right; margin-right: 10px;">
+                            {{flight.distance | ratingRound}} km
+                            <span *ngIf="flight.destinations && flight.destinations.length > 0">
+                                {{flight.destinations.length}} stops
+                            </span>
+                        </span>
                     </small>
                 </a>
             </ul>

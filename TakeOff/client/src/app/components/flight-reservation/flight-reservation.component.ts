@@ -95,8 +95,8 @@ export class FlightReservationComponent implements OnInit {
       this.passengerForm = new FormGroup(this.formObject);
     }
     this.roomForm = this.formBuilder.group({
-      startDate: ['',Validators.required],
-      numberOfDays: ['',[Validators.required,Validators.min(1)]]
+      startDate: ['', Validators.required],
+      numberOfDays: ['', [Validators.required, Validators.min(1)]]
     });
 
     this.vehicleForm = this.formBuilder.group({
@@ -148,37 +148,37 @@ export class FlightReservationComponent implements OnInit {
       }
     }
 
-    if(this.choosenItem){
+    if (this.choosenItem) {
       this.complexObject2.roomsAndRatings = [];
-      this.complexObject2.roomsAndRatings.push({'room':this.choosenItem.room});
-      this.complexObject2.totalPrice = this.choosenItem.totalPrice*(100-this.choosenItem.room.discount)/100;
+      this.complexObject2.roomsAndRatings.push({ 'room': this.choosenItem.room });
+      this.complexObject2.totalPrice = this.choosenItem.totalPrice * (100 - this.choosenItem.room.discount) / 100;
       const startDate = this.roomForm.get('startDate').value;
       this.complexObject2.reservationStartDate = new Date(Date.UTC(startDate.getFullYear(),
-                                                                   startDate.getMonth(),
-                                                                   startDate.getDate()));
+        startDate.getMonth(),
+        startDate.getDate()));
       const endDate = new Date(this.choosenItem.endingDate);
       this.complexObject2.reservationEndDate = new Date(Date.UTC(endDate.getFullYear(),
-                                                                 endDate.getMonth(),
-                                                                 endDate.getDate()));
+        endDate.getMonth(),
+        endDate.getDate()));
     }
-    if(this.choosenItem2){
+    if (this.choosenItem2) {
       this.complexObject2Vehicle.vehicle = this.choosenItem2.vehicle;
-      this.complexObject2Vehicle.totalPrice = this.choosenItem2.totalPrice*(100-this.choosenItem2.vehicle.discount)/100;
+      this.complexObject2Vehicle.totalPrice = this.choosenItem2.totalPrice * (100 - this.choosenItem2.vehicle.discount) / 100;
       const startDate = this.vehicleForm.get('startDate').value;
       this.complexObject2Vehicle.reservationStartDate = new Date(Date.UTC(startDate.getFullYear(),
-                                                                          startDate.getMonth(),
-                                                                          startDate.getDate()));
+        startDate.getMonth(),
+        startDate.getDate()));
       const endDate = this.vehicleForm.get('endDate').value;
       this.complexObject2Vehicle.reservationEndDate = new Date(Date.UTC(endDate.getFullYear(),
-                                                                        endDate.getMonth(),
-                                                                        endDate.getDate()));
+        endDate.getMonth(),
+        endDate.getDate()));
     }
-    const data = {'roomReservation': this.complexObject2, 'vehicleReservation':this.complexObject2Vehicle, 'friends':friends};
+    const data = { 'roomReservation': this.complexObject2, 'vehicleReservation': this.complexObject2Vehicle, 'friends': friends };
     this.dialogRef.close(data);
 
   }
 
-  searchRooms(){
+  searchRooms() {
     this.complexObject.checkIn = this.roomForm.get('startDate').value;
     this.complexObject.numberOfDays = this.roomForm.get('numberOfDays').value;
     this.complexObject.location = this.data.landingLocation;
@@ -186,10 +186,10 @@ export class FlightReservationComponent implements OnInit {
       (data) => {
         this.rooms = data;
       }
-    )
+    );
   }
 
-  searchVehicles(){
+  searchVehicles() {
     this.complexObjectVehicle.startDate = this.vehicleForm.get('startDate').value;
     this.complexObjectVehicle.endDate = this.vehicleForm.get('endDate').value;
     this.complexObjectVehicle.location = this.data.landingLocation;
@@ -197,7 +197,7 @@ export class FlightReservationComponent implements OnInit {
       (data) => {
         this.vehicles = data;
       }
-    )
+    );
   }
 
 }
