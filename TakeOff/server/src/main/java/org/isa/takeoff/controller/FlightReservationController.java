@@ -141,7 +141,7 @@ public class FlightReservationController {
 			return new ResponseEntity<>(reservationsDTO, HttpStatus.OK);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);

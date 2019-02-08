@@ -13,6 +13,7 @@ import org.isa.takeoff.dto.OfficeDTO;
 import org.isa.takeoff.dto.RentACarDTO;
 import org.isa.takeoff.dto.RentACarMainServiceDTO;
 import org.isa.takeoff.dto.UserRatingRentACarDTO;
+import org.isa.takeoff.dto.RoomOnDiscountDTO;
 import org.isa.takeoff.dto.VehicleDTO;
 import org.isa.takeoff.dto.VehicleOnDiscountDTO;
 import org.isa.takeoff.dto.VehiclePriceDTO;
