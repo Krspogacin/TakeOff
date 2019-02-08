@@ -1,12 +1,15 @@
+import { AmChart, AmChartsService } from '@amcharts/amcharts3-angular';
 import { Component, OnInit } from '@angular/core';
-import { MatDialog, MatSnackBar } from '@angular/material';
+import { MatDialog } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
+import { AppComponent } from 'src/app/app.component';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { FlightService } from 'src/app/services/flight/flight.service';
 import { ReservationService } from 'src/app/services/reservation/reservation.service';
 import { FlightDialogComponent } from '../flight-dialog/flight-dialog.component';
 import { FlightReservationComponent } from '../flight-reservation/flight-reservation.component';
-import { AppComponent } from 'src/app/app.component';
+
+
 
 declare const SeatchartJS: any;
 
@@ -17,6 +20,8 @@ declare const SeatchartJS: any;
 })
 export class FlightComponent implements OnInit {
 
+  private chart: AmChart;
+
   flightExists = false;
   loadingFlight = true;
   loadingDestinations = true;
@@ -24,6 +29,7 @@ export class FlightComponent implements OnInit {
   userRole: any;
   message: string;
   flight: any;
+  rating: number;
   destinations = [];
   tickets = [];
   map = {
@@ -45,7 +51,9 @@ export class FlightComponent implements OnInit {
 
   constructor(private flightService: FlightService, private route: ActivatedRoute,
     private authService: AuthenticationService, private dialog: MatDialog,
-    private reservationService: ReservationService, private appComponent: AppComponent) { }
+    private reservationService: ReservationService, private appComponent: AppComponent,
+    private AmCharts: AmChartsService) { }
+
 
   ngOnInit() {
     const id = parseInt(this.route.snapshot.paramMap.get('id'), 10);
@@ -92,6 +100,12 @@ export class FlightComponent implements OnInit {
             }
           );
 
+          this.flightService.getFlightRating(id).subscribe(
+            (rating: number) => {
+              this.rating = rating;
+            }
+          );
+
           // this.createFlyingMap();
         },
         error => {
@@ -107,6 +121,7 @@ export class FlightComponent implements OnInit {
           this.loadingDestinations = false;
         }
       );
+
     } else {
 
     }
@@ -207,34 +222,36 @@ export class FlightComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(
       (data) => {
-        const cart = this.sc.getShoppingCart();
-        const reservations = [];
-        let friendIndex = 0;
-        const reservationDTO = { 'roomReservation': data.roomReservation, 'vehicleReservation': data.vehicleReservation };
-        for (const key of Object.keys(cart)) {
-          for (const n of cart[key]) {
-            const ticket = this.tickets.find(t => {
-              return t.number === n;
-            });
-            ticket['reserved'] = true; // optional
-            ticket['type'] = key; // seat class
-            const user = data.friends[friendIndex];
-            reservations.push({ 'user': user, 'ticket': ticket, 'reservationDTO': reservationDTO });
-            friendIndex++;
+        if (data) {
+          const cart = this.sc.getShoppingCart();
+          const reservations = [];
+          let friendIndex = 0;
+          const reservationDTO = { 'roomReservation': data.roomReservation, 'vehicleReservation': data.vehicleReservation };
+          for (const key of Object.keys(cart)) {
+            for (const n of cart[key]) {
+              const ticket = this.tickets.find(t => {
+                return t.number === n;
+              });
+              ticket['reserved'] = true; // optional
+              ticket['type'] = key; // seat class
+              const user = data.friends[friendIndex];
+              reservations.push({ 'user': user, 'ticket': ticket, 'reservationDTO': reservationDTO });
+              friendIndex++;
+            }
           }
-        }
 
-        this.reservationService.createReservations(reservations).subscribe(
-          () => {
-            this.appComponent.showSnackBar('Reservation successful!');
-          },
-          () => {
-            this.appComponent.showSnackBar('Reservation failed. Please try again.');
-          },
-          () => {
-            setTimeout(function () { location.reload(); }, 3000);
-          }
-        );
+          this.reservationService.createReservations(reservations).subscribe(
+            () => {
+              this.appComponent.showSnackBar('Reservation successful!');
+            },
+            () => {
+              this.appComponent.showSnackBar('Reservation failed. Please try again.');
+            },
+            () => {
+              setTimeout(function () { location.reload(); }, 3000);
+            }
+          );
+        }
       }
     );
   }

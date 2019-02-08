@@ -8,7 +8,8 @@
     <div *ngIf="!loading">
       <mat-list *ngIf="allUsers.length > 0">
         <mat-list-item *ngFor="let user of allUsers | friendsFilter : searchValue;">
-          <img matListAvatar src="{{user.image}}" alt="">
+          <img matListAvatar src="{{user.image}}" alt="" *ngIf="user.image">
+          <img matListAvatar src="/assets/images/avatar.jpg" alt="" *ngIf="!user.image">
           <h3 matLine> {{user.firstName}} {{user.lastName}}</h3>
           <button mat-button color="primary" matTooltip="Send request" (click)="sendFriendRequest(user)" *ngIf="!addedFriends.includes(user)">
             <mat-icon>person_add</mat-icon>

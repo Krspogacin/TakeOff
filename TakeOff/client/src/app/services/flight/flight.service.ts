@@ -39,4 +39,8 @@ export class FlightService {
   updateFlight(flight: any) {
     return this.http.put('/flights', flight);
   }
+
+  getFlightRating(id: number) {
+    return this.http.get('/flights/' + id + '/rating');
+  }
 }

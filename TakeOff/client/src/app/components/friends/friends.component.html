@@ -13,7 +13,8 @@
             <div class="card-header">
               <h4 class="card-title text-center">{{element.firstName}} {{element.lastName}}</h4>
             </div>
-            <img src="{{element.image}}" class="card-img-top" alt="Profile image">
+            <img src="{{element.image}}" class="card-img-top" alt="Profile image" *ngIf="element.image">
+            <img src="/assets/images/avatar.jpg" class="card-img-top" alt="Profile image" *ngIf="!element.image">
             <div class="card-body">
               <p class="card-text">
                 <b>About me</b><br>
@@ -42,7 +43,8 @@
             <div class="card-header">
               <h4 class="card-title text-center">{{element.firstName}} {{element.lastName}}</h4>
             </div>
-            <img src="{{element.image}}" class="card-img-top" alt="...">
+            <img src="{{element.image}}" class="card-img-top" alt="..." *ngIf="element.image">
+            <img src="/assets/images/avatar.jpg" class="card-img-top" alt="" *ngIf="!element.image">
             <div class="card-body">
               <p class="card-text">
                 <b>About me</b><br>
@@ -71,7 +73,8 @@
             <div class="card-header">
               <h4 class="card-title text-center">{{element.firstName}} {{element.lastName}}</h4>
             </div>
-            <img src="{{element.image}}" class="card-img-top" alt="Profile image">
+            <img src="{{element.image}}" class="card-img-top" alt="Profile image" *ngIf="element.image">
+            <img src="/assets/images/avatar.jpg" class="card-img-top" alt="Profile image" *ngIf="!element.image">
             <div class="card-body">
               <p class="card-text">
                 <b>About me</b><br>
