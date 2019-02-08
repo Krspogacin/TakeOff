@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,6 +79,7 @@ public class AirCompanyController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_SYS_ADMIN')")
 	public ResponseEntity<AirCompanyDTO> addCompany(@RequestBody AirCompanyDTO companyDTO) {
 
 		AirCompany company = new AirCompany(companyDTO.getName(), companyDTO.getDescription());
@@ -97,6 +99,7 @@ public class AirCompanyController {
 	}
 
 	@RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_AIRCOMPANY_ADMIN')")
 	public ResponseEntity<AirCompanyDTO> updateCompany(@RequestBody AirCompanyDTO companyDTO) {
 
 		try {
@@ -164,6 +167,7 @@ public class AirCompanyController {
 	}
 
 	@RequestMapping(value = "/{id}/destinations", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_AIRCOMPANY_ADMIN')")
 	public ResponseEntity<List<LocationDTO>> setCompanyDestinations(@PathVariable Long id,
 			@RequestBody List<LocationDTO> destinationsDTO) {
 
@@ -316,6 +320,7 @@ public class AirCompanyController {
 	}
 	
 	@RequestMapping(value="/rateAirCompany", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<?> rateCompany(@RequestBody UserRatingAirCompanyDTO userRatingAirCompanyDTO) 
 	{
 		if (userRatingAirCompanyDTO.getAirCompany() == null || userRatingAirCompanyDTO.getRating() == null || userRatingAirCompanyDTO.getUsername() == null)

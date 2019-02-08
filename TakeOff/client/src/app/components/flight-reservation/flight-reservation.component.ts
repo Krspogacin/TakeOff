@@ -148,6 +148,8 @@ export class FlightReservationComponent implements OnInit {
       }
     }
 
+    let room = null;
+    let vehicle = null;
     if (this.choosenItem) {
       this.complexObject2.roomsAndRatings = [];
       this.complexObject2.roomsAndRatings.push({ 'room': this.choosenItem.room });
@@ -160,6 +162,7 @@ export class FlightReservationComponent implements OnInit {
       this.complexObject2.reservationEndDate = new Date(Date.UTC(endDate.getFullYear(),
         endDate.getMonth(),
         endDate.getDate()));
+      room = this.complexObject2;
     }
     if (this.choosenItem2) {
       this.complexObject2Vehicle.vehicle = this.choosenItem2.vehicle;
@@ -172,8 +175,9 @@ export class FlightReservationComponent implements OnInit {
       this.complexObject2Vehicle.reservationEndDate = new Date(Date.UTC(endDate.getFullYear(),
         endDate.getMonth(),
         endDate.getDate()));
+      vehicle = this.complexObject2Vehicle;
     }
-    const data = { 'roomReservation': this.complexObject2, 'vehicleReservation': this.complexObject2Vehicle, 'friends': friends };
+    const data = { 'roomReservation': room, 'vehicleReservation': vehicle, 'friends': friends };
     this.dialogRef.close(data);
 
   }

@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,6 +51,7 @@ public class RoomController {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_HOTEL_ADMIN')")
 	public ResponseEntity<RoomDTO> addRoom(@RequestBody RoomDTO roomDTO) 
 	{
 		if (roomDTO.getHotel() == null)
@@ -73,6 +75,7 @@ public class RoomController {
 	}
 	
 	@RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_HOTEL_ADMIN')")
 	public ResponseEntity<RoomDTO> updateRoom(@RequestBody RoomDTO roomDTO) 
 	{
 		try 
@@ -97,6 +100,7 @@ public class RoomController {
 	}
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasRole('ROLE_HOTEL_ADMIN')")
 	public ResponseEntity<?> deleteRoom(@PathVariable Long id) 
 	{
 		try 
@@ -124,6 +128,7 @@ public class RoomController {
 	}
 	
 	@RequestMapping(value = "/addRoomPrice", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_HOTEL_ADMIN')")
 	public ResponseEntity<List<RoomPriceDTO>> addRoomPrice(@RequestBody List<RoomPriceDTO> roomPricesDTO){
 		for(RoomPriceDTO roomPriceDTO: roomPricesDTO){
 			if (roomPriceDTO.getRoom() == null)
@@ -153,6 +158,7 @@ public class RoomController {
 	}
 	
 	@RequestMapping(value = "/updateRoomPrices", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_HOTEL_ADMIN')")
 	public ResponseEntity<List<RoomPriceDTO>> updateRoomPrices(@RequestBody List<RoomPriceDTO> roomPrices){
 		try 
 		{
@@ -173,6 +179,7 @@ public class RoomController {
 	}
 	
 	@RequestMapping(value="/rateRoom", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<?> rateRoom(@RequestBody UserRatingRoomDTO userRatingRoomDTO) 
 	{
 		if (userRatingRoomDTO.getRoom() == null || userRatingRoomDTO.getRating() == null || userRatingRoomDTO.getUsername() == null)

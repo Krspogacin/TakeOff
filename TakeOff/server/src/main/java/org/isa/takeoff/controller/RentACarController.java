@@ -3,17 +3,19 @@ package org.isa.takeoff.controller;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.Month;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.isa.takeoff.dto.AvailableVehiclesDTO;
+import org.isa.takeoff.dto.ChartDataDTO;
 import org.isa.takeoff.dto.OfficeDTO;
 import org.isa.takeoff.dto.RentACarDTO;
 import org.isa.takeoff.dto.RentACarMainServiceDTO;
 import org.isa.takeoff.dto.UserRatingRentACarDTO;
-import org.isa.takeoff.dto.RoomOnDiscountDTO;
 import org.isa.takeoff.dto.VehicleDTO;
 import org.isa.takeoff.dto.VehicleOnDiscountDTO;
 import org.isa.takeoff.dto.VehiclePriceDTO;
@@ -34,6 +36,7 @@ import org.isa.takeoff.service.OfficeService;
 import org.isa.takeoff.service.RentACarMainServiceService;
 import org.isa.takeoff.service.RentACarService;
 import org.isa.takeoff.service.UserService;
+import org.isa.takeoff.service.VehicleReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -68,6 +71,9 @@ public class RentACarController
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private VehicleReservationService vehicleReservationService;  
 	
 	@RequestMapping(method = GET, value = "/checkMainServiceName/{id}/{name}")
 	public ResponseEntity<?> checkMainServiceName(@PathVariable("id") Long id, @PathVariable("name") String name)
@@ -753,6 +759,39 @@ public class RentACarController
 		catch(Exception e)
 		{
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/{id}/getRentACarChartData", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<ChartDataDTO>> getRentACarChartData(@PathVariable Long id) 
+	{
+		try 
+		{
+			RentACar rentACar = rentACarService.findOne(id);
+			List<Vehicle> vehicles = rentACar.getVehicles();
+
+			LocalDate date = LocalDate.of(2019, Month.JANUARY, 1);
+			LocalDate endDate = LocalDate.of(2019, Month.APRIL, 1);
+			
+			List<ChartDataDTO> chartData = new ArrayList<>();
+			while (date.isBefore(endDate))
+			{
+				int numOfReservations = 0;
+				for (Vehicle vehicle : vehicles)
+				{
+					numOfReservations += vehicleReservationService.findAllByDate(vehicle.getId(), date).size();					
+				}
+				ChartDataDTO rentACarChartDataDTO = new ChartDataDTO(date, numOfReservations);  
+				chartData.add(rentACarChartDataDTO);
+				date = date.plusDays(1);
+			}
+			
+			return new ResponseEntity<>(chartData, HttpStatus.OK);
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 }

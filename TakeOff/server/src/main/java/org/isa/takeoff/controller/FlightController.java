@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,6 +64,7 @@ public class FlightController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_AIRCOMPANY_ADMIN')")
 	public ResponseEntity<FlightDTO> addFlight(@RequestBody FlightDTO flightDTO) {
 
 		if (flightDTO.getCompany() == null) {
@@ -121,6 +123,7 @@ public class FlightController {
 	}
 
 	@RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_AIRCOMPANY_ADMIN')")
 	public ResponseEntity<FlightDTO> updateFlight(@RequestBody FlightDTO flightDTO) {
 
 		try {
@@ -158,6 +161,7 @@ public class FlightController {
 	}
 
 	@RequestMapping(value = "/{id}/destinations", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_AIRCOMPANY_ADMIN')")
 	public ResponseEntity<List<LocationDTO>> setFlightDestinations(@PathVariable Long id,
 			@RequestBody List<LocationDTO> destinationsDTO) {
 
@@ -209,6 +213,7 @@ public class FlightController {
 	}
 
 	@RequestMapping(value = "/tickets", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_AIRCOMPANY_ADMIN')")
 	public ResponseEntity<List<TicketDTO>> updateFlightTickets(@RequestBody List<TicketDTO> ticketsDTO) {
 
 		try {
@@ -255,6 +260,7 @@ public class FlightController {
 	}
 
 	@RequestMapping(value = "/{id}/diagram", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_AIRCOMPANY_ADMIN')")
 	public ResponseEntity<FlightDiagramDTO> updateFlightDiagram(@PathVariable Long id,
 			@RequestBody FlightDiagramDTO diagramDTO) {
 
@@ -267,12 +273,10 @@ public class FlightController {
 			// delete old tickets if they are in disabled rows
 			for (Ticket t : oldTickets) {
 				int number = (int) Math.floor(t.getNumber() / diagramDTO.getCols());
-				System.out.println("floor: " +number);
 				if (diagramDTO.getDisabledRows().contains(number)) {
 					if (t.getIsReserved()) {
 						return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 					}
-					System.out.println("***number: " + t.getNumber());
 					flight.removeTicket(t);
 				}
 			}
@@ -303,6 +307,7 @@ public class FlightController {
 	}
 	
 	@RequestMapping(value="/rateFlight", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<?> rateFlight(@RequestBody UserRatingFlightDTO userRatingFlightDTO) 
 	{
 		if (userRatingFlightDTO.getFlight() == null || userRatingFlightDTO.getRating() == null || userRatingFlightDTO.getUsername() == null)

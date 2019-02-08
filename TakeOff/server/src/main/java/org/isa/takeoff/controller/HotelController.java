@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -89,6 +90,7 @@ public class HotelController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_SYS_ADMIN')")
 	public ResponseEntity<HotelDTO> addHotel(@RequestBody HotelDTO hotelDTO) {
 
 		if(hotelDTO.getLocation() == null){
@@ -110,6 +112,7 @@ public class HotelController {
 	}
 
 	@RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_HOTEL_ADMIN')")
 	public ResponseEntity<HotelDTO> updateHotel(@RequestBody HotelDTO hotelDTO) {
 		
 		if (hotelDTO.getLocation() == null)
@@ -140,6 +143,7 @@ public class HotelController {
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_HOTEL_ADMIN')")
 	public ResponseEntity<Void> deleteHotel(@RequestBody HotelDTO hotelDTO) {
 		
 		Hotel hotel = hotelService.findOne(hotelDTO.getId());
@@ -279,6 +283,7 @@ public class HotelController {
 	}
 	
 	@RequestMapping(value="/saveHotelServices", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_HOTEL_ADMIN')")
 	public ResponseEntity<List<ServiceHotelDTO>> saveHotelServices(@RequestBody List<ServiceHotelDTO> hotelServicesDTO){
 		
 		List<ServiceHotelDTO> hotelServicesDTO2 = new ArrayList<>();
@@ -338,6 +343,7 @@ public class HotelController {
 	}
 	
 	@RequestMapping(value = "/getAvailableRooms", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<List<AvailableRoomsDTO>> getAvailableRooms(@RequestParam String parameters) {
 		
 		RoomSearchDTO roomSearch = new RoomSearchDTO();
@@ -433,6 +439,7 @@ public class HotelController {
 	}
 
 	@RequestMapping(value = "/roomsOnDiscount", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<List<AvailableRoomsDTO>> roomsOnDiscount(@RequestParam String parameters) 
 	{
 		RoomOnDiscountDTO roomOnDiscount = new RoomOnDiscountDTO();
@@ -507,6 +514,7 @@ public class HotelController {
 	}
 	
 	@RequestMapping(value="/rateHotel", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<?> rateHotel(@RequestBody UserRatingHotelDTO userRatingHotelDTO) 
 	{
 		if (userRatingHotelDTO.getHotel() == null || userRatingHotelDTO.getRating() == null || userRatingHotelDTO.getUsername() == null)

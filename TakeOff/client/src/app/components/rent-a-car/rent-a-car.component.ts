@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, TemplateRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { RentACarService } from 'src/app/services/rent-a-car/rent-a-car.service';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog, PageEvent, MatPaginator, MatTableDataSource, MatTable, MatTableModule} from '@angular/material';
@@ -11,13 +11,14 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
 import { RentACarMainServiceDialogComponent } from '../rent-a-car-main-service-dialog/rent-a-car-main-service-dialog.component';
 import { OfficeDialogComponent } from '../office-dialog/office-dialog.component';
+import { AmChartsService, AmChart } from '@amcharts/amcharts3-angular';
 
 @Component({
   selector: 'app-rent-a-car',
   templateUrl: './rent-a-car.component.html',
   styleUrls: ['./rent-a-car.component.css']
 })
-export class RentACarComponent implements OnInit {
+export class RentACarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   loadingRentACar = true;
   loadingVehicles = true;
@@ -42,6 +43,8 @@ export class RentACarComponent implements OnInit {
   offices: any = null;
   officeMapUrl: SafeResourceUrl;
   officeLocation: string;
+  private chart: AmChart;
+  id: number;
 
   constructor(private rentACarService: RentACarService,
               private authService: AuthenticationService,
@@ -49,10 +52,12 @@ export class RentACarComponent implements OnInit {
               public dialog: MatDialog,
               public appComponent: AppComponent,
               private vehicleService: VehicleService,
-              private sanitizer: DomSanitizer) { }
+              private sanitizer: DomSanitizer,
+              private amCharts: AmChartsService) { }
 
   ngOnInit() {
     const id = parseInt(this.route.snapshot.paramMap.get('id'), 10);
+    this.id = id;
     if (!isNaN(id)) {
       this.rentACarService.getRentACarById(id).subscribe(
         (data) => {
@@ -177,6 +182,24 @@ export class RentACarComponent implements OnInit {
           }
         }
       );
+    }
+  }
+
+  ngAfterViewInit() {
+    this.rentACarService.getRentACarChartData(this.id).subscribe(
+      (chartData: []) => {
+        console.log(chartData);
+        this.loadCharts(chartData);
+       },
+       () => {
+        alert('JEBAIGA');
+       }
+     );
+  }
+
+  ngOnDestroy() {
+    if (this.chart) {
+      this.amCharts.destroyChart(this.chart);
     }
   }
 
@@ -569,7 +592,96 @@ export class RentACarComponent implements OnInit {
 
   updateOfficeLocationMap() {
     this.officeMapUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://maps.google.com/maps?q=' +
-                                                                              this.officeLocation +
-                                                                              '&t=&z=11&ie=UTF8&iwloc=&output=embed');
+                                                                      this.officeLocation +
+                                                                      '&t=&z=11&ie=UTF8&iwloc=&output=embed');
+  }
+
+  loadCharts(chartData: []) {
+    this.chart = this.amCharts.makeChart('chartdiv', {
+        'type': 'serial',
+        'theme': 'light',
+        'marginRight': 40,
+        'marginLeft': 40,
+        'autoMarginOffset': 20,
+        'mouseWheelZoomEnabled': true,
+        'dataDateFormat': 'YYYY-MM-DD',
+        'valueAxes': [{
+            'id': 'v1',
+            'axisAlpha': 0,
+            'position': 'left',
+            'ignoreAxisWidth': true
+        }],
+        'balloon': {
+            'borderThickness': 1,
+            'shadowAlpha': 0
+        },
+        'graphs': [{
+            'id': 'g1',
+            'balloon': {
+              'drop': true,
+              'adjustBorderColor': false,
+              'color': '#ffffff'
+            },
+            'bullet': 'round',
+            'bulletBorderAlpha': 1,
+            'bulletColor': '#FFFFFF',
+            'bulletSize': 5,
+            'hideBulletsCount': 50,
+            'lineThickness': 2,
+            'title': 'red line',
+            'useLineColorForBulletBorder': true,
+            'valueField': 'value',
+            'balloonText': '<span style=\'font-size:18px;\'>[[value]]</span>'
+        }],
+        'chartScrollbar': {
+            'graph': 'g1',
+            'oppositeAxis': false,
+            'offset': 30,
+            'scrollbarHeight': 80,
+            'backgroundAlpha': 0,
+            'selectedBackgroundAlpha': 0.1,
+            'selectedBackgroundColor': '#888888',
+            'graphFillAlpha': 0,
+            'graphLineAlpha': 0.5,
+            'selectedGraphFillAlpha': 0,
+            'selectedGraphLineAlpha': 1,
+            'autoGridCount': true,
+            'color': '#AAAAAA'
+        },
+        'chartCursor': {
+            'pan': true,
+            'valueLineEnabled': true,
+            'valueLineBalloonEnabled': true,
+            'cursorAlpha': 1,
+            'cursorColor': '#258cbb',
+            'limitToGraph': 'g1',
+            'valueLineAlpha': 0.2,
+            'valueZoomable': true
+        },
+        'valueScrollbar': {
+          'oppositeAxis': false,
+          'offset': 50,
+          'scrollbarHeight': 10
+        },
+        'categoryField': 'date',
+        'categoryAxis': {
+            'parseDates': true,
+            'dashLength': 1,
+            'minorGridEnabled': true
+        },
+        'export': {
+            'enabled': true
+        },
+        'dataProvider': chartData
+    }, 10);
+
+    this.chart.addListener('rendered', this.zoomChart);
+    this.zoomChart();
+  }
+
+  zoomChart() {
+    if (this) {
+      this.chart.zoomToIndexes(this.chart.dataProvider.length, this.chart.dataProvider.length);
+    }
   }
 }

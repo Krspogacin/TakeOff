@@ -40,7 +40,7 @@ export class RentACarService {
   }
 
   getVehiclesOnDiscount(object: any) {
-    return this.http.get('/rent-a-cars/vehiclesOnDiscount?parameters='+ encodeURI(JSON.stringify(object)));
+    return this.http.get('/rent-a-cars/vehiclesOnDiscount?parameters=' + encodeURI(JSON.stringify(object)));
   }
 
   getAvailableVehicles(parameters: any) {
@@ -93,5 +93,8 @@ export class RentACarService {
 
   getOffices(id: number) {
     return this.http.get('rent-a-cars/' + id + '/offices');
+  }
+  getRentACarChartData(id: number) {
+    return this.http.get('rent-a-cars/' + id + '/getRentACarChartData');
   }
 }
