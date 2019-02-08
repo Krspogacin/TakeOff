@@ -30,6 +30,7 @@ export class HotelReserveDialogComponent implements OnInit {
   reservationObject: any = {};
   error = false;
   landingDate: any;
+  roomLoaded: boolean = false;
 
   constructor(private dialogRef: MatDialogRef<HotelReserveDialogComponent>,
               private formBuilder: FormBuilder,
@@ -157,6 +158,7 @@ export class HotelReserveDialogComponent implements OnInit {
             room.no = 0;
             this.selectionForm.addControl('Room' + room.room.id,this.formBuilder.control('',[Validators.min(1),Validators.max(this.numberOfRooms)]));
           });
+          this.roomLoaded = true;
         }
       );
     }

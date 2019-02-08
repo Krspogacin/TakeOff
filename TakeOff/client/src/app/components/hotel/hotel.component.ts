@@ -19,12 +19,15 @@ export class HotelComponent implements OnInit {
   filteredHotels = [];
   pageSize = 10;
   pageIndex = 0;
-  nameLocation = "";
+  nameLocationFilter = '';
   message: string;
   length = this.hotels.length;
   id = 0;
   userRole: string = null;
   hotelRatings: any;
+  startDate: Date;
+  today: Date;
+  endDate: Date;
 
   constructor(private HotelService: HotelService,
              private authService: AuthenticationService,
@@ -43,6 +46,8 @@ export class HotelComponent implements OnInit {
         }
       );
       this.userRole = this.authService.getAuthority();
+      this.today = new Date();
+      this.startDate = this.today;
   }
 
   openDialog(){
@@ -59,6 +64,7 @@ export class HotelComponent implements OnInit {
     (result) => {
       if (result) {
         this.hotels.push(result);
+        this.hotelRatings.push({'rating':0, 'hotel': result});
         this.message = 'Added successfully!';
       }
     },
@@ -76,13 +82,13 @@ export class HotelComponent implements OnInit {
     this.pageIndex = event.pageIndex;
   }
 
-  search(){
-    this.hotels.forEach(hotel => {
-      if (hotel.name.indexOf(this.nameLocation) != -1){
-        this.filteredHotels.push(hotel);
-      }
-    });
-    this.hotels = this.filteredHotels;
+  search(nameLocation){
+    this.nameLocationFilter = nameLocation;
+  }
+
+  change(value: any){
+    this.startDate = new Date(value);
+    this.endDate = this.startDate;
   }
   openReservationDialog(hotel: any, reservation: any){
   const ladningDate = new Date(reservation.ticket.flight.landingDate);
@@ -161,7 +167,6 @@ export class HotelComponent implements OnInit {
 
     const roomReservation = roomToReserve;
     roomReservation.reservationId = reservation.reservationDTO.id;
-    console.log(roomReservation);
     this.reservationService.createRoomReservation(roomReservation).subscribe(
       () => {
         this.appComponent.showSnackBar('You have created room reservation successfully!');

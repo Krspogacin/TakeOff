@@ -107,6 +107,29 @@ public class FlightReservationController {
 						user = userService.findByUsernameUser(r.getUser().getUsername());
 					}
 					Reservation reservation = new Reservation();
+					if(r.getReservationDTO().getRoomReservation() != null){
+						RoomReservation roomReservation = new RoomReservation();
+						roomReservation.setPrice(r.getReservationDTO().getRoomReservation().getTotalPrice());
+						roomReservation.setReservationEndDate(r.getReservationDTO().getRoomReservation().getReservationEndDate());
+						roomReservation.setReservationStartDate(r.getReservationDTO().getRoomReservation().getReservationStartDate());
+						List<RoomReservationRooms> rrrs = new ArrayList<>();
+						RoomReservationRooms rrr = new RoomReservationRooms();
+						Room room = roomService.findOne(r.getReservationDTO().getRoomReservation().getRoomsAndRatings().get(0).getRoom().getId());
+						rrr.setRoom(room);
+						rrr.setRoomReservation(roomReservation);
+						rrrs.add(rrr);
+						roomReservation.setRooms(rrrs);
+						reservation.setRoomReservation(roomReservation);
+					}
+					if(r.getReservationDTO().getVehicleReservation() != null){
+						VehicleReservation vehicleReservation = new VehicleReservation();
+						vehicleReservation.setPrice(r.getReservationDTO().getVehicleReservation().getTotalPrice());
+						vehicleReservation.setReservationEndDate(r.getReservationDTO().getVehicleReservation().getReservationEndDate());
+						vehicleReservation.setReservationStartDate(r.getReservationDTO().getVehicleReservation().getReservationStartDate());
+						Vehicle vehicle = vehicleService.findOne(r.getReservationDTO().getVehicleReservation().getVehicle().getId());
+						vehicleReservation.setVehicle(vehicle);
+						reservation.setVehicleReservation(vehicleReservation);
+					}
 					FlightReservation flightReservation = new FlightReservation(user, ticket, reservation);
 					reservationService.save(flightReservation);
 				}
@@ -225,7 +248,7 @@ public class FlightReservationController {
 	}
 	
 	@RequestMapping(value = "/roomReservations", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<ReservationDTO> createVehicleReservation(@RequestBody RoomReservationDTO roomReservationDTO){
+	public ResponseEntity<ReservationDTO> createRoomReservation(@RequestBody RoomReservationDTO roomReservationDTO){
 		if (roomReservationDTO.getReservationId() == null || roomReservationDTO.getReservationStartDate() == null ||
 			roomReservationDTO.getReservationEndDate() == null || roomReservationDTO.getTotalPrice() == null ||  roomReservationDTO.getRoomsAndRatings() == null){
 			

@@ -12,7 +12,9 @@ import org.isa.takeoff.dto.AvailableVehiclesDTO;
 import org.isa.takeoff.dto.OfficeDTO;
 import org.isa.takeoff.dto.RentACarDTO;
 import org.isa.takeoff.dto.RentACarMainServiceDTO;
+import org.isa.takeoff.dto.RoomOnDiscountDTO;
 import org.isa.takeoff.dto.VehicleDTO;
+import org.isa.takeoff.dto.VehicleOnDiscountDTO;
 import org.isa.takeoff.dto.VehiclePriceDTO;
 import org.isa.takeoff.dto.VehicleReservationParametersDTO;
 import org.isa.takeoff.model.Location;
@@ -66,7 +68,7 @@ public class RentACarController
 		RentACarMainService rentACarMainService = this.rentACarMainServiceService.findByName(name);
 		if (rentACarMainService != null)
 		{
-			if (id != null && rentACarMainService.getId().equals(id)) 
+			if (id != -1 && rentACarMainService.getId().equals(id)) 
 			{
 				return new ResponseEntity<>(HttpStatus.OK);
 			}
@@ -210,23 +212,79 @@ public class RentACarController
 		}
 	}
 	
-	@RequestMapping(value = "/{id}/vehiclesOnDiscount", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<VehicleDTO>> getVehiclesOnDiscount(@PathVariable Long id) 
+	@RequestMapping(value = "/vehiclesOnDiscount", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<AvailableVehiclesDTO>> getVehiclesOnDiscount(@RequestParam String parameters) 
 	{
+		VehicleOnDiscountDTO vehicleOnDiscount = new VehicleOnDiscountDTO();
 		try 
 		{
-			RentACar rentACar = rentACarService.findOne(id);
-			List<Vehicle> vehicles = rentACar.getVehicles();
-		
-			List<VehicleDTO> vehicleDTO = new ArrayList<>();
-			for (Vehicle vehicle : vehicles)
-			{
-				if (vehicle.getDiscount() != null && vehicle.getDiscount() > 0)
-				{
-					vehicleDTO.add(new VehicleDTO(vehicle));					
+			vehicleOnDiscount = objectMapper.readValue(parameters, VehicleOnDiscountDTO.class);
+			List<AvailableVehiclesDTO> availableVehicles = new ArrayList<>();
+			List<RentACar> rentACars = rentACarService.findAll();
+			for(RentACar rentACar: rentACars){
+				if(rentACar.getLocation().getCity().equals(vehicleOnDiscount.getLocation().getCity())){
+					List<RentACarMainService> rentACarMainServices = rentACar.getMainServicesRentACar();
+					long reservationDays = ChronoUnit.DAYS.between(vehicleOnDiscount.getStartDate(), vehicleOnDiscount.getEndDate()) + 1;
+					Long mainServiceId = null;
+					
+					for(RentACarMainService mainService : rentACarMainServices)
+					{
+						if (mainService.getStartDay() <= reservationDays &&
+						   ((mainService.getEndDay() != null && reservationDays <= mainService.getEndDay()) || mainService.getEndDay() == null))
+						{
+							mainServiceId = mainService.getId();
+							break;
+						}
+					}
+					List<Vehicle> vehicles = rentACar.getVehicles();				
+					for (Vehicle vehicle : vehicles)
+					{
+						if (vehicle.getDiscount() != null && vehicle.getDiscount() > 0)
+						{
+							List<VehicleReservation> vehicleReservations = vehicle.getVehicleReservations();				
+							boolean reserved = false;
+							for (VehicleReservation vehicleReservation : vehicleReservations)
+							{
+								if ((vehicleReservation.getReservationStartDate().isBefore(vehicleOnDiscount.getStartDate()) &&
+									 vehicleReservation.getReservationEndDate().isAfter(vehicleOnDiscount.getEndDate())) || 
+									(vehicleReservation.getReservationStartDate().isBefore(vehicleOnDiscount.getStartDate()) &&
+									 vehicleReservation.getReservationEndDate().isAfter(vehicleOnDiscount.getEndDate())))
+								{
+									reserved = true;
+									break;
+								}
+							}
+							if (reserved)
+							{
+								continue;
+							}
+							List<VehiclePrice> prices = vehicle.getVehiclePrices();
+							Double vehiclePrice = null;
+							for (VehiclePrice price : prices)
+							{
+								if (price.getRentACarMainService().getId() == mainServiceId)
+								{					
+									vehiclePrice = price.getPrice();
+									break;
+								}
+							}
+							List<VehicleRating> ratings = vehicle.getVehicleRatings();
+							Double vehicleRating = 0.0;
+							
+							if (!ratings.isEmpty())
+							{
+								AtomicReference<Double> ratingsSum = new AtomicReference<Double>(0.0);
+								ratings.forEach(rating -> ratingsSum.accumulateAndGet(rating.getRating(), (x, y) -> x + y));
+								vehicleRating = ratingsSum.get() / ratings.size();
+							}
+							
+							AvailableVehiclesDTO availableVehicle = new AvailableVehiclesDTO(new VehicleDTO(vehicle), vehiclePrice * reservationDays, vehicleRating);
+							availableVehicles.add(availableVehicle);
+						}
+					}
 				}
 			}
-			return new ResponseEntity<>(vehicleDTO, HttpStatus.OK);
+			return new ResponseEntity<>(availableVehicles, HttpStatus.OK);
 		}
 		catch (Exception e) 
 		{
@@ -354,8 +412,10 @@ public class RentACarController
 					{					
 						if ((parameters.getMinPrice() == null || parameters.getMinPrice() <= price.getPrice()) &&
 							(parameters.getMaxPrice() == null || parameters.getMaxPrice() >= price.getPrice()))
-						vehiclePrice = price.getPrice();
-						break;
+						{
+							vehiclePrice = price.getPrice();
+							break;
+						}
 					}
 				}
 				

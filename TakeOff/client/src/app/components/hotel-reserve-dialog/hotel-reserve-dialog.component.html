@@ -84,7 +84,7 @@
     <mat-hint *ngIf="availableRooms.length != 0 && numberOfRooms-selectedRooms >= numberOfRooms">Need to select {{numberOfRooms}} rooms</mat-hint>
     <mat-hint *ngIf="availableRooms.length != 0 && numberOfRooms-selectedRooms >= 0 && numberOfRooms-selectedRooms < numberOfRooms">Need to select {{numberOfRooms-selectedRooms}} rooms</mat-hint>
     <mat-hint *ngIf="numberOfRooms-selectedRooms < 0">Invalid number of selected rooms</mat-hint>
-    <h3 *ngIf="availableRooms.length == 0">No rooms for this parameters</h3>
+    <h3 *ngIf="roomLoaded && availableRooms.length == 0">No rooms for this parameters</h3>
       <ul class="list-group">
         <form [formGroup]="selectionForm">
         <li *ngFor="let room of availableRooms" class="list-group-item list-group-item-primary flex-column align-items-start">

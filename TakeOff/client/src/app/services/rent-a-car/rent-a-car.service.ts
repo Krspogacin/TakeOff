@@ -10,7 +10,7 @@ export class RentACarService {
 
   checkMainServiceName(id: number, name: string) {
     if (isNaN(id)) {
-      id = null;
+      id = -1;
     }
     return this.http.get('/rent-a-cars/checkMainServiceName/' + id + '/' + name);
   }
@@ -39,8 +39,8 @@ export class RentACarService {
     return this.http.get('/rent-a-cars/' + id + '/areThereAvailableVehiclesNotOnDiscount');
   }
 
-  getVehiclesOnDiscount(id: number) {
-    return this.http.get('/rent-a-cars/' + id + '/vehiclesOnDiscount');
+  getVehiclesOnDiscount(object: any) {
+    return this.http.get('/rent-a-cars/vehiclesOnDiscount?parameters='+ encodeURI(JSON.stringify(object)));
   }
 
   getAvailableVehicles(parameters: any) {

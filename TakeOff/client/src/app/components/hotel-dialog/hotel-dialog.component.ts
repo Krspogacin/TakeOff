@@ -12,7 +12,7 @@ declare let require: any;
 export class HotelDialogComponent implements OnInit,AfterViewInit {
 
   hotelUpdateForm: FormGroup;
-  location: any = {};
+  location: any;
 
 
   constructor(private dialogRef: MatDialogRef<HotelDialogComponent>,
@@ -42,7 +42,6 @@ export class HotelDialogComponent implements OnInit,AfterViewInit {
         this.location.city = e.suggestion.city ? e.suggestion.city : e.suggestion.name;
         this.location.latitude = e.suggestion.latlng.lat;
         this.location.longitude = e.suggestion.latlng.lng;
-        console.log(this.location);
       });
 
       placesAutocomplete.on('clear', e => {
@@ -54,7 +53,12 @@ export class HotelDialogComponent implements OnInit,AfterViewInit {
     const updatedHotel = this.hotelUpdateForm.value;
     updatedHotel.id = this.data.id;
     delete updatedHotel['address'];
-    updatedHotel.location = this.location;
+    console.log(this.location);
+    if(this.location){
+      updatedHotel.location = this.location;
+    }else{
+      updatedHotel.location = this.data.location;
+    }
     this.dialogRef.close(updatedHotel);
   }
 

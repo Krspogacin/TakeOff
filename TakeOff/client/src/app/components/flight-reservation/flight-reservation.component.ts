@@ -4,6 +4,8 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { MatDialogRef, MatListOption, MatSelectionList, MAT_DIALOG_DATA } from '@angular/material';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { UserService } from 'src/app/services/user/user.service';
+import { HotelService } from 'src/app/services/hotel/hotel.service';
+import { RentACarService } from 'src/app/services/rent-a-car/rent-a-car.service';
 
 @Component({
   selector: 'app-flight-reservation',
@@ -23,14 +25,27 @@ export class FlightReservationComponent implements OnInit {
   fieldNumber = 4;
   total = 0;
   currency = '€';
+  roomForm: FormGroup;
+  vehicleForm: FormGroup;
+  rooms: any;
+  vehicles: any;
+  complexObject: any = {};
+  complexObjectVehicle: any = {};
+  landingDate: Date;
+  choosenItem: any = null;
+  choosenItem2: any = null;
+  complexObject2: any = {};
+  complexObject2Vehicle: any = {};
 
   @ViewChild(MatSelectionList) friendList: MatSelectionList;
 
-  constructor(private userService: UserService, private authService: AuthenticationService,
+  constructor(private userService: UserService, private hotelService: HotelService,
+    private authService: AuthenticationService, private rentACarService: RentACarService,
     private dialogRef: MatDialogRef<FlightReservationComponent>,
     private formBuilder: FormBuilder, @Inject(MAT_DIALOG_DATA) private data: any) { }
 
   ngOnInit() {
+    this.landingDate = this.data.landingDate;
     const username = this.authService.getUsername();
     if (username) {
       this.userService.getUser(username).subscribe(
@@ -79,6 +94,15 @@ export class FlightReservationComponent implements OnInit {
 
       this.passengerForm = new FormGroup(this.formObject);
     }
+    this.roomForm = this.formBuilder.group({
+      startDate: ['',Validators.required],
+      numberOfDays: ['',[Validators.required,Validators.min(1)]]
+    });
+
+    this.vehicleForm = this.formBuilder.group({
+      startDate: ['', Validators.required],
+      endDate: ['', Validators.required]
+    });
   }
 
   selectionChange(option: MatListOption) {
@@ -124,8 +148,56 @@ export class FlightReservationComponent implements OnInit {
       }
     }
 
-    this.dialogRef.close(friends);
+    if(this.choosenItem){
+      this.complexObject2.roomsAndRatings = [];
+      this.complexObject2.roomsAndRatings.push({'room':this.choosenItem.room});
+      this.complexObject2.totalPrice = this.choosenItem.totalPrice*(100-this.choosenItem.room.discount)/100;
+      const startDate = this.roomForm.get('startDate').value;
+      this.complexObject2.reservationStartDate = new Date(Date.UTC(startDate.getFullYear(),
+                                                                   startDate.getMonth(),
+                                                                   startDate.getDate()));
+      const endDate = new Date(this.choosenItem.endingDate);
+      this.complexObject2.reservationEndDate = new Date(Date.UTC(endDate.getFullYear(),
+                                                                 endDate.getMonth(),
+                                                                 endDate.getDate()));
+    }
+    if(this.choosenItem2){
+      this.complexObject2Vehicle.vehicle = this.choosenItem2.vehicle;
+      this.complexObject2Vehicle.totalPrice = this.choosenItem2.totalPrice*(100-this.choosenItem2.vehicle.discount)/100;
+      const startDate = this.vehicleForm.get('startDate').value;
+      this.complexObject2Vehicle.reservationStartDate = new Date(Date.UTC(startDate.getFullYear(),
+                                                                          startDate.getMonth(),
+                                                                          startDate.getDate()));
+      const endDate = this.vehicleForm.get('endDate').value;
+      this.complexObject2Vehicle.reservationEndDate = new Date(Date.UTC(endDate.getFullYear(),
+                                                                        endDate.getMonth(),
+                                                                        endDate.getDate()));
+    }
+    const data = {'roomReservation': this.complexObject2, 'vehicleReservation':this.complexObject2Vehicle, 'friends':friends};
+    this.dialogRef.close(data);
 
+  }
+
+  searchRooms(){
+    this.complexObject.checkIn = this.roomForm.get('startDate').value;
+    this.complexObject.numberOfDays = this.roomForm.get('numberOfDays').value;
+    this.complexObject.location = this.data.landingLocation;
+    this.hotelService.getRoomsOnDiscount(this.complexObject).subscribe(
+      (data) => {
+        this.rooms = data;
+      }
+    )
+  }
+
+  searchVehicles(){
+    this.complexObjectVehicle.startDate = this.vehicleForm.get('startDate').value;
+    this.complexObjectVehicle.endDate = this.vehicleForm.get('endDate').value;
+    this.complexObjectVehicle.location = this.data.landingLocation;
+    this.rentACarService.getVehiclesOnDiscount(this.complexObjectVehicle).subscribe(
+      (data) => {
+        this.vehicles = data;
+      }
+    )
   }
 
 }

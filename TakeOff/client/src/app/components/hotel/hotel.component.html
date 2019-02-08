@@ -5,18 +5,18 @@
 <br>
 <div align="center">
     <input matInput [(ngModel)]="nameLocation" style="height:40px; width:20%; border: 2px solid orange;" type="text" placeholder="Hotel name or location">
-    <input style="height:40px; width:20%; border: 2px solid orange;" autocomplete="off" matInput [matDatepicker]="picker" placeholder="Check in date">
+    <input #ref [min]="today" style="height:40px; width:20%; border: 2px solid orange;" autocomplete="off" matInput (dateChange)="change(ref.value)" [matDatepicker]="picker" placeholder="Check in date">
     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-    <mat-datepicker #picker disabled="false"></mat-datepicker>
-    <input style="height:40px; width:20%; border: 2px solid orange;" autocomplete="off" matInput [matDatepicker]="picker2" placeholder="Check out date">
+    <mat-datepicker #picker [startAt]="today" disabled="false"></mat-datepicker>
+    <input [(ngModel)]="endDate" style="height:40px; width:20%; border: 2px solid orange;" [min]="startDate" autocomplete="off" matInput [matDatepicker]="picker2" placeholder="Check out date">
     <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-    <mat-datepicker #picker2 disabled="false"></mat-datepicker>&nbsp;&nbsp;
-    <button mat-raised-button style="background-color: orange; color: white;" (click)="search()"><mat-icon>search</mat-icon>Search</button>
+    <mat-datepicker #picker2 disabled="false" [startAt]="startDate"></mat-datepicker>&nbsp;&nbsp;
+    <button mat-raised-button style="background-color: orange; color: white;" (click)="search(nameLocation)"><mat-icon>search</mat-icon>Search</button>
 </div>
 <br>
 <h2 style="padding: 0% 0% 0% 2.5%;">List of hotels:</h2>
 <div style="display:flex; flex-wrap: wrap" *ngIf="hotels">
-<mat-card *ngFor="let h of hotels.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)" class="example-card">
+<mat-card *ngFor="let h of hotels.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize) | licationAndName : nameLocationFilter;" class="example-card">
     <mat-card-header>
         <mat-card-title>{{h.name}}</mat-card-title>
     </mat-card-header>
