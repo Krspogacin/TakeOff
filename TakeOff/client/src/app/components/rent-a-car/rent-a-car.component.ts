@@ -188,11 +188,10 @@ export class RentACarComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     this.rentACarService.getRentACarChartData(this.id).subscribe(
       (chartData: []) => {
-        console.log(chartData);
         this.loadCharts(chartData);
        },
        () => {
-        alert('JEBAIGA');
+        this.appComponent.showSnackBar('Error! Could not load reservations chart data');
        }
      );
   }
@@ -336,8 +335,14 @@ export class RentACarComponent implements OnInit, AfterViewInit, OnDestroy {
               );
 
               },
-              () => {
-                this.message = 'Error! Vehicle could not be updated!';
+              (error) => {
+                if (error.status === 403) {
+                  this.message = 'Could not update because vehicle is currently reserved!';
+                } else {
+                  this.message = 'Error! Vehicle could not be updated!';
+                }
+
+                this.appComponent.showSnackBar(this.message);
               },
               () => {
                 this.appComponent.showSnackBar(this.message);
@@ -362,8 +367,14 @@ export class RentACarComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.message = 'Deleted vehicle successfully!';
       },
-      () => {
-        this.message = 'Error! Vehicle could not be deleted!';
+      (error) => {
+        if (error.status === 403) {
+          this.message = 'Could not delete because vehicle is currently reserved!';
+        } else {
+          this.message = 'Error! Vehicle could not be deleted!';
+        }
+
+        this.appComponent.showSnackBar(this.message);
       },
       () => {
         this.appComponent.showSnackBar(this.message);

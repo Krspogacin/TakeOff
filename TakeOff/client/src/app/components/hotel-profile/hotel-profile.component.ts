@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { HotelService } from 'src/app/services/hotel/hotel.service';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { ActivatedRoute } from '@angular/router';
@@ -8,13 +8,14 @@ import { HotelDialogComponent } from '../hotel-dialog/hotel-dialog.component';
 import { RoomDialogComponent } from '../room-dialog/room-dialog.component';
 import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser';
 import { FormGroup, FormBuilder } from '@angular/forms';
+import { AmChart, AmChartsService } from '@amcharts/amcharts3-angular';
 
 @Component({
   selector: 'app-hotel-profile',
   templateUrl: './hotel-profile.component.html',
   styleUrls: ['./hotel-profile.component.css']
 })
-export class HotelProfileComponent implements OnInit {
+export class HotelProfileComponent implements OnInit, AfterViewInit, OnDestroy {
 
   loadingHotel = true;
   loadingRooms = true;
@@ -54,7 +55,8 @@ export class HotelProfileComponent implements OnInit {
   wifi: any = {'cb':false,'price':''};
   gym: any = {'cb':false,'price':''};
   sportsFields: any = {'cb':false,'price':''};
-
+  private chart: AmChart;
+  id: number;
 
   constructor(private hotelService: HotelService,
     private authService: AuthenticationService,
@@ -63,10 +65,12 @@ export class HotelProfileComponent implements OnInit {
     public snackBar: MatSnackBar,
     private roomService: RoomService,
     private formBuilder: FormBuilder,
-    private sanitizer: DomSanitizer) { }
+    private sanitizer: DomSanitizer,
+    private amCharts: AmChartsService) { }
 
   ngOnInit() {
     const id = parseInt(this.route.snapshot.paramMap.get('id'), 10);
+    this.id = id;
     if (!isNaN(id)) {
       this.hotelService.getHotelById(id).subscribe(
         (data) => {
@@ -231,6 +235,23 @@ export class HotelProfileComponent implements OnInit {
           this.defaultServices = services;
         }
       );
+    }
+  }
+
+  ngAfterViewInit() {
+    this.hotelService.getHotelChartData(this.id).subscribe(
+      (chartData: []) => {
+        this.loadCharts(chartData);
+       },
+       () => {
+        this.showSnackBar('Error! Could not load reservations chart data');
+       }
+     );
+  }
+
+  ngOnDestroy() {
+    if (this.chart) {
+      this.amCharts.destroyChart(this.chart);
     }
   }
 
@@ -456,5 +477,94 @@ export class HotelProfileComponent implements OnInit {
         this.edit = false;
       }
     );
+  }
+
+  loadCharts(chartData: []) {
+    this.chart = this.amCharts.makeChart('chartdiv', {
+        'type': 'serial',
+        'theme': 'light',
+        'marginRight': 40,
+        'marginLeft': 40,
+        'autoMarginOffset': 20,
+        'mouseWheelZoomEnabled': true,
+        'dataDateFormat': 'YYYY-MM-DD',
+        'valueAxes': [{
+            'id': 'v1',
+            'axisAlpha': 0,
+            'position': 'left',
+            'ignoreAxisWidth': true
+        }],
+        'balloon': {
+            'borderThickness': 1,
+            'shadowAlpha': 0
+        },
+        'graphs': [{
+            'id': 'g1',
+            'balloon': {
+              'drop': true,
+              'adjustBorderColor': false,
+              'color': '#ffffff'
+            },
+            'bullet': 'round',
+            'bulletBorderAlpha': 1,
+            'bulletColor': '#FFFFFF',
+            'bulletSize': 5,
+            'hideBulletsCount': 50,
+            'lineThickness': 2,
+            'title': 'red line',
+            'useLineColorForBulletBorder': true,
+            'valueField': 'value',
+            'balloonText': '<span style=\'font-size:18px;\'>[[value]]</span>'
+        }],
+        'chartScrollbar': {
+            'graph': 'g1',
+            'oppositeAxis': false,
+            'offset': 30,
+            'scrollbarHeight': 80,
+            'backgroundAlpha': 0,
+            'selectedBackgroundAlpha': 0.1,
+            'selectedBackgroundColor': '#888888',
+            'graphFillAlpha': 0,
+            'graphLineAlpha': 0.5,
+            'selectedGraphFillAlpha': 0,
+            'selectedGraphLineAlpha': 1,
+            'autoGridCount': true,
+            'color': '#AAAAAA'
+        },
+        'chartCursor': {
+            'pan': true,
+            'valueLineEnabled': true,
+            'valueLineBalloonEnabled': true,
+            'cursorAlpha': 1,
+            'cursorColor': '#258cbb',
+            'limitToGraph': 'g1',
+            'valueLineAlpha': 0.2,
+            'valueZoomable': true
+        },
+        'valueScrollbar': {
+          'oppositeAxis': false,
+          'offset': 50,
+          'scrollbarHeight': 10
+        },
+        'categoryField': 'date',
+        'categoryAxis': {
+            'parseDates': true,
+            'dashLength': 1,
+            'minorGridEnabled': true
+        },
+        'export': {
+            'enabled': true
+        },
+        'dataProvider': chartData
+    }, 10);
+
+    this.chart.addListener('rendered', this.zoomChart);
+    this.zoomChart();
+  }
+
+  zoomChart() {
+    if (this) {
+      this.chart.zoomToIndexes(this.chart.dataProvider.length, this.chart.dataProvider.length);
+    }
   }
 }

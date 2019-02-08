@@ -40,18 +40,13 @@ export class AppComponent implements OnInit {
   }
 
   changePassword() {
-    const dialogRef = this.dialog.open(ChangePasswordDialogComponent,
+    this.dialog.open(ChangePasswordDialogComponent,
     {
       data: {'enabled': this.authenticationService.isUserEnabled()},
       disableClose: true,
       autoFocus: true,
       width: '40%'
     });
-    dialogRef.afterClosed().subscribe(
-      () => {
-        this.showSnackBar('You have changed your password successfully!');
-      }
-    );
   }
 
   showSnackBar(message: string) {

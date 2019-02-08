@@ -1,5 +1,7 @@
 package org.isa.takeoff.controller;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,15 +45,18 @@ import org.isa.takeoff.service.FlightReservationService;
 import org.isa.takeoff.service.FlightService;
 import org.isa.takeoff.service.HotelService;
 import org.isa.takeoff.service.RentACarService;
+import org.isa.takeoff.service.RoomReservationService;
 import org.isa.takeoff.service.RoomService;
 import org.isa.takeoff.service.TicketService;
 import org.isa.takeoff.service.UserService;
+import org.isa.takeoff.service.VehicleReservationService;
 import org.isa.takeoff.service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -91,6 +96,12 @@ public class FlightReservationController {
 
 	@Autowired
 	private EmailService emailService;
+	
+	@Autowired
+	private RoomReservationService roomReservationService;
+	
+	@Autowired
+	private VehicleReservationService vehicleReservationService;
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<FlightReservationDTO>> addReservations(
@@ -374,6 +385,80 @@ public class FlightReservationController {
 			return new ResponseEntity<>(frs.size(), HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/cancelFlightReservation", method = RequestMethod.PUT)
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity<?> cancelFlightReservation(@RequestBody ReservationDTO reservationDTO) 
+	{
+		Reservation reservation = this.reservationService.findOneReservation(reservationDTO.getId());
+		List<FlightReservation> flightReservations = reservation.getFlightReservations();
+		if (LocalDateTime.now().isAfter(flightReservations.get(0).getTicket().getFlight().getTakeOffDate().minusHours(3)))
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		try 
+		{
+			for (FlightReservation flightReservation : flightReservations)
+			{
+				Ticket ticket = this.ticketService.findOne(flightReservation.getTicket().getId());
+				ticket.setIsReserved(false);
+				this.ticketService.save(ticket);				
+			}
+			this.reservationService.deleteReservation(reservationDTO.getId());
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		catch (Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value = "/cancelVehicleReservation", method = RequestMethod.PUT)
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity<?> cancelVehicleReservation(@RequestBody ReservationDTO reservationDTO) 
+	{
+		if (reservationDTO.getVehicleReservation() == null || LocalDate.now().isAfter(reservationDTO.getVehicleReservation().getReservationStartDate().minusDays(2)))
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		try 
+		{
+			Reservation reservation = this.reservationService.findOneReservation(reservationDTO.getId());
+			reservation.setVehicleReservation(null);
+			this.reservationService.saveReservation(reservation);
+			this.vehicleReservationService.delete(reservationDTO.getVehicleReservation().getId());
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		catch (Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value = "/cancelRoomReservation", method = RequestMethod.PUT)
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity<?> cancelRoomReservation(@RequestBody ReservationDTO reservationDTO) 
+	{
+		if (reservationDTO.getRoomReservation() == null || LocalDate.now().isAfter(reservationDTO.getRoomReservation().getReservationStartDate().minusDays(2)))
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		try 
+		{
+			Reservation reservation = this.reservationService.findOneReservation(reservationDTO.getId());
+			reservation.setRoomReservation(null);
+			this.reservationService.saveReservation(reservation);
+			this.roomReservationService.delete(reservationDTO.getRoomReservation().getId());
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		catch (Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 }

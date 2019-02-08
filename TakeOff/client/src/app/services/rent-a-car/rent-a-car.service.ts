@@ -94,6 +94,7 @@ export class RentACarService {
   getOffices(id: number) {
     return this.http.get('rent-a-cars/' + id + '/offices');
   }
+  
   getRentACarChartData(id: number) {
     return this.http.get('rent-a-cars/' + id + '/getRentACarChartData');
   }

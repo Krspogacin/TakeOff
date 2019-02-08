@@ -790,7 +790,6 @@ public class RentACarController
 		}
 		catch (Exception e) 
 		{
-			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}

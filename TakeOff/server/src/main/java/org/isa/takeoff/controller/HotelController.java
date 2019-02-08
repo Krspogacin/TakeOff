@@ -2,10 +2,12 @@ package org.isa.takeoff.controller;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.isa.takeoff.dto.AvailableRoomsDTO;
+import org.isa.takeoff.dto.ChartDataDTO;
 import org.isa.takeoff.dto.HotelDTO;
 import org.isa.takeoff.dto.HotelRatingDTO;
 import org.isa.takeoff.dto.RoomDTO;
@@ -22,12 +24,14 @@ import org.isa.takeoff.model.Location;
 import org.isa.takeoff.model.Room;
 import org.isa.takeoff.model.RoomPrice;
 import org.isa.takeoff.model.RoomRating;
+import org.isa.takeoff.model.RoomReservation;
 import org.isa.takeoff.model.RoomReservationRooms;
 import org.isa.takeoff.model.Service;
 import org.isa.takeoff.model.ServiceHotel;
 import org.isa.takeoff.model.User;
 import org.isa.takeoff.service.HotelService;
 import org.isa.takeoff.service.LocationService;
+import org.isa.takeoff.service.RoomReservationService;
 import org.isa.takeoff.service.ServiceService;
 import org.isa.takeoff.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +66,9 @@ public class HotelController {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private RoomReservationService roomReservationService;
 
 	@RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<HotelDTO>> getHotels() {
@@ -548,6 +555,47 @@ public class HotelController {
 		catch(Exception e)
 		{
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/{id}/getHotelChartData", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<ChartDataDTO>> getHotelChartData(@PathVariable Long id) 
+	{
+		try 
+		{
+			Hotel hotel = hotelService.findOne(id);
+			List<Room> rooms = hotel.getRooms();
+
+			LocalDate date = LocalDate.of(2019, Month.JANUARY, 1);
+			LocalDate endDate = LocalDate.of(2019, Month.APRIL, 1);
+			
+			List<ChartDataDTO> chartData = new ArrayList<>();
+			while (date.isBefore(endDate))
+			{
+				int numOfReservations = 0;
+				for (RoomReservation roomReservation : roomReservationService.findAllByDate(date))
+				{
+					for (RoomReservationRooms reservation : roomReservation.getRooms())
+					{
+						for (Room room : rooms)
+						{
+							if (reservation.getRoom().getId() == room.getId())
+							{
+								numOfReservations++;
+							}
+						}
+					}
+				}
+				ChartDataDTO rentACarChartDataDTO = new ChartDataDTO(date, numOfReservations);  
+				chartData.add(rentACarChartDataDTO);
+				date = date.plusDays(1);
+			}
+			
+			return new ResponseEntity<>(chartData, HttpStatus.OK);
+		}
+		catch (Exception e) 
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 }

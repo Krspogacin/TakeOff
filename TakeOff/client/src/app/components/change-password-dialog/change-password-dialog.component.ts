@@ -4,6 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { mustMatch } from '../registration-dialog/registration-dialog.component';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { UserService } from 'src/app/services/user/user.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-change-password-dialog',
@@ -48,6 +49,7 @@ export class ChangePasswordDialogComponent implements OnInit {
       this.userService.updatePassword(user).subscribe(
         () => {
           this.dialogRef.close();
+          this.showSnackBar('You have changed your password successfully!');
         },
         () => {
           this.changePasswordForm.get('oldPassword').setErrors( { wrongOldPassword: true } );
@@ -62,5 +64,17 @@ export class ChangePasswordDialogComponent implements OnInit {
 
   cancel() {
     this.dialogRef.close(null);
+  }
+
+  showSnackBar(message: string) {
+    if (!message) {
+      return;
+    }
+    const snackBarRef = this.snackBar.open(message, 'Dissmiss', { verticalPosition: 'top', duration: 4000 });
+    snackBarRef.onAction().subscribe(
+      () => {
+        snackBarRef.dismiss();
+      }
+    );
   }
 }

@@ -87,7 +87,11 @@
             <div class="col">
               <div class="row d-flex justify-content-center mt-4">
                 <h4 class="mr-2">Ticket price <mat-icon class="align-middle">arrow_forward</mat-icon></h4>
-                <p style="font-size: 140%;">{{item.ticket.flight.ticketPrice}}€</p>
+                <p style="font-size: 140%;">
+                  {{(item.ticket.type === 'first_class') ? (item.ticket.flight.ticketPrice * 2) : 
+                                (item.ticket.type === 'business') ? (item.ticket.flight.ticketPrice * 1.5) : 
+                                                  item.ticket.flight.ticketPrice}}€
+                </p>
               </div>
             </div>
           </div>

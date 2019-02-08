@@ -91,12 +91,8 @@
                   </div>
                   <span class="badge badge-pill badge-info align-middle">{{vehicle.rating | ratingRound}}/5</span> 
                   <div *ngIf="userRole && userRole === 'ROLE_RENTACAR_ADMIN'" class="d-flex justify-content-end mt-1">
-                    <span matTooltip="Cannot be updated because it is reserved!" [matTooltipDisabled]="!vehicle.reserved">
-                      <button mat-button color="primary" (click)="openUpdateVehicleDialog(vehicle)" [disabled]="vehicle.reserved"><mat-icon>edit</mat-icon></button>
-                    </span>
-                    <span matTooltip="Cannot be deleted because it is reserved!" [matTooltipDisabled]="!vehicle.reserved">
-                      <button mat-button color="primary" (click)="deleteVehicle(vehicle.id)" [disabled]="vehicle.reserved"><mat-icon>delete</mat-icon></button>
-                    </span>
+                      <button mat-button color="primary" (click)="openUpdateVehicleDialog(vehicle)"><mat-icon>edit</mat-icon></button>
+                      <button mat-button color="primary" (click)="deleteVehicle(vehicle.id)"><mat-icon>delete</mat-icon></button>
                   </div>         
                 </div>
               </div>

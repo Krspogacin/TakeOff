@@ -68,4 +68,8 @@ export class HotelService {
   getRoomsOnDiscount(object: any) {
     return this.http.get('/hotels/roomsOnDiscount?parameters='+ encodeURI(JSON.stringify(object)));
   }
+
+  getHotelChartData(id: number) {
+    return this.http.get('hotels/' + id + '/getHotelChartData');
+  }
 }

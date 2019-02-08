@@ -1,5 +1,6 @@
 package org.isa.takeoff.controller;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.isa.takeoff.model.Vehicle;
 import org.isa.takeoff.model.VehiclePrice;
 import org.isa.takeoff.model.VehicleRating;
 import org.isa.takeoff.model.VehicleRatingId;
+import org.isa.takeoff.model.VehicleReservation;
 import org.isa.takeoff.service.RentACarMainServiceService;
 import org.isa.takeoff.service.RentACarService;
 import org.isa.takeoff.service.UserService;
@@ -97,6 +99,16 @@ public class VehicleController
 		try 
 		{
 			Vehicle vehicle = this.vehicleService.findOne(vehicleDTO.getId());
+			
+			List<VehicleReservation> vehicleReservations =  vehicle.getVehicleReservations();
+			for (VehicleReservation vehicleReservation : vehicleReservations)
+			{
+				if (vehicleReservation.getReservationEndDate().isAfter(LocalDate.now()))
+				{
+					return new ResponseEntity<>(HttpStatus.FORBIDDEN); 
+				}
+			}
+			
 			vehicle.setBrand(vehicleDTO.getBrand());
 			vehicle.setModel(vehicleDTO.getModel());
 			vehicle.setYear(vehicleDTO.getYear());
@@ -120,9 +132,18 @@ public class VehicleController
 		{
 			Vehicle vehicle = this.vehicleService.findOne(id);
 			
-			if (vehicle.isReserved() || vehicle.getRentACar() == null)
+			if (vehicle.getRentACar() == null)
 			{
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+			
+			List<VehicleReservation> vehicleReservations =  vehicle.getVehicleReservations();
+			for (VehicleReservation vehicleReservation : vehicleReservations)
+			{
+				if (vehicleReservation.getReservationEndDate().isAfter(LocalDate.now()))
+				{
+					return new ResponseEntity<>(HttpStatus.FORBIDDEN); 
+				}
 			}
 			
 			this.vehicleService.delete(id);

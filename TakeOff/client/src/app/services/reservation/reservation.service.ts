@@ -54,4 +54,16 @@ export class ReservationService {
   rateRoom(userRating: any) {
     return this.http.post('/rooms/rateRoom', userRating);
   }
+
+  cancelFlightReservation(reservation: any) {
+    return this.http.put('/reservations/cancelFlightReservation', reservation);
+  }
+
+  cancelVehicleReservation(reservation: any) {
+    return this.http.put('/reservations/cancelVehicleReservation', reservation);
+  }
+
+  cancelRoomReservation(reservation: any) {
+    return this.http.put('/reservations/cancelRoomReservation', reservation);
+  }
 }

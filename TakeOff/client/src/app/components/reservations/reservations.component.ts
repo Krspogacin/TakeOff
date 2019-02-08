@@ -323,14 +323,38 @@ export class ReservationsComponent implements OnInit {
   }
 
   cancelFlightReservation(index: number) {
-
+    this.reservationService.cancelFlightReservation(this.reservations[index].reservationDTO).subscribe(
+      () => {
+        this.gatherReservationsData(this.authService.getUsername());
+        this.appComponent.showSnackBar('You have canceled flight reservation successfully!');
+      },
+      () => {
+        this.appComponent.showSnackBar('Error! Something went wrong');
+      }
+    );
   }
 
   cancelVehicleReservation(index: number) {
-
+    this.reservationService.cancelVehicleReservation(this.reservations[index].reservationDTO).subscribe(
+      () => {
+        this.gatherReservationsData(this.authService.getUsername());
+        this.appComponent.showSnackBar('You have canceled vehicle reservation successfully!');
+      },
+      () => {
+        this.appComponent.showSnackBar('Error! Something went wrong');
+      }
+    );
   }
 
   cancelRoomReservation(index: number) {
-
+    this.reservationService.cancelRoomReservation(this.reservations[index].reservationDTO).subscribe(
+      () => {
+        this.gatherReservationsData(this.authService.getUsername());
+        this.appComponent.showSnackBar('You have canceled room reservation successfully!');
+      },
+      () => {
+        this.appComponent.showSnackBar('Error! Something went wrong');
+      }
+    );
   }
 }
