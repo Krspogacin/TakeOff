@@ -59,7 +59,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 			.exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
 			.authorizeRequests()
-			.antMatchers("/").permitAll()
 			.antMatchers("/hotels/**").permitAll()
 			.antMatchers("/rooms/**").permitAll()
 			.antMatchers("/companies/**").permitAll()

@@ -48,6 +48,12 @@ export class HotelComponent implements OnInit {
       this.userRole = this.authService.getAuthority();
       this.today = new Date();
       this.startDate = this.today;
+
+      this.authService.onSubject.subscribe(
+        (data) => {
+          this.userRole = this.authService.getAuthority();
+        }
+      );
   }
 
   openDialog(){

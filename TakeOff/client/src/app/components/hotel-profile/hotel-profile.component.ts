@@ -236,6 +236,12 @@ export class HotelProfileComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       );
     }
+
+    this.authService.onSubject.subscribe(
+      () => {
+        this.userRole = this.authService.getAuthority();
+      }
+    );
   }
 
   ngAfterViewInit() {

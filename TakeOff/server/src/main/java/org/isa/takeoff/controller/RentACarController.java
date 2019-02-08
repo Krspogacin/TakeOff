@@ -41,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,6 +77,7 @@ public class RentACarController
 	private VehicleReservationService vehicleReservationService;  
 	
 	@RequestMapping(method = GET, value = "/checkMainServiceName/{id}/{name}")
+	@PreAuthorize("hasRole('ROLE_RENTACAR_ADMIN')")
 	public ResponseEntity<?> checkMainServiceName(@PathVariable("id") Long id, @PathVariable("name") String name)
 	{
 		RentACarMainService rentACarMainService = this.rentACarMainServiceService.findByName(name);
@@ -144,7 +146,7 @@ public class RentACarController
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	//@PreAuthorize("hasRole('SYS_ADMIN')")
+	@PreAuthorize("hasRole('SYS_ADMIN')")
 	public ResponseEntity<RentACarDTO> addRentACar(@RequestBody RentACarDTO rentACarDTO) 
 	{
 		if (rentACarDTO.getLocation() == null)
@@ -168,7 +170,7 @@ public class RentACarController
 	}
 
 	@RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	//@PreAuthorize("hasRole('RENTACAR_ADMIN')")
+	@PreAuthorize("hasRole('RENTACAR_ADMIN')")
 	public ResponseEntity<RentACarDTO> updateRentACar(@RequestBody RentACarDTO rentACarDTO) 
 	{
 		if (rentACarDTO.getLocation() == null)
@@ -226,6 +228,7 @@ public class RentACarController
 	}
 	
 	@RequestMapping(value = "/vehiclesOnDiscount", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<List<AvailableVehiclesDTO>> getVehiclesOnDiscount(@RequestParam String parameters) 
 	{
 		VehicleOnDiscountDTO vehicleOnDiscount = new VehicleOnDiscountDTO();
@@ -306,6 +309,7 @@ public class RentACarController
 	}
 	
 	@RequestMapping(value = "/{id}/areThereAvailableVehiclesNotOnDiscount", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<Boolean> areThereAvailableVehiclesNotOnDiscount(@PathVariable Long id) 
 	{
 		try 
@@ -330,6 +334,7 @@ public class RentACarController
 	}
 	
 	@RequestMapping(value = "/vehicles/availableVehicles", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<List<AvailableVehiclesDTO>> getAvailableVehicles(@RequestParam String parametersDTO) 
 	{
 		VehicleReservationParametersDTO parameters;
@@ -562,6 +567,7 @@ public class RentACarController
 	}
 	
 	@RequestMapping(value = "/mainServices", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_RENTACAR_ADMIN')")
 	public ResponseEntity<RentACarMainServiceDTO> addMainService(@RequestBody RentACarMainServiceDTO rentACarMainServiceDTO) 
 	{
 		if (rentACarMainServiceDTO.getRentACar() == null)
@@ -584,6 +590,7 @@ public class RentACarController
 	}
 	
 	@RequestMapping(value = "/mainServices", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_RENTACAR_ADMIN')")
 	public ResponseEntity<RentACarMainServiceDTO> updateMainService(@RequestBody RentACarMainServiceDTO rentACarMainServiceDTO) 
 	{
 		if (rentACarMainServiceDTO.getRentACar() == null)
@@ -609,6 +616,7 @@ public class RentACarController
 	
 	
 	@RequestMapping(value = "/mainServices/{id}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasRole('ROLE_RENTACAR_ADMIN')")
 	public ResponseEntity<?> deleteMainService(@PathVariable Long id) 
 	{
 		try 
@@ -623,6 +631,7 @@ public class RentACarController
 	}
 	
 	@RequestMapping(value = "/offices", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_RENTACAR_ADMIN')")
 	public ResponseEntity<OfficeDTO> addOffice(@RequestBody OfficeDTO officeDTO) 
 	{
 		if (officeDTO.getRentACar() == null || officeDTO.getLocation() == null)
@@ -654,6 +663,7 @@ public class RentACarController
 	}
 	
 	@RequestMapping(value = "/offices", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_RENTACAR_ADMIN')")
 	public ResponseEntity<OfficeDTO> updateOffice(@RequestBody OfficeDTO officeDTO) 
 	{
 		if (officeDTO.getRentACar() == null || officeDTO.getLocation() == null)
@@ -691,6 +701,7 @@ public class RentACarController
 	
 	
 	@RequestMapping(value = "/offices/{id}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasRole('ROLE_RENTACAR_ADMIN')")
 	public ResponseEntity<?> deleteOffice(@PathVariable Long id) 
 	{
 		try 
@@ -726,6 +737,7 @@ public class RentACarController
 	}
 	
 	@RequestMapping(value="/rateRentACar", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<?> rateRentACar(@RequestBody UserRatingRentACarDTO userRatingRentACarDTO) 
 	{
 		if (userRatingRentACarDTO.getRentACar() == null || userRatingRentACarDTO.getRating() == null || userRatingRentACarDTO.getUsername() == null)
