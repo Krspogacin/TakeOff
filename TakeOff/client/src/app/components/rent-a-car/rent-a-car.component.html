@@ -151,7 +151,9 @@
         <div *ngIf="!offices || offices.length == 0" class="mt-3">
           <h4 style="font-size: 150%; text-align: center;">This rent a car service does not have any office yet!</h4>
         </div>
-      </mat-tab>      
+      </mat-tab>
+      <mat-tab label="Reservations chart">
+      </mat-tab>   
     </mat-tab-group>
   </div>
   <br><br>
@@ -161,3 +163,4 @@
     </p>
   </div>
 </div>
+<div id="chartdiv" class="w-100" style="height: 500px;"></div>

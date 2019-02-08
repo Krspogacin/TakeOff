@@ -20,6 +20,7 @@ import org.isa.takeoff.model.FlightReservation;
 import org.isa.takeoff.model.Hotel;
 import org.isa.takeoff.model.HotelRating;
 import org.isa.takeoff.model.HotelRatingId;
+import org.isa.takeoff.model.RentACar;
 import org.isa.takeoff.model.RentACarRating;
 import org.isa.takeoff.model.RentACarRatingId;
 import org.isa.takeoff.model.Reservation;
@@ -234,7 +235,24 @@ public class FlightReservationController {
 																			   vehicleReservationDTO.getReservationEndDate(),
 																			   vehicleReservationDTO.getTotalPrice());
 				
-				Vehicle vehicle = this.vehicleService.findOne(vehicleReservationDTO.getVehicle().getId());
+				Vehicle vehicle = new Vehicle(vehicleReservationDTO.getVehicle());
+				vehicle.setId(vehicleReservationDTO.getVehicle().getId());
+				vehicle.setVersion(vehicleReservationDTO.getVehicle().getVersion());
+				vehicle.setReserved(true);
+				
+				RentACar rentACar = this.rentACarService.findOne(vehicleReservationDTO.getVehicle().getRentACar().getId());
+				vehicle.setRentACar(rentACar);
+				
+				//Optimistic lock exception is expected when two users try to make a reservation of the same vehicle in the same time
+				try
+				{
+					vehicle = this.vehicleService.save(vehicle);					
+				}
+				catch(Exception e)
+				{
+					return new ResponseEntity<>(HttpStatus.CONFLICT);
+				}
+				
 				vehicleReservation.setVehicle(vehicle);
 				reservation.setVehicleReservation(vehicleReservation);
 				reservation = this.reservationService.saveReservation(reservation);
