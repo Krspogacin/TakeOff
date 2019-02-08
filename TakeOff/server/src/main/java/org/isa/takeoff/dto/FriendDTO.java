@@ -7,20 +7,22 @@ public class FriendDTO {
 	private UserDTO user1;
 	private UserDTO user2;
 	private boolean accepted;
+	private Long version;
 
 	public FriendDTO() {
 
 	}
 
 	public FriendDTO(Friend friend) {
-		this(new UserDTO(friend.getId().getUser1()), new UserDTO(friend.getId().getUser2()), friend.isAccepted());
+		this(new UserDTO(friend.getId().getUser1()), new UserDTO(friend.getId().getUser2()), friend.isAccepted(), friend.getVersion());
 	}
 
-	public FriendDTO(UserDTO user1, UserDTO user2, boolean accepted) {
+	public FriendDTO(UserDTO user1, UserDTO user2, boolean accepted, Long version) {
 		super();
 		this.user1 = user1;
 		this.user2 = user2;
 		this.accepted = accepted;
+		this.version = version;
 	}
 
 	public UserDTO getUser1() {
@@ -45,6 +47,14 @@ public class FriendDTO {
 
 	public void setAccepted(boolean accepted) {
 		this.accepted = accepted;
+	}
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 
 }

@@ -220,7 +220,7 @@ export class FlightComponent implements OnInit {
 
         this.reservationService.createReservations(reservations).subscribe(
           () => {
-            this.appComponent.showSnackBar('Reservation successfull!');
+            this.appComponent.showSnackBar('Reservation successful!');
           },
           () => {
             this.appComponent.showSnackBar('Reservation failed. Please try again.');
@@ -269,7 +269,7 @@ export class FlightComponent implements OnInit {
         },
         () => {
           this.appComponent.showSnackBar(this.message);
-          // setTimeout(function () { location.reload(); }, 3000);
+          setTimeout(function () { location.reload(); }, 3000);
         }
       );
     }

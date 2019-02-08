@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { AirCompanyService } from 'src/app/services/air-company/air-company.service';
-import { PageEvent, MatDialog } from '@angular/material';
-import { AddEntityDialogComponent } from '../add-entity-dialog/add-entity-dialog.component';
-import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
+import { MatDialog, PageEvent } from '@angular/material';
 import { AppComponent } from 'src/app/app.component';
-import { AirCompanyDialogComponent } from '../air-company-dialog/air-company-dialog.component';
+import { AirCompanyService } from 'src/app/services/air-company/air-company.service';
+import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
+import { AddEntityDialogComponent } from '../add-entity-dialog/add-entity-dialog.component';
 
 declare let require: any;
 
@@ -30,9 +29,15 @@ export class AirCompaniesComponent implements OnInit {
 
   selected = this.sortOptions[0].value;
   selectedOption = this.sortOptions[0];
-  nameFilterParam = '';
-  countryFilterParam = '';
-  cityFilterParam = '';
+  search = false;
+  flights = [];
+  minDate = new Date();
+  searchObject = {
+    'companyId': null,
+    'departure': null,
+    'arrival': null,
+    'date': null
+  };
 
   constructor(private authService: AuthenticationService, private airCompanyService: AirCompanyService,
     private dialog: MatDialog, private appComponent: AppComponent) { }
@@ -65,20 +70,20 @@ export class AirCompaniesComponent implements OnInit {
 
   openDialog(): void {
     const dialogRef = this.dialog.open(AddEntityDialogComponent,
-    {
-      data: 0,
-      disableClose: true,
-      autoFocus: true,
-      width: '60%',
-      height: '90%'
-    });
+      {
+        data: 0,
+        disableClose: true,
+        autoFocus: true,
+        width: '60%',
+        height: '90%'
+      });
     dialogRef.afterClosed().subscribe(
       (result) => {
         if (result) {
-            this.message = 'Added successfully!';
-            const airCompany = result;
-            airCompany.rating = 0;
-            this.companies.push(airCompany);
+          this.message = 'Added successfully!';
+          const airCompany = result;
+          airCompany.rating = 0;
+          this.companies.push(airCompany);
         }
       },
       () => {
@@ -101,13 +106,24 @@ export class AirCompaniesComponent implements OnInit {
         this.selectedOption = this.sortOptions[i];
       }
     }
-    this.companies = this.appComponent.sortArray(this.companies, this.selectedOption.sortBy, this.selectedOption.asc);
+    if (!this.search) {
+      this.companies = this.appComponent.sortArray(this.companies, this.selectedOption.sortBy, this.selectedOption.asc);
+    } else {
+      this.flights = this.appComponent.sortArray(this.flights, this.selectedOption.sortBy, this.selectedOption.asc);
+    }
   }
 
-  search(searchName: string, countryParam: string, cityParam: string) {
-    this.nameFilterParam = searchName;
-    this.countryFilterParam = countryParam;
-    this.cityFilterParam = cityParam;
+  searchFlights(departure, arrival, date) {
+    this.searchObject.departure = departure;
+    this.searchObject.arrival = arrival;
+    this.searchObject.date = date ? new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())) : null;
+
+    this.airCompanyService.searchFlights(this.searchObject).subscribe(
+      (flights: []) => {
+        this.flights = flights;
+        this.search = true;
+      }
+    );
   }
 
 }

@@ -1,96 +1,109 @@
 <div *ngIf="!loadingCompany && !loadingFlights && !loadingDestinations">
     <div *ngIf="companyExists">
-        <h1>{{company.name}}</h1>
-
-        <div *ngIf="userRole && userRole === 'ROLE_AIRCOMPANY_ADMIN'">
-            <button mat-raised-button color="primary" (click)="openAddFlightDialog()">
-                <mat-icon>add</mat-icon> Add flight
-            </button>
-            <button mat-raised-button color="primary" (click)="openUpdateDialog()" style="margin: 5px">
-                <mat-icon>edit</mat-icon> Update
-            </button>
+        <div class="row">
+            <h1 class="p-3 col-6">{{company.name}}</h1>
+            <div class="col-6" *ngIf="userRole && userRole === 'ROLE_AIRCOMPANY_ADMIN'">
+                <button mat-raised-button color="primary" (click)="openAddFlightDialog()">
+                    <mat-icon>add</mat-icon> Add flight
+                </button>
+                <button mat-raised-button color="primary" (click)="openUpdateDialog()" style="margin: 5px">
+                    <mat-icon>edit</mat-icon> Update
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="p-3 col-6">
+                <p><b>Description:</b> {{(!company.description) ? '✗' : company.description}}</p>
+                <b>Rating: </b>
+                <div class="star-ratings-css mx-2">
+                    <div class="star-ratings-css-top">
+                        <span [ngStyle]="{'width': ((rating * 100) / 5) + '%'}">★★★★★</span>
+                    </div>
+                    <div><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+                </div>
+                <span class="badge badge-pill badge-info align-middle">{{rating}}/5</span>
+                <p><br><b>Address:</b> {{company.location.address}}</p>
+            </div>
+            <div class="col-6">
+                <div *ngIf="destinations.length > 0">
+                    <h3>Offices</h3>
+                    <mat-form-field>
+                        <mat-chip-list>
+                            <mat-chip *ngFor="let dest of destinations" color="primary">
+                                {{dest.city}}, {{dest.country}}
+                            </mat-chip>
+                        </mat-chip-list>
+                    </mat-form-field>
+                </div>
+            </div>
         </div>
 
-        <div class="p-3">
-            <p><b>Description:</b> {{(!company.description) ? '✗' : company.description}}</p>
-            <b>Rating: </b>
-            <div class="star-ratings-css mx-2">
-                <div class="star-ratings-css-top">
-                    <span [ngStyle]="{'width': ((rating * 100) / 5) + '%'}">★★★★★</span>
-                </div>
-                <div><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-            </div>
-            <span class="badge badge-pill badge-info align-middle">{{rating}}/5</span>
-            <p><br><b>Address:</b> {{company.location.address}}</p>
-            <div>
-                <iframe width="600" height="500" [src]='mapUrl' frameborder="0" scrolling="no" marginheight="0"
+        <div class="row container-fluid">
+            <div class="col-6">
+                <iframe [src]='mapUrl' width="600" height="500" frameborder="0" scrolling="no" marginheight="0"
                     marginwidth="0">
                 </iframe>
             </div>
+            <div class="col-6" *ngIf="onDiscountTickets.length > 0">
+                <h3>Tickets on discount</h3>
+                <div class="list-group">
+                    <a class="list-group-item" *ngFor="let ticket of onDiscountTickets">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">
+                                {{ticket.flight.takeOffLocation.city}}, {{ticket.flight.takeOffLocation.country}}
+                                &nbsp;<mat-icon>forward</mat-icon>&nbsp;
+                                {{ticket.flight.landingLocation.city}}, {{ticket.flight.landingLocation.country}}
+                            </h5>
+                            <small>
+                                <button mat-flat-button color="primary" (click)="createFastReservation(ticket)" *ngIf="userRole === 'ROLE_USER'">BookNow</button>
+                                &nbsp;&nbsp;
+                                {{ticket.flight.ticketPrice | currency}}
+                            </small>
+                        </div>
+                        <small>
+                            <span style="margin-left: 20px">{{ticket.flight.takeOffDate | date:'short'}}</span>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <span style="margin-left: 70px">{{ticket.flight.landingDate | date:'short'}}</span>
+                        </small>
+                    </a>
+                </div>
+            </div>
+            <br>
         </div>
 
-        <h3>Destinations:</h3>
-        <mat-form-field>
-            <mat-chip-list>
-                <mat-chip *ngFor="let dest of destinations" color="primary">
-                    {{dest.city}}, {{dest.country}}
-                </mat-chip>
-            </mat-chip-list>
-        </mat-form-field>
+        <div class="row">
+            <ul class="list-group p-3 col-6" *ngIf="flights.length > 0">
+                <h3>Flights</h3>
+                <a class="list-group-item list-group-item-action" *ngFor="let flight of flights" routerLink="/flights/{{flight.id}}">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">
+                            <mat-icon>flight_takeoff</mat-icon>
+                            <span style="margin-left: 10px">
+                                {{flight.takeOffLocation.city}}
+                            </span>
+                            <mat-icon style="margin-left: 100px">flight_land</mat-icon>
+                            <span style="margin-left: 10px">
+                                {{flight.landingLocation.city}}
+                            </span>
+                        </h5>
+                        <small>from {{flight.ticketPrice | currency}}</small>
+                    </div>
+                    <small>
+                        <span style="margin-left: 10px">{{flight.takeOffDate | date:'short'}}</span>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span style="margin-left: 110px">{{flight.landingDate | date:'short'}}</span>
+                    </small>
+                </a>
+            </ul>
 
-        <h3>Flights:</h3>
-        <ul class="list-group col-6">
-            <a class="list-group-item list-group-item-action row" *ngFor="let flight of flights" routerLink="/flights/{{flight.id}}">
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">
-                        <mat-icon>flight_takeoff</mat-icon>&nbsp;&nbsp;{{flight.takeOffLocation.city}}&nbsp;
-                        <mat-icon>flight_land</mat-icon>&nbsp;&nbsp;{{flight.landingLocation.city}}
-                    </h5>
-                    <small>from {{flight.ticketPrice | currency}}</small>
-                </div>
-                <!-- <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius
-                    blandit.</p> -->
-                <small>{{flight.takeOffDate | date}}</small>
-                <!-- <div class="col-3">
-                    <mat-label>
-                        <mat-icon>flight_takeoff</mat-icon> {{flight.takeOffLocation.city}} &nbsp;
-                    </mat-label>
-                    <mat-label>
-                        <mat-icon>flight_land</mat-icon> {{flight.landingLocation.city}}
-                    </mat-label>
-                </div>
-                <div class="col-3">
-                    {{flight.takeOffDate | date}} <b>-</b> {{flight.landingDate | date}}
-                </div> -->
-            </a>
-        </ul>
-        <!-- <mat-card *ngFor="let flight of flights">
-            <mat-card-header>
-                <mat-card-title>
-                    <mat-label>
-                        <mat-icon>flight_takeoff</mat-icon> {{flight.takeOffLocation.city}}
-                    </mat-label>
-                    <mat-label>
-                        <mat-icon>flight_land</mat-icon> {{flight.landingLocation.city}}
-                    </mat-label>
-                </mat-card-title>
-                {{flight.takeOffDate | date}}
-                {{flight.landingDate}}
-            </mat-card-header>
-            <mat-card-content>
-                <p><b>Distance:</b> {{flight.distance}} </p>
-                <p><b>Ticket price:</b> {{flight.ticketPrice | currency}} </p>
-            </mat-card-content>
-            <mat-card-actions>
-                <button mat-stroked-button color="primary" routerLink="/flights/{{flight.id}}">DETAILS</button>
-            </mat-card-actions>
-        </mat-card> -->
+            <div *ngIf="flights.length === 0" class="p-3">
+                <h5>Company has no active flights.</h5>
+            </div>
+        </div>
 
+        <div *ngIf="!companyExists">
+            <p>
+                Air company not found!
+            </p>
+        </div>
     </div>
-
-    <div *ngIf="!companyExists">
-        <p>
-            Air company not found!
-        </p>
-    </div>
-</div>

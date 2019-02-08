@@ -39,6 +39,7 @@ import org.isa.takeoff.service.FlightService;
 import org.isa.takeoff.service.HotelService;
 import org.isa.takeoff.service.RentACarService;
 import org.isa.takeoff.service.RoomService;
+import org.isa.takeoff.service.TicketService;
 import org.isa.takeoff.service.UserService;
 import org.isa.takeoff.service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +80,9 @@ public class FlightReservationController {
 	@Autowired
 	private RentACarService rentACarService;
 	
+	@Autowired
+	private TicketService ticketService;
+	
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<FlightReservationDTO>> addReservations(@RequestBody List<FlightReservationDTO> reservationsDTO) {
@@ -91,12 +95,10 @@ public class FlightReservationController {
 				Ticket ticket = null;
 				for (Ticket t : tickets) {
 					if (t.getId().equals(r.getTicket().getId())) {
-//						if (t.getIsReserved()) {
-//							return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//						}
+						ticket = new Ticket(r.getTicket());
+						ticket.setFlight(t.getFlight());
 						t.setIsReserved(true);
 						t.setType(r.getTicket().getType());
-						ticket = t;
 						break;
 					}
 				}
@@ -130,6 +132,7 @@ public class FlightReservationController {
 						vehicleReservation.setVehicle(vehicle);
 						reservation.setVehicleReservation(vehicleReservation);
 					}
+					ticket = ticketService.save(ticket);
 					FlightReservation flightReservation = new FlightReservation(user, ticket, reservation);
 					reservationService.save(flightReservation);
 				}
@@ -138,7 +141,7 @@ public class FlightReservationController {
 			return new ResponseEntity<>(reservationsDTO, HttpStatus.OK);
 
 		} catch (Exception e) {
-
+//			e.printStackTrace();
 		}
 
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);

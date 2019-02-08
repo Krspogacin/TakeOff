@@ -1,11 +1,13 @@
 package org.isa.takeoff.controller;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.isa.takeoff.dto.AirCompanyDTO;
 import org.isa.takeoff.dto.FlightDTO;
+import org.isa.takeoff.dto.FlightSearchDTO;
 import org.isa.takeoff.dto.LocationDTO;
 import org.isa.takeoff.model.AirCompany;
 import org.isa.takeoff.model.AirCompanyRating;
@@ -22,7 +24,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping(value = "/companies")
@@ -33,6 +38,9 @@ public class AirCompanyController {
 
 	@Autowired
 	private LocationService locationService;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<AirCompanyDTO>> getCompanies() {
@@ -263,6 +271,41 @@ public class AirCompanyController {
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
+	}
+
+	@RequestMapping(value = "/flights", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<FlightDTO>> searchFlights(@RequestParam String parameters) {
+
+		List<FlightDTO> flights = new ArrayList<>();
+		FlightSearchDTO searchDTO = null;
+		try {
+			searchDTO = objectMapper.readValue(parameters, FlightSearchDTO.class);
+			Long companyId = searchDTO.getCompanyId();
+			String from = searchDTO.getDeparture();
+			String to = searchDTO.getArrival();
+			LocalDate date = searchDTO.getDate();
+
+			List<AirCompany> companies = airCompanyService.findAll();
+
+			companies.stream().forEach(company -> company.getFlights().stream().forEach(flight -> {
+
+				if ((companyId == null || company.getId().equals(companyId))
+						&& (from == null || flight.getTakeOffLocation().getCity().toLowerCase().startsWith(from))
+						&& (to == null || flight.getLandingLocation().getCity().toLowerCase().startsWith(to))
+						&& (date == null || date.isBefore(flight.getTakeOffDate().toLocalDate()))) {
+					
+					
+					flights.add(new FlightDTO(flight));
+				}
+
+			}));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+		return new ResponseEntity<>(flights, HttpStatus.OK);
 	}
 
 }
