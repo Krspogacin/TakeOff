@@ -4,7 +4,7 @@
         <button mat-raised-button color="primary" style="float: right;margin: 5px;" (click)="openAddRoomDialog()"><mat-icon>add</mat-icon> Add room</button>
         <button mat-raised-button color="primary" style="float: right;margin: 5px;" (click)="openUpdateDialog()"><mat-icon>edit</mat-icon> Update hotel</button>
         <p><font size="5"><b>Description:</b> {{hotel.description}}</font></p>
-        <b>Rating: </b>
+        <b><font size="5">Rating:</font> </b>
         <div class="star-ratings-css mx-2">
             <div class="star-ratings-css-top">
                 <span [ngStyle]="{'width': ((rating * 100) / 5) + '%'}">
@@ -22,7 +22,7 @@
                     frameborder="0" scrolling="no" marginheight="0" marginwidth="0">
             </iframe>
         </div>
-        <div class="mat-elevation-z8" *ngIf="rooms">
+        <div class="mat-elevation-z8" *ngIf="rooms && rooms.length != 0">
         <b><font size="5">Rooms: </font></b>
         <table style="width:100%" mat-table matSort [dataSource]="rooms.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)">
             
@@ -132,7 +132,7 @@
         </mat-paginator>
         </div>
         <br><br>
-        <div class="mat-elevation-z8" *ngIf="rooms">
+        <div class="mat-elevation-z8" *ngIf="rooms && rooms.length != 0">
         <b><font size="5">Room prices: </font></b>
         <table style="width:100%" mat-table matSort [dataSource]="rooms.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)">
         

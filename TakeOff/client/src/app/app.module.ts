@@ -27,6 +27,8 @@ import { FriendsFilterPipe } from './pipes/friends-filter/friends-filter.pipe';
 import { VehicleReservationDialogComponent } from './components/vehicle-reservation-dialog/vehicle-reservation-dialog.component';
 import { RatingRoundPipe } from './pipes/rating-round/rating-round.pipe';
 import { ChangePasswordDialogComponent } from './components/change-password-dialog/change-password-dialog.component';
+import { AmChartsModule } from '@amcharts/amcharts3-angular';
+import { LicationAndNamePipe } from './pipes/location-and-name/lication-and-name.pipe';
 
 @NgModule({
     declarations: [
@@ -50,6 +52,7 @@ import { ChangePasswordDialogComponent } from './components/change-password-dial
         OfficeDialogComponent,
         RatingRoundPipe,
         ChangePasswordDialogComponent,
+        LicationAndNamePipe,
     ],
     entryComponents: [
         RoutingComponents,
@@ -70,6 +73,7 @@ import { ChangePasswordDialogComponent } from './components/change-password-dial
         BrowserAnimationsModule,
         MaterialModule,
         ReactiveFormsModule,
+        AmChartsModule
     ],
     providers: [{ provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
     bootstrap: [AppComponent]

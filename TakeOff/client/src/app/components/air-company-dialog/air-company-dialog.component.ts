@@ -16,6 +16,7 @@ export class AirCompanyDialogComponent implements OnInit {
     'name': '',
     'location': { 'address': '' },
     'description': '',
+    'version': null
   };
   location: any = {};
   destinations = [];
@@ -132,6 +133,7 @@ export class AirCompanyDialogComponent implements OnInit {
     delete company.destinations;
     company.id = this.company.id;
     company.location = this.location;
+    company.version = this.company.version;
 
     const updated = {
       'company': company,

@@ -1,16 +1,342 @@
+<!-- <div id="chartdiv" style="width: 100%; height: 500px;"></div> -->
 <div *ngIf="!loading">
-  <div *ngIf="exists">
-
-    <ul class="list-group list-group-flush">
-      <li class="list-group-item" *ngFor="let res of reservations">
-        {{res.ticket.flight.takeOffDate | date}}<br>
-        {{res.ticket.flight.distance}}km<br>
-        {{res.ticket.type}}
-      </li>
-    </ul>
-
+  <div *ngIf="exists" class="mt-5">
+    <h1 style="text-align: center"><i>Your reservations history</i></h1>
+    <div *ngIf="reservations && reservations.length > 0" class="row d-flex justify-content-center mt-2">
+      <div class="list-group w-75">
+        <div class="list-group-item flex-column align-items-stretch my-2" 
+            *ngFor="let item of reservations; let i = index;"
+            [ngClass]="{'list-group-item-danger': item.state === 0, 
+                        'list-group-item-warning': item.state === 1,
+                        'list-group-item-success': item.state === 2}">
+          <!-- FLIGHT RESERVATION -->
+          <div class="row">
+            <div class="col d-flex justify-content-center">
+              <p class="font-weight-light">Air Company</p>
+            </div>
+            <mat-divider [vertical]="true"></mat-divider>
+            <div class="col d-flex justify-content-center">
+              <p class="font-weight-light">Flight</p>
+            </div>
+          </div>
+          <div class="row">
+            <!-- aircompany info --> 
+            <div class="col" style="text-align: center;">
+              <h3>{{item.ticket.flight.company.name}}</h3>
+              <p class="font-weight-bold">Location: {{item.ticket.flight.company.location.address}}</p>
+            </div>
+            <mat-divider [vertical]="true"></mat-divider>
+            <!-- flight info -->
+            <div class="col" style="text-align: center;">
+              <p class="font-weight-bold">{{item.ticket.flight.takeOffLocation.city}}, {{item.ticket.flight.takeOffLocation.country}}</p>
+              <p class="font-weight-bold">{{item.ticket.flight.takeOffDate | date:'MM/dd/y HH:mm'}}</p>
+              <p class="font-weight-bold"><mat-icon>arrow_downward</mat-icon></p>
+              <p class="font-weight-bold">{{item.ticket.flight.landingLocation.city}}, {{item.ticket.flight.landingLocation.country}}</p>
+              <p class="font-weight-bold">{{item.ticket.flight.landingDate | date:'MM/dd/y HH:mm'}}</p>
+            </div>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="row">
+            <!-- Air Company rating -->
+            <div class="col">
+              <b>Rate us:</b><br>
+                <span (mouseover)="item.hoveringAircompany = true;" 
+                      (mouseout)="item.aircompanyRatingToShow = item.aircompanyRating; item.hoveringAircompany = false;"
+                      [ngStyle]="{'cursor': item.hoveringAircompany ? 'pointer' : 'initial', 'pointer-events': item.state === 0 ? 'initial' : 'none'}"
+                      style="font-size: 25px;">
+                  <span *ngFor="let rate of [1, 2, 3, 4, 5]"
+                        (mouseover)="item.aircompanyRatingToShow = rate" 
+                        [ngStyle]="{'color': item.aircompanyRatingToShow >= rate ? (item.hoveringAircompany ? 'blue' : '#e7711b') : '#a2a2a2' }"
+                        (click)="rateAirCompany(i, rate)">
+                        ★
+                  </span>
+                </span>
+              <span class="badge badge-pill badge-info">{{item.aircompanyRating | ratingRound}}/5</span>
+            </div>
+            <mat-divider [vertical]="true"></mat-divider>
+            <!-- Flight rating -->
+            <div class="col">
+              <b>Rate our flight: </b><br>
+              <span (mouseover)="item.hoveringFlight = true;" 
+                    (mouseout)="item.flightRatingToShow = item.flightRating; item.hoveringFlight = false;"
+                    [ngStyle]="{'cursor': item.hoveringFlight ? 'pointer' : 'initial', 'pointer-events': item.state === 0 ? 'initial' : 'none'}"
+                    style="font-size: 25px;">
+                <span *ngFor="let rate of [1, 2, 3, 4, 5]" 
+                      (mouseover)="item.flightRatingToShow = rate" 
+                      [ngStyle]="{'color': item.flightRatingToShow >= rate ? (item.hoveringFlight ? 'blue' : '#e7711b') : '#a2a2a2' }"
+                      (click)="rateFlight(i, rate)">
+                      ★
+                </span>
+              </span>
+              <span class="badge badge-pill badge-info">{{item.flightRating | ratingRound}}/5</span>
+            </div>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="row">
+            <div class="col d-flex justify-content-center">
+                <p class="font-weight-light">Ticket info</p>
+            </div>
+          </div>
+          <div class="row">
+            <!-- ticket info-->
+            <div class="col">
+              <p class="font-weight-bold">Type: {{item.ticket.type | uppercase}}</p>
+              <p class="font-weight-bold">Number: {{item.ticket.number}}</p>
+            </div>
+            <mat-divider [vertical]="true"></mat-divider>
+            <!-- ticket price -->
+            <div class="col">
+              <div class="row d-flex justify-content-center mt-4">
+                <h4 class="mr-2">Ticket price <mat-icon class="align-middle">arrow_forward</mat-icon></h4>
+                <p style="font-size: 140%;">{{item.ticket.flight.ticketPrice}}€</p>
+              </div>
+            </div>
+          </div>
+          <mat-divider *ngIf="item.canCancel"></mat-divider>
+          <div *ngIf="item.canCancel">
+            <div class="d-flex justify-content-center mt-2">
+              <!-- cancel flight reservation if possible -->
+              <button mat-raised-button color="warn" (click)="cancelFlightReservation(i)">Cancel <mat-icon>close</mat-icon></button>
+            </div>
+            <div class="d-flex justify-content-center mt-3">
+              <p class="font-weight-light">*You can cancel your flight reservation at last 3 hours before</p>
+            </div>
+          </div>
+          <div class="row">
+            <!-- VEHICLE RESERVATION -->
+            <div class="col">
+              <mat-expansion-panel [disabled]="!item.reservationDTO.vehicleReservation">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <span class="font-weight-bold" *ngIf="!item.reservationDTO.vehicleReservation">You have no vehicle reservation for this flight.</span>
+                    <span class="font-weight-bold" *ngIf="item.reservationDTO.vehicleReservation">Vehicle reservation</span>
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="list-group-item flex-column align-items-stretch" *ngIf="item.reservationDTO.vehicleReservation"
+                     [ngClass]="{'list-group-item-danger': item.reservationDTO.vehicleReservation.state === 0, 
+                                 'list-group-item-warning': item.reservationDTO.vehicleReservation.state === 1,
+                                 'list-group-item-success': item.reservationDTO.vehicleReservation.state === 2}">
+                  <div class="row">
+                    <div class="col d-flex justify-content-center">
+                      <p class="font-weight-light">Rent a car service</p>
+                    </div>
+                    <mat-divider [vertical]="true"></mat-divider>
+                    <div class="col d-flex justify-content-center">
+                      <p class="font-weight-light">Vehicle</p>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <!-- rent a car info --> 
+                    <div class="col" style="text-align: center;">
+                      <p class="font-weight-bold">{{item.reservationDTO.vehicleReservation.vehicle.rentACar.name}}</p>
+                    </div>
+                    <mat-divider [vertical]="true"></mat-divider>
+                    <!-- vehicle info -->
+                    <div class="col" style="text-align: center;">
+                      <p class="font-weight-bold">{{item.reservationDTO.vehicleReservation.vehicle.brand}} {{item.reservationDTO.vehicleReservation.vehicle.model}} {{item.reservationDTO.vehicleReservation.vehicle.year}}</p>
+                    </div>
+                  </div>
+                  <mat-divider></mat-divider>
+                  <div class="row">
+                    <!-- Rent a car rating -->
+                    <div class="col">
+                      <b>Rate us:</b><br>
+                      <span (mouseover)="item.hoveringRentACar = true;" 
+                            (mouseout)="item.reservationDTO.vehicleReservation.rentACarRatingToShow = item.reservationDTO.vehicleReservation.rentACarRating; item.hoveringRentACar = false;"
+                            [ngStyle]="{'cursor': item.hoveringRentACar ? 'pointer' : 'initial', 'pointer-events': item.reservationDTO.vehicleReservation.state === 0 ? 'initial' : 'none'}"
+                            style="font-size: 25px;">
+                        <span *ngFor="let rate of [1, 2, 3, 4, 5]" 
+                              (mouseover)="item.reservationDTO.vehicleReservation.rentACarRatingToShow = rate" 
+                              [ngStyle]="{'color': item.reservationDTO.vehicleReservation.rentACarRatingToShow >= rate ? (item.hoveringRentACar ? 'blue' : '#e7711b') : '#a2a2a2' }"
+                              (click)="rateRentACar(i, rate)">
+                              ★
+                        </span>
+                      </span>
+                      <span class="badge badge-pill badge-info">{{item.reservationDTO.vehicleReservation.rentACarRating | ratingRound}}/5</span>
+                    </div>
+                    <mat-divider [vertical]="true"></mat-divider>
+                    <!-- Vehicle rating -->
+                    <div class="col">
+                      <b>Rate our vehicle: </b><br>
+                      <span (mouseover)="item.hoveringVehicle = true;" 
+                            (mouseout)="item.reservationDTO.vehicleReservation.vehicleRatingToShow = item.reservationDTO.vehicleReservation.vehicleRating; item.hoveringVehicle = false;"
+                            [ngStyle]="{'cursor': item.hoveringVehicle ? 'pointer' : 'initial', 'pointer-events': item.reservationDTO.vehicleReservation.state === 0 ? 'initial' : 'none'}"
+                            style="font-size: 25px;">
+                        <span *ngFor="let rate of [1, 2, 3, 4, 5]" 
+                              (mouseover)="item.reservationDTO.vehicleReservation.vehicleRatingToShow = rate" 
+                              [ngStyle]="{'color': item.reservationDTO.vehicleReservation.vehicleRatingToShow >= rate ? (item.hoveringVehicle ? 'blue' : '#e7711b') : '#a2a2a2' }"
+                              (click)="rateVehicle(i, rate)">
+                              ★
+                        </span>
+                      </span>
+                      <span class="badge badge-pill badge-info">{{item.reservationDTO.vehicleReservation.vehicleRating | ratingRound}}/5</span>
+                    </div>
+                  </div>
+                  <mat-divider></mat-divider>
+                  <div class="row">
+                    <!-- startdate, enddate and totalprice-->
+                    <div class="col">
+                      <div class="row">
+                        <div class="col d-flex justify-content-center">
+                          <p class="font-weight-light">Reservation period</p>
+                        </div>
+                      </div>
+                      <p class="font-weight-bold">From: {{item.reservationDTO.vehicleReservation.reservationStartDate | date}}</p>
+                      <p class="font-weight-bold">To: {{item.reservationDTO.vehicleReservation.reservationEndDate | date}}</p>
+                    </div>
+                    <mat-divider [vertical]="true"></mat-divider>
+                    <div class="col">
+                      <div class="row d-flex justify-content-center mt-5">
+                        <h4 class="mr-2">Total price <mat-icon class="align-middle">arrow_forward</mat-icon></h4>
+                        <p style="font-size: 140%;" class="mt-1">{{item.reservationDTO.vehicleReservation.totalPrice}}€</p>
+                      </div>
+                    </div>
+                  </div>
+                  <mat-divider *ngIf="item.reservationDTO.vehicleReservation.canCancel"></mat-divider>
+                  <div *ngIf="item.reservationDTO.vehicleReservation.canCancel">
+                    <div class="d-flex justify-content-center mt-2">
+                      <!-- cancel reservation if possible -->
+                      <button mat-raised-button color="warn" (click)="cancelVehicleReservation(i)">Cancel <mat-icon>close</mat-icon></button>
+                    </div>
+                    <div class="d-flex justify-content-center mt-3">
+                      <p class="font-weight-light">*You can cancel your vehicle reservation at last 2 days before</p>
+                    </div>
+                  </div>
+                </div>
+              </mat-expansion-panel>
+            </div>
+            <!-- ROOM RESERVATION -->
+            <div class="col">
+              <mat-expansion-panel [disabled]="!item.reservationDTO.roomReservation">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <span class="font-weight-bold" *ngIf="!item.reservationDTO.roomReservation">You have no room reservation for this flight.</span>
+                    <span class="font-weight-bold" *ngIf="item.reservationDTO.roomReservation">Room reservation</span>
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="list-group-item flex-column align-items-stretch" *ngIf="item.reservationDTO.roomReservation"
+                      [ngClass]="{'list-group-item-danger': item.reservationDTO.roomReservation.state === 0, 
+                                  'list-group-item-warning': item.reservationDTO.roomReservation.state === 1,
+                                  'list-group-item-success': item.reservationDTO.roomReservation.state === 2}">
+                  <div class="row">
+                    <div class="col d-flex justify-content-center">
+                      <p class="font-weight-light">Hotel</p>
+                    </div>
+                    <mat-divider [vertical]="true"></mat-divider>
+                    <div class="col d-flex justify-content-center">
+                      <p class="font-weight-light">Reservation period</p>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <!-- hotel info --> 
+                    <div class="col" style="text-align: center;">
+                      <p class="font-weight-bold">{{item.reservationDTO.roomReservation.roomsAndRatings[0].room.hotel.name}}</p>
+                    </div>
+                    <mat-divider [vertical]="true"></mat-divider>
+                    <!-- startdate, enddate  -->
+                    <div class="col" style="text-align: center;">
+                      <p class="font-weight-bold">From: {{item.reservationDTO.roomReservation.reservationStartDate | date}}</p>
+                      <p class="font-weight-bold">To: {{item.reservationDTO.roomReservation.reservationEndDate | date}}</p>
+                    </div>
+                  </div>
+                  <mat-divider></mat-divider>
+                  <div class="row">
+                    <!-- Hotel rating -->
+                    <div class="col">
+                      <b>Rate us:</b><br>
+                      <span (mouseover)="item.hoveringHotel = true;"
+                            (mouseout)="item.reservationDTO.roomReservation.hotelRatingToShow = item.reservationDTO.roomReservation.hotelRating; item.hoveringHotel = false;"
+                            [ngStyle]="{'cursor': item.hoveringHotel ? 'pointer' : 'initial', 'pointer-events': item.reservationDTO.roomReservation.state === 0 ? 'initial' : 'none'}"
+                            style="font-size: 25px;">
+                        <span *ngFor="let rate of [1, 2, 3, 4, 5]" 
+                              (mouseover)="item.reservationDTO.roomReservation.hotelRatingToShow = rate" 
+                              [ngStyle]="{'color': item.reservationDTO.roomReservation.hotelRatingToShow >= rate ? (item.hoveringHotel ? 'blue' : '#e7711b') : '#a2a2a2' }"
+                              (click)="rateHotel(i, rate)">
+                              ★
+                        </span>
+                      </span>
+                      <span class="badge badge-pill badge-info">{{item.reservationDTO.roomReservation.hotelRating | ratingRound}}/5</span>
+                    </div>
+                    <mat-divider [vertical]="true"></mat-divider>
+                    <!-- Total price -->
+                    <div class="col">
+                      <div class="row d-flex justify-content-center mt-3">
+                        <h4 class="mr-2">Total price <mat-icon class="align-middle">arrow_forward</mat-icon></h4>
+                        <p style="font-size: 140%;" class="mt-1">{{item.reservationDTO.roomReservation.totalPrice}}€</p>
+                      </div>
+                    </div>
+                  </div>
+                  <mat-divider *ngIf="item.reservationDTO.roomReservation.canCancel"></mat-divider>
+                  <div *ngIf="item.reservationDTO.roomReservation.canCancel">
+                    <div class="d-flex justify-content-center mt-2">
+                      <!-- cancel reservation if possible -->
+                      <button mat-raised-button color="warn" (click)="cancelRoomReservation(i)">Cancel <mat-icon>close</mat-icon></button>
+                    </div>
+                    <div class="d-flex justify-content-center mt-3">
+                      <p class="font-weight-light">*You can cancel your room reservation at last 2 days before</p>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <mat-expansion-panel [disabled]="!item.reservationDTO.roomReservation">
+                      <mat-expansion-panel-header>
+                        <mat-panel-title>
+                          <span class="font-weight-bold">Rooms</span>
+                        </mat-panel-title>
+                      </mat-expansion-panel-header>
+                      <div class="list-group" *ngIf="item.reservationDTO.roomReservation">
+                        <div *ngFor="let room of item.reservationDTO.roomReservation.roomsAndRatings; let j = index;">
+                          <div *ngIf="room.show" class="list-group-item flex-column align-items-stretch my-2"
+                               [ngClass]="{'list-group-item-danger': item.reservationDTO.roomReservation.state === 0, 
+                                          'list-group-item-warning': item.reservationDTO.roomReservation.state === 1,
+                                          'list-group-item-success': item.reservationDTO.roomReservation.state === 2}">
+                            <!-- Room -->
+                            <div class="row">
+                              <div class="col d-flex justify-content-center">
+                                <p class="font-weight-light">Room {{j + 1}}</p>
+                              </div>
+                              <mat-divider [vertical]="true"></mat-divider>
+                              <div class="col d-flex justify-content-center">
+                                <p class="font-weight-light">Room Rating</p>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <!-- Room info -->
+                              <div class="col">
+                                <p class="font-weight-bold">Type: {{room.room.type}}</p>
+                                <p class="font-weight-bold">No. of beds: {{room.room.numberOfBeds}}</p>
+                                <p class="font-weight-bold">Floor: {{room.room.floor}}</p>
+                              </div>
+                              <mat-divider [vertical]="true"></mat-divider>
+                              <!-- Room rating -->
+                              <div class="col">
+                                <b>Rate room:</b><br>
+                                <span (mouseover)="room.hovering = true;"
+                                      (mouseout)="room.ratingToShow = room.rating; room.hovering = false;"
+                                      [ngStyle]="{'cursor': room.hovering ? 'pointer' : 'initial', 'pointer-events': item.reservationDTO.roomReservation.state === 0 ? 'initial' : 'none'}"
+                                      style="font-size: 25px;">
+                                  <span *ngFor="let rate of [1, 2, 3, 4, 5]" 
+                                        (mouseover)="room.ratingToShow = rate" 
+                                        [ngStyle]="{'color': room.ratingToShow >= rate ? (room.hovering ? 'blue' : '#e7711b') : '#a2a2a2' }"
+                                        (click)="rateRoom(i, j, rate)">
+                                        ★
+                                  </span>
+                                </span>
+                                <span class="badge badge-pill badge-info">{{room.rating | ratingRound}}/5</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </mat-expansion-panel>
+                  </div>
+                </div>
+              </mat-expansion-panel>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-
   <div *ngIf="!exists">
     <h3>You don't have any reservations yet!</h3>
   </div>

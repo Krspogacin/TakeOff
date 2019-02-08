@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Version;
 
+import org.isa.takeoff.dto.TicketDTO;
+
 @Entity
 public class Ticket {
 
@@ -20,7 +22,7 @@ public class Ticket {
 
 	@Column(name = "number", nullable = false)
 	private Integer number;
-	
+
 	@Column(name = "type")
 	private String type;
 
@@ -38,6 +40,21 @@ public class Ticket {
 
 	@Version
 	private Long version;
+	
+	public Ticket() {
+		
+	}
+
+	public Ticket(TicketDTO ticketDTO) {
+		super();
+		this.id = ticketDTO.getId();
+		this.number = ticketDTO.getNumber();
+		this.type = ticketDTO.getType();
+		this.discount = ticketDTO.getDiscount();
+		this.isOnDiscount = ticketDTO.isOnDiscount();
+		this.isReserved = ticketDTO.isReserved();
+		this.version = ticketDTO.getVersion();
+	}
 
 	public Long getId() {
 		return id;

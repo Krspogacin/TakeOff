@@ -73,4 +73,9 @@ public class RoomService {
 			return null;
 		}
 	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public RoomRating saveRating(RoomRating roomRating) {
+		return roomRatingRepository.save(roomRating);
+	}
 }

@@ -65,7 +65,7 @@ export class HotelService {
     return this.http.get('/hotels/' + id + '/roomsNotOnDiscount');
   }
 
-  getRoomsOnDiscount(id: number) {
-    return this.http.get('/hotels/' + id + '/roomsOnDiscount');
+  getRoomsOnDiscount(object: any) {
+    return this.http.get('/hotels/roomsOnDiscount?parameters='+ encodeURI(JSON.stringify(object)));
   }
 }

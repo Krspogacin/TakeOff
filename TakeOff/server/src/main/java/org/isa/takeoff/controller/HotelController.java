@@ -9,23 +9,27 @@ import org.isa.takeoff.dto.AvailableRoomsDTO;
 import org.isa.takeoff.dto.HotelDTO;
 import org.isa.takeoff.dto.HotelRatingDTO;
 import org.isa.takeoff.dto.RoomDTO;
+import org.isa.takeoff.dto.RoomOnDiscountDTO;
 import org.isa.takeoff.dto.RoomRatingDTO;
 import org.isa.takeoff.dto.RoomSearchDTO;
 import org.isa.takeoff.dto.ServiceDTO;
 import org.isa.takeoff.dto.ServiceHotelDTO;
+import org.isa.takeoff.dto.UserRatingHotelDTO;
 import org.isa.takeoff.model.Hotel;
 import org.isa.takeoff.model.HotelRating;
+import org.isa.takeoff.model.HotelRatingId;
 import org.isa.takeoff.model.Location;
 import org.isa.takeoff.model.Room;
 import org.isa.takeoff.model.RoomPrice;
 import org.isa.takeoff.model.RoomRating;
-import org.isa.takeoff.model.RoomReservation;
 import org.isa.takeoff.model.RoomReservationRooms;
 import org.isa.takeoff.model.Service;
 import org.isa.takeoff.model.ServiceHotel;
+import org.isa.takeoff.model.User;
 import org.isa.takeoff.service.HotelService;
 import org.isa.takeoff.service.LocationService;
 import org.isa.takeoff.service.ServiceService;
+import org.isa.takeoff.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -54,6 +58,9 @@ public class HotelController {
 	
 	@Autowired 
 	private ObjectMapper objectMapper;
+	
+	@Autowired
+	private UserService userService;
 
 	@RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<HotelDTO>> getHotels() {
@@ -425,26 +432,52 @@ public class HotelController {
 		}
 	}
 
-	@RequestMapping(value = "/{id}/roomsOnDiscount", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<RoomDTO>> roomsOnDiscount(@PathVariable Long id) 
+	@RequestMapping(value = "/roomsOnDiscount", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<AvailableRoomsDTO>> roomsOnDiscount(@RequestParam String parameters) 
 	{
-		try 
-		{
-			Hotel hotel = hotelService.findOne(id);
-			List<Room> rooms = hotel.getRooms();
-		
-			List<RoomDTO> roomDTO = new ArrayList<>();
-			for (Room room : rooms)
-			{
-				if (room.getDiscount() != null && room.getDiscount() > 0)
-				{
-					roomDTO.add(new RoomDTO(room));					
+		RoomOnDiscountDTO roomOnDiscount = new RoomOnDiscountDTO();
+		try {
+			roomOnDiscount = objectMapper.readValue(parameters, RoomOnDiscountDTO.class);
+			List<AvailableRoomsDTO> roomsDTO = new ArrayList<>();
+			List<Hotel> hotels = hotelService.findAll();
+			for(Hotel hotel: hotels){
+				if(hotel.getLocation().getCity().equals(roomOnDiscount.getLocation().getCity())){
+					List<Room> rooms = hotel.getRooms();
+					RoomDTO roomDTO = new RoomDTO();
+					for (Room room : rooms)
+					{
+						if (room.getDiscount() != null && room.getDiscount() > 0)
+						{
+							int counter = 0;
+							roomDTO = new RoomDTO(room);
+							LocalDate endingDate = roomOnDiscount.getCheckIn().plusDays(roomOnDiscount.getNumberOfDays());
+							for(RoomReservationRooms reservation: room.getRoomReservations()){
+								if((roomOnDiscount.getCheckIn().isBefore(reservation.getRoomReservation().getReservationEndDate()) && roomOnDiscount.getCheckIn().isAfter(reservation.getRoomReservation().getReservationStartDate())) ||
+								   (endingDate.isBefore(reservation.getRoomReservation().getReservationEndDate()) && endingDate.isAfter(reservation.getRoomReservation().getReservationStartDate()))){
+									counter++;
+								}
+							}
+							int availableRooms = room.getNumberOfRooms() - counter; 
+							if (availableRooms == 0){
+								continue;
+							}
+							double totalPrice = room.getDefaultPrice()*roomOnDiscount.getNumberOfDays();
+							Double sum = 0.0;
+							for(RoomRating rr: room.getRoomRatings()){
+								sum += rr.getRating();
+							}
+							Double rating = 0.0;
+							if(sum != 0.0){
+								rating = sum/room.getRoomRatings().size();
+							}
+							roomsDTO.add(new AvailableRoomsDTO(roomDTO, totalPrice, rating, availableRooms, endingDate));
+						}
+					}
 				}
 			}
-			return new ResponseEntity<>(roomDTO, HttpStatus.OK);
+			return new ResponseEntity<>(roomsDTO, HttpStatus.OK);	
 		}
-		catch (Exception e) 
-		{
+		catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
@@ -470,6 +503,43 @@ public class HotelController {
 		catch (Exception e) 
 		{
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value="/rateHotel", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> rateHotel(@RequestBody UserRatingHotelDTO userRatingHotelDTO) 
+	{
+		if (userRatingHotelDTO.getHotel() == null || userRatingHotelDTO.getRating() == null || userRatingHotelDTO.getUsername() == null)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		User user = null;
+		try
+		{
+			user = this.userService.findByUsernameUser(userRatingHotelDTO.getUsername());
+		}
+		catch(Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+		try
+		{
+			Hotel hotel = this.hotelService.findOne(userRatingHotelDTO.getHotel().getId());
+			HotelRating hotelRating = this.hotelService.findOneRating(new HotelRatingId(hotel, user));
+			if (hotelRating == null )
+			{				
+				hotelRating = new HotelRating();
+				hotelRating.setId(new HotelRatingId(hotel, user));
+			}
+			hotelRating.setRating(userRatingHotelDTO.getRating());
+			this.hotelService.saveRating(hotelRating);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		catch(Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
 }

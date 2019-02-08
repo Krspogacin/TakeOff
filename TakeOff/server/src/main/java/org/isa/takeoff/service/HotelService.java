@@ -50,4 +50,9 @@ public class HotelService {
 			return null;
 		}
 	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public HotelRating saveRating(HotelRating hotelRating) {
+		return hotelRatingRepository.save(hotelRating);
+	}
 }

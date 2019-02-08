@@ -1,73 +1,102 @@
-<h1 mat-dialog-title>Add new room</h1>
+<h1 mat-dialog-title>Add new rooms</h1>
 <mat-dialog-content class="fields-container">
   <form [formGroup]="roomForm">
-  <mat-form-field>
-      <input autocomplete="off" matInput type="number" formControlName="numberOfBeds" placeholder="NumberOfPersons">
-      <mat-error *ngIf="roomForm.get('numberOfBeds').invalid && (roomForm.get('numberOfBeds').dirty || roomForm.get('numberOfBeds').touched)">
-          <div *ngIf="roomForm.get('numberOfBeds').errors.required"> Number of persons is required.</div>
-      </mat-error>
-  </mat-form-field>
+  <div class="row d-flex justify-content-center mt-3">
+    <mat-form-field class="w-75">
+        <input autocomplete="off" matInput type="number" formControlName="numberOfBeds" placeholder="NumberOfBeds">
+        <mat-error *ngIf="roomForm.get('numberOfBeds').invalid && (roomForm.get('numberOfBeds').dirty || roomForm.get('numberOfBeds').touched)">
+            <div *ngIf="roomForm.get('numberOfBeds').errors.required"> Number of persons is required.</div>
+            <div *ngIf="!roomForm.get('numberOfBeds').errors.required && roomForm.get('numberOfBeds').errors.min">
+                    Minimum {{numberOfRoomsMin}} bed </div>
+        </mat-error>
+    </mat-form-field>
+  </div>
   <br>
-  <mat-form-field>
-      <mat-select matInput formControlName="type" placeholder="Type">
-          <mat-option value='APARTMENT'>APARTMENT</mat-option>
-          <mat-option value='STUDIO'>STUDIO</mat-option>
-          <mat-option value='DUPLEX'>DUPLEX</mat-option>
-          <mat-option value='FAMILY'>FAMILY</mat-option>
-          <mat-option value='SUITE'>SUITE</mat-option>
-      </mat-select>
-      <mat-error *ngIf="roomForm.get('type').invalid && (roomForm.get('type').dirty || roomForm.get('type').touched)">
-          <div *ngIf="roomForm.get('type').errors.required"> Type is required.</div>
-      </mat-error>
-  </mat-form-field>
+  <div class="row d-flex justify-content-center">
+    <mat-form-field class="w-75">
+        <mat-select matInput formControlName="type" placeholder="Type">
+            <mat-option value='APARTMENT'>APARTMENT</mat-option>
+            <mat-option value='STUDIO'>STUDIO</mat-option>
+            <mat-option value='DUPLEX'>DUPLEX</mat-option>
+            <mat-option value='FAMILY'>FAMILY</mat-option>
+            <mat-option value='SUITE'>SUITE</mat-option>
+        </mat-select>
+        <mat-error *ngIf="roomForm.get('type').invalid && (roomForm.get('type').dirty || roomForm.get('type').touched)">
+            <div *ngIf="roomForm.get('type').errors.required"> Type is required.</div>
+        </mat-error>
+    </mat-form-field>
+  </div>
   <br>
-  <mat-form-field>
-      <input autocomplete="off" matInput type="number" formControlName="floor" placeholder="Floor">
-      <mat-error *ngIf="roomForm.get('floor').invalid && (roomForm.get('floor').dirty || roomForm.get('floor').touched)">
-          <div *ngIf="roomForm.get('floor').errors.required"> Floor is required.</div>
-      </mat-error>
-  </mat-form-field>
+  <div class="row d-flex justify-content-center">
+    <mat-form-field class="w-75">
+        <input autocomplete="off" matInput type="number" formControlName="floor" placeholder="Floor">
+        <mat-error *ngIf="roomForm.get('floor').invalid && (roomForm.get('floor').dirty || roomForm.get('floor').touched)">
+            <div *ngIf="roomForm.get('floor').errors.required"> Floor is required.</div>
+            <div *ngIf="!roomForm.get('floor').errors.required && roomForm.get('floor').errors.min">
+                    {{numberOfRoomsMin}} floor minimum </div>
+        </mat-error>
+    </mat-form-field>
+  </div>
   <br>
-  <mat-form-field>
-      <input autocomplete="off" matInput type="number" formControlName="defaultPrice" placeholder="Default price">
-      <mat-error *ngIf="roomForm.get('defaultPrice').invalid && (roomForm.get('defaultPrice').dirty || roomForm.get('defaultPrice').touched)">
-          <div *ngIf="roomForm.get('defaultPrice').errors.required"> Default price is required.</div>
-      </mat-error>
-  </mat-form-field>
+  <div class="row d-flex justify-content-center">
+    <mat-form-field class="w-75">
+        <input autocomplete="off" matInput type="number" formControlName="defaultPrice" placeholder="Default price per day(€)">
+        <mat-error *ngIf="roomForm.get('defaultPrice').invalid && (roomForm.get('defaultPrice').dirty || roomForm.get('defaultPrice').touched)">
+            <div *ngIf="roomForm.get('defaultPrice').errors.required"> Default price is required.</div>
+            <div *ngIf="!roomForm.get('defaultPrice').errors.required && roomForm.get('defaultPrice').errors.min">
+                      Minimum {{numberOfRoomsMin}} €  </div>
+        </mat-error>
+    </mat-form-field>
+  </div>
   <br>
-  <mat-form-field>
-      <input autocomplete="off" matInput type="number" formControlName="discount" placeholder="Discount">
-  </mat-form-field>
+  <div class="row d-flex justify-content-center">
+    <mat-form-field class="w-75">
+        <input autocomplete="off" matInput type="number" formControlName="discount" placeholder="Discount">
+    </mat-form-field>
+  </div>
   <br>
-  <mat-checkbox color="primary" formControlName="hasAirCondition"> Air condition</mat-checkbox>&nbsp;&nbsp;
-  <mat-checkbox color="primary" formControlName="hasBalcony"> Balcony </mat-checkbox>
-  <mat-form-field>
-      <input autocomplete="off" matInput type="number" formControlName="numberOfRooms" placeholder="Number of rooms">
-      <mat-error *ngIf="roomForm.get('numberOfRooms').invalid && (roomForm.get('numberOfRooms').dirty || roomForm.get('numberOfRooms').touched)">
-          <div *ngIf="roomForm.get('numberOfRooms').errors.required"> Number of rooms is required.</div>
-          <div *ngIf="!roomForm.get('numberOfRooms').errors.required && roomForm.get('numberOfRooms').errors.min">
-                        You can create minimum {{numberOfRoomsMin}} room </div>
-      </mat-error>
-  </mat-form-field>
+  <div class="row d-flex justify-content-center">
+    <div class="col ml-5">
+        <mat-checkbox color="primary" formControlName="hasAirCondition"> Air condition</mat-checkbox>&nbsp;&nbsp;
+    </div>
+    <div class="col">
+        <mat-checkbox color="primary" formControlName="hasBalcony"> Balcony </mat-checkbox>
+    </div> 
+  </div>
+  <br>
+  <div class="row d-flex justify-content-center">
+    <mat-form-field class="w-75">
+        <input autocomplete="off" matInput type="number" formControlName="numberOfRooms" placeholder="Number of rooms">
+        <mat-error *ngIf="roomForm.get('numberOfRooms').invalid && (roomForm.get('numberOfRooms').dirty || roomForm.get('numberOfRooms').touched)">
+            <div *ngIf="roomForm.get('numberOfRooms').errors.required"> Number of rooms is required.</div>
+            <div *ngIf="!roomForm.get('numberOfRooms').errors.required && roomForm.get('numberOfRooms').errors.min">
+                            You can create minimum {{numberOfRoomsMin}} room </div>
+        </mat-error>
+    </mat-form-field>
+  </div>
   </form>
   <br>
   <h3>Enter prices per day for specific periods: </h3>
   <br>
   <form [formGroup]="roomPriceForm">
-  <div *ngFor="let period of periods.slice(0,periods.length-1)">
-  <mat-form-field>
-    <input autocomplete="off" matInput type="number" step="0.01" [formControlName]="'Period'+period" [placeholder]="'Les then ' + period + ' days(€)'">
-    <mat-hint>
-        Default price will apply for this period if you leave this field blank
-    </mat-hint>
-  </mat-form-field> <br><br>
+    <div *ngFor="let period of periods.slice(0,periods.length-1)">
+        <div class="row d-flex justify-content-center">
+            <mat-form-field class="w-75">
+                <input autocomplete="off" matInput type="number" step="0.01" [formControlName]="'Period'+period" [placeholder]="'Les then ' + period + ' days(€)'">
+                <mat-hint>
+                    Default price will apply for this period if you leave this field blank
+                </mat-hint>
+            </mat-form-field> <br><br>
+        </div>
+    </div>
+  <div class="row d-flex justify-content-center">
+    <mat-form-field class="w-75">
+        <input autocomplete="off" matInput type="number" step="0.01" formControlName="MoreThan" [placeholder]="periods[periods.length-1] + ' days(€)'">
+        <mat-hint>
+                Default price will apply for this period if you leave this field blank
+        </mat-hint>
+    </mat-form-field>
   </div>
-  <mat-form-field>
-      <input autocomplete="off" matInput type="number" step="0.01" formControlName="MoreThan" [placeholder]="periods[periods.length-1] + ' days(€)'">
-      <mat-hint>
-            Default price will apply for this period if you leave this field blank
-       </mat-hint>
-  </mat-form-field>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions>

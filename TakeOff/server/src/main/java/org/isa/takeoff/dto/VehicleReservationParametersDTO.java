@@ -25,14 +25,6 @@ public class VehicleReservationParametersDTO
 		this.rentACarId = rentACarId;
 	}
 
-
-	@Override
-	public String toString() {
-		return "VehicleReservationParametersDTO [rentACarId=" + rentACarId + ", startDate=" + startDate + ", endDate="
-				+ endDate + ", numOfPassengers=" + numOfPassengers + ", minPrice=" + minPrice + ", maxPrice=" + maxPrice
-				+ ", fuelTypes=" + fuelTypes + ", transmissionTypes=" + transmissionTypes + "]";
-	}
-
 	public LocalDate getStartDate() {
 		return startDate;
 	}

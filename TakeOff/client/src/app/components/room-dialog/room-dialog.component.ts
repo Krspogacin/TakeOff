@@ -1,7 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { forEach } from '@angular/router/src/utils/collection';
 
 @Component({
   selector: 'app-room-dialog',
@@ -45,10 +44,10 @@ export class RoomDialogComponent implements OnInit {
       });
     }
     this.roomForm = this.formBuilder.group({
-      numberOfBeds: [this.parentObject.room.numberOfBeds, Validators.required],
+      numberOfBeds: [this.parentObject.room.numberOfBeds, [Validators.required,Validators.min(1)]],
       type: [this.parentObject.room.type, Validators.required],
-      floor: [this.parentObject.room.floor, Validators.required],
-      defaultPrice: [this.parentObject.room.defaultPrice, Validators.required],
+      floor: [this.parentObject.room.floor, [Validators.required,Validators.min(1)]],
+      defaultPrice: [this.parentObject.room.defaultPrice, [Validators.required,Validators.min(1)]],
       discount: [this.parentObject.room.discount],
       hasAirCondition: [this.parentObject.room.hasAirCondition],
       hasBalcony: [this.parentObject.room.hasBalcony],

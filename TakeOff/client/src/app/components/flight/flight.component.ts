@@ -189,7 +189,9 @@ export class FlightComponent implements OnInit {
       {
         data: {
           'seats': seats,
-          'total': total
+          'total': total,
+          'landingDate': this.flight.landingDate,
+          'landingLocation': this.flight.landingLocation
         },
         disableClose: true,
         autoFocus: true,
@@ -198,10 +200,11 @@ export class FlightComponent implements OnInit {
       });
 
     dialogRef.afterClosed().subscribe(
-      (friends) => {
+      (data) => {
         const cart = this.sc.getShoppingCart();
         const reservations = [];
         let friendIndex = 0;
+        const reservationDTO = {'roomReservation': data.roomReservation, 'vehicleReservation': data.vehicleReservation};
         for (const key of Object.keys(cart)) {
           for (const n of cart[key]) {
             const ticket = this.tickets.find(t => {
@@ -209,15 +212,15 @@ export class FlightComponent implements OnInit {
             });
             ticket['reserved'] = true; // optional
             ticket['type'] = key; // seat class
-            const user = friends[friendIndex];
-            reservations.push({ 'user': user, 'ticket': ticket });
+            const user = data.friends[friendIndex];
+            reservations.push({ 'user': user, 'ticket': ticket, 'reservationDTO': reservationDTO});
             friendIndex++;
           }
         }
 
         this.reservationService.createReservations(reservations).subscribe(
           () => {
-            this.appComponent.showSnackBar('Reservation successfull!');
+            this.appComponent.showSnackBar('Reservation successful!');
           },
           () => {
             this.appComponent.showSnackBar('Reservation failed. Please try again.');
@@ -266,7 +269,7 @@ export class FlightComponent implements OnInit {
         },
         () => {
           this.appComponent.showSnackBar(this.message);
-          // setTimeout(function () { location.reload(); }, 3000);
+          setTimeout(function () { location.reload(); }, 3000);
         }
       );
     }

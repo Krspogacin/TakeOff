@@ -1,5 +1,5 @@
-import { Component, OnInit, Pipe, PipeTransform } from '@angular/core';
-import { PageEvent, MatDialog, MatSnackBar, MatSelect } from '@angular/material';
+import { Component, OnInit } from '@angular/core';
+import { PageEvent, MatDialog } from '@angular/material';
 import { RentACarService } from 'src/app/services/rent-a-car/rent-a-car.service';
 import { AppComponent } from 'src/app/app.component';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
@@ -62,14 +62,6 @@ export class RentACarsComponent implements OnInit {
     );
   }
 
-  // showRating(index: number) {
-  //   this.rentACars[index].ratingToShow = this.rentACars[index].rating;
-  // }
-
-  // hoverRating(index: number, rating: number) {
-  //   this.rentACars[index].ratingToShow = rating;
-  // }
-
   openAddRentACarDialog() {
     const dialogRef = this.dialog.open(AddEntityDialogComponent,
     {
@@ -119,13 +111,11 @@ export class RentACarsComponent implements OnInit {
   }
 
   openReservationDialog(rentACar: any, reservation: any) {
-    const dayAfterLadningDate = new Date(reservation.ticket.flight.landingDate);
-    dayAfterLadningDate.setDate(dayAfterLadningDate.getDate() + 1);
     const dialogRef = this.dialog.open(VehicleReservationDialogComponent,
     {
       data: {
         'rentACar': rentACar,
-        'landingDate': dayAfterLadningDate
+        'landingDate': new Date(reservation.ticket.flight.landingDate)
       },
       disableClose: true,
       autoFocus: true,
@@ -158,9 +148,7 @@ export class RentACarsComponent implements OnInit {
                   const landingDate = new Date(reservation.ticket.flight.landingDate);
                   const landingCountry = reservation.ticket.flight.landingLocation.country;
                   const landingCity = reservation.ticket.flight.landingLocation.city;
-                  const tomorrow = new Date(landingDate);
-                  tomorrow.setDate(tomorrow.getDate() + 1);
-                  if (tomorrow.getTime() >=  new Date().getTime() &&
+                  if (landingDate.getTime() >=  new Date().getTime() &&
                       landingCountry === rentACar.location.country &&
                       landingCity === rentACar.location.city) {
 
@@ -201,6 +189,7 @@ export class RentACarsComponent implements OnInit {
     console.log(vehicleReservation);
     this.reservationService.createVehicleReservation(vehicleReservation).subscribe(
       () => {
+        this.reservationService.reservationsSubject.next();
         this.appComponent.showSnackBar('You have created vehicle reservation successfully!');
       },
       () => {

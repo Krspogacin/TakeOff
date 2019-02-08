@@ -12,7 +12,9 @@ import org.isa.takeoff.dto.AvailableVehiclesDTO;
 import org.isa.takeoff.dto.OfficeDTO;
 import org.isa.takeoff.dto.RentACarDTO;
 import org.isa.takeoff.dto.RentACarMainServiceDTO;
+import org.isa.takeoff.dto.UserRatingRentACarDTO;
 import org.isa.takeoff.dto.VehicleDTO;
+import org.isa.takeoff.dto.VehicleOnDiscountDTO;
 import org.isa.takeoff.dto.VehiclePriceDTO;
 import org.isa.takeoff.dto.VehicleReservationParametersDTO;
 import org.isa.takeoff.model.Location;
@@ -20,6 +22,8 @@ import org.isa.takeoff.model.Office;
 import org.isa.takeoff.model.RentACar;
 import org.isa.takeoff.model.RentACarMainService;
 import org.isa.takeoff.model.RentACarRating;
+import org.isa.takeoff.model.RentACarRatingId;
+import org.isa.takeoff.model.User;
 import org.isa.takeoff.model.Vehicle;
 import org.isa.takeoff.model.VehiclePrice;
 import org.isa.takeoff.model.VehicleRating;
@@ -28,6 +32,7 @@ import org.isa.takeoff.service.LocationService;
 import org.isa.takeoff.service.OfficeService;
 import org.isa.takeoff.service.RentACarMainServiceService;
 import org.isa.takeoff.service.RentACarService;
+import org.isa.takeoff.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -60,13 +65,16 @@ public class RentACarController
 	@Autowired
 	private ObjectMapper objectMapper;
 	
+	@Autowired
+	private UserService userService;
+	
 	@RequestMapping(method = GET, value = "/checkMainServiceName/{id}/{name}")
 	public ResponseEntity<?> checkMainServiceName(@PathVariable("id") Long id, @PathVariable("name") String name)
 	{
 		RentACarMainService rentACarMainService = this.rentACarMainServiceService.findByName(name);
 		if (rentACarMainService != null)
 		{
-			if (id != null && rentACarMainService.getId().equals(id)) 
+			if (id != -1 && rentACarMainService.getId().equals(id)) 
 			{
 				return new ResponseEntity<>(HttpStatus.OK);
 			}
@@ -210,23 +218,79 @@ public class RentACarController
 		}
 	}
 	
-	@RequestMapping(value = "/{id}/vehiclesOnDiscount", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<VehicleDTO>> getVehiclesOnDiscount(@PathVariable Long id) 
+	@RequestMapping(value = "/vehiclesOnDiscount", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<AvailableVehiclesDTO>> getVehiclesOnDiscount(@RequestParam String parameters) 
 	{
+		VehicleOnDiscountDTO vehicleOnDiscount = new VehicleOnDiscountDTO();
 		try 
 		{
-			RentACar rentACar = rentACarService.findOne(id);
-			List<Vehicle> vehicles = rentACar.getVehicles();
-		
-			List<VehicleDTO> vehicleDTO = new ArrayList<>();
-			for (Vehicle vehicle : vehicles)
-			{
-				if (vehicle.getDiscount() != null && vehicle.getDiscount() > 0)
-				{
-					vehicleDTO.add(new VehicleDTO(vehicle));					
+			vehicleOnDiscount = objectMapper.readValue(parameters, VehicleOnDiscountDTO.class);
+			List<AvailableVehiclesDTO> availableVehicles = new ArrayList<>();
+			List<RentACar> rentACars = rentACarService.findAll();
+			for(RentACar rentACar: rentACars){
+				if(rentACar.getLocation().getCity().equals(vehicleOnDiscount.getLocation().getCity())){
+					List<RentACarMainService> rentACarMainServices = rentACar.getMainServicesRentACar();
+					long reservationDays = ChronoUnit.DAYS.between(vehicleOnDiscount.getStartDate(), vehicleOnDiscount.getEndDate()) + 1;
+					Long mainServiceId = null;
+					
+					for(RentACarMainService mainService : rentACarMainServices)
+					{
+						if (mainService.getStartDay() <= reservationDays &&
+						   ((mainService.getEndDay() != null && reservationDays <= mainService.getEndDay()) || mainService.getEndDay() == null))
+						{
+							mainServiceId = mainService.getId();
+							break;
+						}
+					}
+					List<Vehicle> vehicles = rentACar.getVehicles();				
+					for (Vehicle vehicle : vehicles)
+					{
+						if (vehicle.getDiscount() != null && vehicle.getDiscount() > 0)
+						{
+							List<VehicleReservation> vehicleReservations = vehicle.getVehicleReservations();				
+							boolean reserved = false;
+							for (VehicleReservation vehicleReservation : vehicleReservations)
+							{
+								if ((vehicleReservation.getReservationStartDate().isBefore(vehicleOnDiscount.getStartDate()) &&
+									 vehicleReservation.getReservationEndDate().isAfter(vehicleOnDiscount.getEndDate())) || 
+									(vehicleReservation.getReservationStartDate().isBefore(vehicleOnDiscount.getStartDate()) &&
+									 vehicleReservation.getReservationEndDate().isAfter(vehicleOnDiscount.getEndDate())))
+								{
+									reserved = true;
+									break;
+								}
+							}
+							if (reserved)
+							{
+								continue;
+							}
+							List<VehiclePrice> prices = vehicle.getVehiclePrices();
+							Double vehiclePrice = null;
+							for (VehiclePrice price : prices)
+							{
+								if (price.getRentACarMainService().getId() == mainServiceId)
+								{					
+									vehiclePrice = price.getPrice();
+									break;
+								}
+							}
+							List<VehicleRating> ratings = vehicle.getVehicleRatings();
+							Double vehicleRating = 0.0;
+							
+							if (!ratings.isEmpty())
+							{
+								AtomicReference<Double> ratingsSum = new AtomicReference<Double>(0.0);
+								ratings.forEach(rating -> ratingsSum.accumulateAndGet(rating.getRating(), (x, y) -> x + y));
+								vehicleRating = ratingsSum.get() / ratings.size();
+							}
+							
+							AvailableVehiclesDTO availableVehicle = new AvailableVehiclesDTO(new VehicleDTO(vehicle), vehiclePrice * reservationDays, vehicleRating);
+							availableVehicles.add(availableVehicle);
+						}
+					}
 				}
 			}
-			return new ResponseEntity<>(vehicleDTO, HttpStatus.OK);
+			return new ResponseEntity<>(availableVehicles, HttpStatus.OK);
 		}
 		catch (Exception e) 
 		{
@@ -271,7 +335,6 @@ public class RentACarController
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		System.out.println(parameters);
 		if (parameters.getStartDate() == null || parameters.getEndDate() == null || parameters.getNumOfPassengers() == null)
 		{
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -354,8 +417,10 @@ public class RentACarController
 					{					
 						if ((parameters.getMinPrice() == null || parameters.getMinPrice() <= price.getPrice()) &&
 							(parameters.getMaxPrice() == null || parameters.getMaxPrice() >= price.getPrice()))
-						vehiclePrice = price.getPrice();
-						break;
+						{
+							vehiclePrice = price.getPrice();
+							break;
+						}
 					}
 				}
 				
@@ -650,6 +715,43 @@ public class RentACarController
 		catch (Exception e) 
 		{
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value="/rateRentACar", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> rateRentACar(@RequestBody UserRatingRentACarDTO userRatingRentACarDTO) 
+	{
+		if (userRatingRentACarDTO.getRentACar() == null || userRatingRentACarDTO.getRating() == null || userRatingRentACarDTO.getUsername() == null)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		User user = null;
+		try
+		{
+			user = this.userService.findByUsernameUser(userRatingRentACarDTO.getUsername());
+		}
+		catch(Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+		try
+		{
+			RentACar rentACar = this.rentACarService.findOne(userRatingRentACarDTO.getRentACar().getId());
+			RentACarRating rentACarRating = this.rentACarService.findOneRating(new RentACarRatingId(rentACar, user));
+			if (rentACarRating == null )
+			{				
+				rentACarRating = new RentACarRating();
+				rentACarRating.setId(new RentACarRatingId(rentACar, user));
+			}
+			rentACarRating.setRating(userRatingRentACarDTO.getRating());
+			this.rentACarService.saveRating(rentACarRating);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		catch(Exception e)
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
 }

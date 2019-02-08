@@ -2,7 +2,7 @@
   <div *ngIf="flightExists">
     <h2>Flight details</h2>
 
-    <div *ngIf="userRole && userRole === 'ROLE_USER'">
+    <div *ngIf="userRole && userRole === 'ROLE_AIRCOMPANY_ADMIN'">
       <button mat-raised-button color="primary" (click)="openUpdateDialog()">
         <mat-icon>edit</mat-icon> Update
       </button>
@@ -12,22 +12,24 @@
 
     <p><b>From:</b>{{flight.takeOffLocation.city}}</p>
     <p><b>To:</b> {{flight.landingLocation.city}} </p>
-    <p><b>Take off date:</b> {{flight.takeOffDate | date}} </p>
-    <p><b>Landing date:</b> {{flight.landingDate}} </p>
+    <p><b>Take off date:</b> {{flight.takeOffDate | date:'short'}} </p>
+    <p><b>Landing date:</b> {{flight.landingDate | date:'short'}} </p>
     <p><b>Distance:</b> calculating... </p>
     <p><b>Ticket price:</b> {{flight.ticketPrice | currency}} </p>
-    <h3>Destinations:</h3>
-    <mat-form-field>
-      <mat-chip-list>
-        <mat-chip *ngFor="let dest of destinations" color="primary">
-          {{dest.city}}, {{dest.country}}
-        </mat-chip>
-      </mat-chip-list>
-    </mat-form-field>
+    <div *ngIf="destinations.length > 0">
+      <h3>Transfer destinations:</h3>
+      <mat-form-field>
+        <mat-chip-list>
+          <mat-chip *ngFor="let dest of destinations" color="primary">
+            {{dest.city}}, {{dest.country}}
+          </mat-chip>
+        </mat-chip-list>
+      </mat-form-field>
+    </div>
     <br>
 
     <button mat-stroked-button color="primary" (click)="addRow()">Add Row</button>
-    
+
   </div>
 
   <div *ngIf="!flightExists">
@@ -46,5 +48,6 @@
 
 <div *ngIf="flightExists">
   <button mat-stroked-button color="primary" (click)="bookFlight()" *ngIf="userRole === 'ROLE_USER'">Book flight</button>
-  <button mat-stroked-button color="primary" (click)="saveDiagram()" *ngIf="userRole === 'ROLE_AIRCOMPANY_ADMIN'">Save diagram</button>
+  <button mat-stroked-button color="primary" (click)="saveDiagram()" *ngIf="userRole === 'ROLE_AIRCOMPANY_ADMIN'">Save
+    diagram</button>
 </div>

@@ -39,6 +39,7 @@ import org.isa.takeoff.service.FlightService;
 import org.isa.takeoff.service.HotelService;
 import org.isa.takeoff.service.RentACarService;
 import org.isa.takeoff.service.RoomService;
+import org.isa.takeoff.service.TicketService;
 import org.isa.takeoff.service.UserService;
 import org.isa.takeoff.service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +80,9 @@ public class FlightReservationController {
 	@Autowired
 	private RentACarService rentACarService;
 	
+	@Autowired
+	private TicketService ticketService;
+	
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<FlightReservationDTO>> addReservations(@RequestBody List<FlightReservationDTO> reservationsDTO) {
@@ -91,12 +95,10 @@ public class FlightReservationController {
 				Ticket ticket = null;
 				for (Ticket t : tickets) {
 					if (t.getId().equals(r.getTicket().getId())) {
-//						if (t.getIsReserved()) {
-//							return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//						}
+						ticket = new Ticket(r.getTicket());
+						ticket.setFlight(t.getFlight());
 						t.setIsReserved(true);
 						t.setType(r.getTicket().getType());
-						ticket = t;
 						break;
 					}
 				}
@@ -107,6 +109,30 @@ public class FlightReservationController {
 						user = userService.findByUsernameUser(r.getUser().getUsername());
 					}
 					Reservation reservation = new Reservation();
+					if(r.getReservationDTO().getRoomReservation().getRoomsAndRatings() != null){
+						RoomReservation roomReservation = new RoomReservation();
+						roomReservation.setPrice(r.getReservationDTO().getRoomReservation().getTotalPrice());
+						roomReservation.setReservationEndDate(r.getReservationDTO().getRoomReservation().getReservationEndDate());
+						roomReservation.setReservationStartDate(r.getReservationDTO().getRoomReservation().getReservationStartDate());
+						List<RoomReservationRooms> rrrs = new ArrayList<>();
+						RoomReservationRooms rrr = new RoomReservationRooms();
+						Room room = roomService.findOne(r.getReservationDTO().getRoomReservation().getRoomsAndRatings().get(0).getRoom().getId());
+						rrr.setRoom(room);
+						rrr.setRoomReservation(roomReservation);
+						rrrs.add(rrr);
+						roomReservation.setRooms(rrrs);
+						reservation.setRoomReservation(roomReservation);
+					}
+					if(r.getReservationDTO().getVehicleReservation().getVehicle() != null){
+						VehicleReservation vehicleReservation = new VehicleReservation();
+						vehicleReservation.setPrice(r.getReservationDTO().getVehicleReservation().getTotalPrice());
+						vehicleReservation.setReservationEndDate(r.getReservationDTO().getVehicleReservation().getReservationEndDate());
+						vehicleReservation.setReservationStartDate(r.getReservationDTO().getVehicleReservation().getReservationStartDate());
+						Vehicle vehicle = vehicleService.findOne(r.getReservationDTO().getVehicleReservation().getVehicle().getId());
+						vehicleReservation.setVehicle(vehicle);
+						reservation.setVehicleReservation(vehicleReservation);
+					}
+					ticket = ticketService.save(ticket);
 					FlightReservation flightReservation = new FlightReservation(user, ticket, reservation);
 					reservationService.save(flightReservation);
 				}
@@ -115,7 +141,7 @@ public class FlightReservationController {
 			return new ResponseEntity<>(reservationsDTO, HttpStatus.OK);
 
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -151,13 +177,14 @@ public class FlightReservationController {
 					List<RoomRatingDTO> roomRatingDTOs = new ArrayList<>();
 					for (RoomReservationRooms room : fr.getReservation().getRoomReservation().getRooms()) {
 						RoomRating roomRating = this.roomService.findOneRating(new RoomRatingId(room.getRoom(), user));
+						RoomRatingDTO roomRatingDTO = new RoomRatingDTO();
+						roomRatingDTO.setRoom(new RoomDTO(room.getRoom()));
 						if (roomRating != null) {
-							RoomRatingDTO roomRatingDTO = new RoomRatingDTO();
-							roomRatingDTO.setRoom(new RoomDTO(room.getRoom()));
 							roomRatingDTO.setRating(roomRating.getRating());
-							roomRatingDTOs.add(roomRatingDTO);							
 						}
+						roomRatingDTOs.add(roomRatingDTO);							
 					}
+					roomReservationDTO.setRoomsAndRatings(roomRatingDTOs);
 					reservationDTO.setRoomReservation(roomReservationDTO);
 				}
 				
@@ -191,7 +218,6 @@ public class FlightReservationController {
 	@RequestMapping(value = "/vehicleReservations", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ReservationDTO> createVehicleReservation(@RequestBody VehicleReservationDTO vehicleReservationDTO) 
 	{	
-		System.out.println(vehicleReservationDTO);
 		if (vehicleReservationDTO.getReservationId() == null || vehicleReservationDTO.getReservationStartDate() == null ||
 			vehicleReservationDTO.getReservationEndDate() == null || vehicleReservationDTO.getTotalPrice() == null || vehicleReservationDTO.getVehicle() == null)
 		{
@@ -225,7 +251,7 @@ public class FlightReservationController {
 	}
 	
 	@RequestMapping(value = "/roomReservations", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<ReservationDTO> createVehicleReservation(@RequestBody RoomReservationDTO roomReservationDTO){
+	public ResponseEntity<ReservationDTO> createRoomReservation(@RequestBody RoomReservationDTO roomReservationDTO){
 		if (roomReservationDTO.getReservationId() == null || roomReservationDTO.getReservationStartDate() == null ||
 			roomReservationDTO.getReservationEndDate() == null || roomReservationDTO.getTotalPrice() == null ||  roomReservationDTO.getRoomsAndRatings() == null){
 			
