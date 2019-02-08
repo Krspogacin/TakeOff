@@ -1,6 +1,6 @@
 <h5 mat-dialog-title>Flight reservation</h5>
 <h5><b>Total: </b>{{total}}{{currency}}</h5>
-<mat-dialog-content [formGroup]="">
+<mat-dialog-content>
   <mat-horizontal-stepper linear labelPosition="bottom">
     <mat-step label="Friends invitation" state="phone">
       <div class="step" *ngIf="seats.length > 1">

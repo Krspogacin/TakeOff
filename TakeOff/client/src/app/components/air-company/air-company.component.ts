@@ -8,6 +8,8 @@ import { AirCompanyDialogComponent } from '../air-company-dialog/air-company-dia
 import { FlightDialogComponent } from '../flight-dialog/flight-dialog.component';
 import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser';
 import { AppComponent } from 'src/app/app.component';
+import { UserService } from 'src/app/services/user/user.service';
+import { ReservationService } from 'src/app/services/reservation/reservation.service';
 
 @Component({
   selector: 'app-air-company',
@@ -27,10 +29,13 @@ export class AirCompanyComponent implements OnInit {
   flights = [];
   mapUrl: SafeResourceUrl;
   rating: number;
+  onDiscountTickets = [];
+  user = {};
 
   constructor(private airCompanyService: AirCompanyService, private route: ActivatedRoute,
     private flightService: FlightService, private authService: AuthenticationService, private dialog: MatDialog,
-    private sanitizer: DomSanitizer, private appComponent: AppComponent) { }
+    private sanitizer: DomSanitizer, private appComponent: AppComponent, private userService: UserService,
+    private reservationService: ReservationService) { }
 
   ngOnInit() {
     const id = parseInt(this.route.snapshot.paramMap.get('id'), 10);
@@ -69,11 +74,22 @@ export class AirCompanyComponent implements OnInit {
         (data: []) => {
           this.flights = data;
           this.flights.forEach(flight => {
+            // get flight destinations
             this.flightService.getFlightDestinations(flight.id).subscribe(
               (dest) => {
                 flight.destinations = dest;
               }
             );
+
+            // get tickets on discount for fast reservation
+            this.flightService.getFlightTickets(flight.id).subscribe(
+              (tickets: []) => {
+                tickets.forEach((element: any) => {
+                  if (element.onDiscount && !element.reserved) {
+                    this.onDiscountTickets.push(element);
+                  }
+                });
+              });
           });
           this.loadingFlights = false;
         },
@@ -82,6 +98,11 @@ export class AirCompanyComponent implements OnInit {
         }
       );
 
+      const username = this.authService.getUsername();
+      this.userService.getUser(username).subscribe(
+        (data) => {
+          this.user = data;
+        });
     } else {
       // not found
     }
@@ -165,6 +186,24 @@ export class AirCompanyComponent implements OnInit {
         }
       }
     );
+  }
+
+  createFastReservation(ticket) {
+    const reservations = [{ 'user': this.user, 'ticket': ticket }];
+
+    this.reservationService.createReservations(reservations).subscribe(
+      () => {
+        this.appComponent.showSnackBar('Reservation successful!');
+        const index = this.onDiscountTickets.indexOf(ticket);
+        if (index > -1) {
+          this.onDiscountTickets.splice(index, 1);
+        }
+      },
+      () => {
+        this.appComponent.showSnackBar('Reservation failed. Please try again.');
+      }
+    );
+
   }
 
 }

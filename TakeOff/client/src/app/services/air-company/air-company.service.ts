@@ -47,4 +47,8 @@ export class AirCompanyService {
   getCompanyRating(id: number) {
     return this.http.get('/companies/' + id + '/rating');
   }
+
+  searchFlights(searchObject) {
+    return this.http.get('/companies/flights?parameters=' + encodeURI(JSON.stringify(searchObject)));
+  }
 }

@@ -1,7 +1,7 @@
 <button *ngIf="userRole === 'ROLE_SYS_ADMIN'" mat-raised-button (click)="openDialog()" color="primary" style="margin: 2.5% 0% 0% 0%;">
   <mat-icon>add</mat-icon> Add Air Company
 </button>
-<mat-form-field style="float: right; padding-right: 3%; padding-top: 2%;">
+<mat-form-field style="float: right; padding-right: 3%; padding-top: 2%;" *ngIf="!search">
   <mat-select placeholder="Sort by" (selectionChange)="sort($event.value)" [(ngModel)]="selected" style="width: 110%;">
     <mat-select-trigger>
       {{selectedOption.viewValue}} <mat-icon color="primary">{{selectedOption.icon}}</mat-icon>
@@ -10,26 +10,40 @@
     </mat-option>
   </mat-select>
 </mat-form-field>
+<button mat-raised-button color="primary" (click)="search = !search" *ngIf="search" style="float: right;">Back to
+  companies</button>
 <div class="row">
-  <!-- <div class="col-md-2 ml-5">
+  <div class="col-md-2 ml-3">
     <div class="mt-5">
-      <h3>Search:</h3>
+      <h4>Search flights</h4>
       <mat-form-field>
-        <input matInput [(ngModel)]="nameParam" placeholder="Search by name">
+        <mat-label>Company</mat-label>
+        <mat-select [(value)]="searchObject.companyId">
+          <mat-option>---</mat-option>
+          <mat-option *ngFor="let company of companies" [value]="company.id">{{company.name}}</mat-option>
+        </mat-select>
       </mat-form-field>
       <mat-form-field>
-        <input matInput [(ngModel)]="countryParam" placeholder="Search by country">
+        <mat-label>Departure destination</mat-label>
+        <input matInput [(ngModel)]="departure" [(ngModel)]="departure">
       </mat-form-field>
       <mat-form-field>
-        <input matInput [(ngModel)]="cityParam" placeholder="Search by city">
+        <mat-label>Arrival destination</mat-label>
+        <input matInput [(ngModel)]="arrival" [(ngModel)]="arrival">
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Departure date</mat-label>
+        <input matInput [min]="minDate" [matDatepicker]="picker" [(ngModel)]="date">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
     </div>
-    <button mat-raised-button color="primary" (click)="search(nameParam, countryParam, cityParam)">
+    <button mat-raised-button color="primary" (click)="searchFlights(departure, arrival, date)">
       Search <mat-icon>search</mat-icon>
     </button>
-  </div> -->
+  </div>
   <div class="col-md-9">
-    <div *ngIf="!loading && companies">
+    <div *ngIf="!loading && companies && !search">
       <div class="container d-flex justify-content-start m-5" *ngFor="let company of companies.slice(pageSize * pageIndex, pageSize * pageIndex + pageSize)">
         <div class="card w-100 p-4 mat-elevation-z12">
           <div class="row">
@@ -63,8 +77,36 @@
         </div>
       </div>
     </div>
+
+    <div *ngIf="flights && search container-fluid">
+      <ul class="list-group ml-5 p-5">
+        <h3>Flights</h3>
+        <a class="list-group-item list-group-item-action" *ngFor="let flight of flights" routerLink="/flights/{{flight.id}}">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">
+              <mat-icon>flight_takeoff</mat-icon>
+              <span style="margin-left: 10px">
+                {{flight.takeOffLocation.city}}
+              </span>
+              <mat-icon style="margin-left: 30px">flight_land</mat-icon>
+              <span style="margin-left: 10px">
+                {{flight.landingLocation.city}}
+              </span>
+              <span style="margin-left: 20px">
+                ({{flight.company.name}})
+              </span>
+            </h5>
+            <small>from {{flight.ticketPrice | currency}}</small>
+          </div>
+          <small>
+            <span style="margin-left: 10px">{{flight.takeOffDate | date:'short'}}</span>
+            <span style="margin-left: 70px">{{flight.landingDate | date:'short'}}</span>
+          </small>
+        </a>
+      </ul>
+    </div>
   </div>
 </div>
-<mat-paginator *ngIf="companies && companies.length > 0" [length]=companies.length [pageSize]="pageSize"
+<mat-paginator *ngIf="companies && companies.length > 0 && !search" [length]=companies.length [pageSize]="pageSize"
   [pageSizeOptions]="[5, 10, 25, 100]" [showFirstLastButtons]="true" (page)="switchPage($event)">
 </mat-paginator>
