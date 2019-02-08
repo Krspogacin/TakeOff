@@ -1,8 +1,9 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, AfterViewInit } from '@angular/core';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { HotelService } from 'src/app/services/hotel/hotel.service';
+import { ReservationService } from 'src/app/services/reservation/reservation.service';
 
 @Component({
   selector: 'app-hotel-reserve-dialog',
@@ -12,7 +13,7 @@ import { HotelService } from 'src/app/services/hotel/hotel.service';
     provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false }
   }]
 })
-export class HotelReserveDialogComponent implements OnInit {
+export class HotelReserveDialogComponent implements OnInit,AfterViewInit {
 
   selectionForm: FormGroup;
   parametersForm: FormGroup;
@@ -35,6 +36,7 @@ export class HotelReserveDialogComponent implements OnInit {
   constructor(private dialogRef: MatDialogRef<HotelReserveDialogComponent>,
               private formBuilder: FormBuilder,
               private hotelService: HotelService,
+              private reservationService: ReservationService,
               @Inject(MAT_DIALOG_DATA) public object : any) { }
 
   ngOnInit() {
@@ -43,6 +45,7 @@ export class HotelReserveDialogComponent implements OnInit {
       return;
     }
     this.landingDate = this.object.landingDate;
+    const id = this.object.reservation;
     this.parametersForm = this.formBuilder.group({
       checkInDate: ['',Validators.required],
       nightsNumber: ['',[Validators.required,Validators.min(1)]],
@@ -51,6 +54,11 @@ export class HotelReserveDialogComponent implements OnInit {
       minPrice: [],
       maxPrice: []
     });
+    this.reservationService.getNumberOfUsers(id).subscribe(
+      (data : number) => {
+        this.parametersForm.get('guestsNumber').setValidators(Validators.max(data));
+      }
+    );
 
     this.selectionForm = new FormGroup({});
     this.CBForm = new FormGroup({});
@@ -61,6 +69,10 @@ export class HotelReserveDialogComponent implements OnInit {
           this.CBForm.addControl('CB' + elem.id,this.formBuilder.control(false));
         });
     });
+  }
+
+  ngAfterViewInit(){
+    
   }
 
   change(value: number){

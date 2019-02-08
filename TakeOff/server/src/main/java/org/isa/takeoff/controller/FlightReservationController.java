@@ -17,6 +17,7 @@ import org.isa.takeoff.model.Flight;
 import org.isa.takeoff.model.FlightRating;
 import org.isa.takeoff.model.FlightRatingId;
 import org.isa.takeoff.model.FlightReservation;
+import org.isa.takeoff.model.Hotel;
 import org.isa.takeoff.model.HotelRating;
 import org.isa.takeoff.model.HotelRatingId;
 import org.isa.takeoff.model.RentACar;
@@ -91,6 +92,7 @@ public class FlightReservationController {
 		try {
 			Flight flight = flightService.findOne(reservationsDTO.get(0).getTicket().getFlight().getId());
 			List<Ticket> tickets = flight.getTickets();
+			Reservation reservation = new Reservation();
 			for (FlightReservationDTO r : reservationsDTO) {
 
 				Ticket ticket = null;
@@ -109,7 +111,6 @@ public class FlightReservationController {
 					if (r.getUser() != null) {
 						user = userService.findByUsernameUser(r.getUser().getUsername());
 					}
-					Reservation reservation = new Reservation();
 					if(r.getReservationDTO().getRoomReservation().getRoomsAndRatings() != null){
 						RoomReservation roomReservation = new RoomReservation();
 						roomReservation.setPrice(r.getReservationDTO().getRoomReservation().getTotalPrice());
@@ -284,10 +285,25 @@ public class FlightReservationController {
 				roomReservation.setPrice(roomReservationDTO.getTotalPrice());
 				
 				List<RoomReservationRooms> rrrs = new ArrayList<>();
+				List<Long> ids = new ArrayList<>();
 				for(RoomRatingDTO roomRating: roomReservationDTO.getRoomsAndRatings()){
 					Room room = roomService.findOne(roomRating.getRoom().getId());
 					RoomReservationRooms rrr = new RoomReservationRooms();
 					rrr.setRoomReservation(roomReservation);
+					if(!ids.contains(roomRating.getRoom().getId())){
+						Room newRoom = new Room(roomRating.getRoom());
+						newRoom.setId(roomRating.getRoom().getId());
+						newRoom.setVersion(roomRating.getRoom().getVersion());
+						newRoom.setIsReserved(true);
+						Hotel hotel = hotelService.findOne(roomRating.getRoom().getHotel().getId());
+						newRoom.setHotel(hotel);
+						try{
+							room = this.roomService.save(newRoom);
+						}catch(Exception e){
+							return new ResponseEntity<>(HttpStatus.CONFLICT);
+						}
+					}
+					ids.add(roomRating.getRoom().getId());
 					rrr.setRoom(room);
 					rrrs.add(rrr);
 				}
@@ -300,6 +316,17 @@ public class FlightReservationController {
 			}
 		}catch(Exception e){
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value = "/getNumberOfUsers/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Integer> numberOfUsersInReservation(@PathVariable Long id){
+		if(id != null){
+			Reservation r = reservationService.findOneReservation(id);
+			List<FlightReservation> frs = r.getFlightReservations();
+			return new ResponseEntity<>(frs.size(), HttpStatus.OK);
+		}else{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
 }

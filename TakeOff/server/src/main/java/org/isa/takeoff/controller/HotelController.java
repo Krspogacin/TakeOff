@@ -365,7 +365,7 @@ public class HotelController {
 					}
 				}
 				int availableRooms = room.getNumberOfRooms() - counter; 
-				if (availableRooms == 0){
+				if (availableRooms <= 0){
 					continue;
 				}else{
 					allRooms += availableRooms;

@@ -27,6 +27,10 @@ export class ReservationService {
     return this.http.post('/reservations/roomReservations', roomReservation);
   }
 
+  getNumberOfUsers(id: number){
+    return this.http.get('/reservations/getNumberOfUsers/' + id);
+  }
+  
   rateAirCompany(userRating: any) {
     return this.http.post('/companies/rateAirCompany', userRating);
   }
