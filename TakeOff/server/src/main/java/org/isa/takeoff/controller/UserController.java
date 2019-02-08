@@ -35,6 +35,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -97,6 +98,7 @@ public class UserController {
 	}
 
 	@RequestMapping(method = GET)
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<List<UserDTO>> getAllUsers() {
 		List<User> users = this.userService.findAllUser();
 		List<UserDTO> usersDTO = new ArrayList<>();
@@ -178,6 +180,7 @@ public class UserController {
 	}
 
 	@RequestMapping(method = GET, value = "/{username}")
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<UserDTO> getLoggedInUser(@PathVariable String username) {
 
 		User user = userService.findByUsernameUser(username);
@@ -190,6 +193,7 @@ public class UserController {
 	}
 
 	@RequestMapping(method = RequestMethod.PUT)
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userDTO) {
 
 		User user = userService.findByUsernameUser(userDTO.getUsername());
@@ -212,6 +216,7 @@ public class UserController {
 	}
 
 	@RequestMapping(method = GET, value = "/{username}/friends")
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<List<FriendDTO>> getUserFriends(@PathVariable String username) {
 
 		User user1 = userService.findByUsernameUser(username);
@@ -233,6 +238,7 @@ public class UserController {
 	}
 
 	@RequestMapping(method = POST, value = "/friends")
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<FriendDTO> sendFriendRequest(@RequestBody FriendDTO friendDTO) {
 
 		User user1 = userService.findByUsernameUser(friendDTO.getUser1().getUsername());
@@ -251,6 +257,7 @@ public class UserController {
 	}
 
 	@RequestMapping(method = RequestMethod.PUT, value = "/friends")
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<FriendDTO> acceptFriendRequest(@RequestBody FriendDTO friendDTO) {
 
 		User user1 = userService.findByUsernameUser(friendDTO.getUser1().getUsername());
@@ -274,6 +281,7 @@ public class UserController {
 
 	// ne moze DELETE method zbog @RequestBody...
 	@RequestMapping(method = RequestMethod.PUT, value = "/friends/delete")
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<FriendDTO> deleteFriendRequest(@RequestBody FriendDTO friendDTO) {
 
 		User user1 = userService.findByUsernameUser(friendDTO.getUser1().getUsername());
@@ -296,6 +304,7 @@ public class UserController {
 	}
 
 	@RequestMapping(method = POST, value = "/addAdmin", consumes = "application/json")
+	@PreAuthorize("hasRole('ROLE_SYS_ADMIN')")
 	public ResponseEntity<?> addAdministrator(@RequestBody AdministratorDTO adminDTO) {
 		Administrator admin = new Administrator();
 		admin.setUsername(adminDTO.getUsername());
@@ -368,6 +377,7 @@ public class UserController {
 	}
 
 	@RequestMapping(method = RequestMethod.PUT, value = "/updatePassword", consumes = "application/json")
+	@PreAuthorize("hasRole('ROLE_SYS_ADMIN') or hasRole('ROLE_AIRCOMPANY_ADMIN') or hasRole('ROLE_HOTEL_ADMIN') or hasRole('ROLE_RENTACAR_ADMIN')")
 	public ResponseEntity<?> updatePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
 
 		Administrator admin = userService.findByUsernameAdmin(changePasswordDTO.getUsername());

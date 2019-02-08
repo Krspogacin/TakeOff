@@ -110,7 +110,7 @@ public class FlightReservationController {
 					if (r.getUser() != null) {
 						user = userService.findByUsernameUser(r.getUser().getUsername());
 					}
-					if(r.getReservationDTO().getRoomReservation().getRoomsAndRatings() != null){
+					if(r.getReservationDTO().getRoomReservation() != null){
 						RoomReservation roomReservation = new RoomReservation();
 						roomReservation.setPrice(r.getReservationDTO().getRoomReservation().getTotalPrice());
 						roomReservation.setReservationEndDate(r.getReservationDTO().getRoomReservation().getReservationEndDate());
@@ -124,7 +124,7 @@ public class FlightReservationController {
 						roomReservation.setRooms(rrrs);
 						reservation.setRoomReservation(roomReservation);
 					}
-					if(r.getReservationDTO().getVehicleReservation().getVehicle() != null){
+					if(r.getReservationDTO().getVehicleReservation() != null){
 						VehicleReservation vehicleReservation = new VehicleReservation();
 						vehicleReservation.setPrice(r.getReservationDTO().getVehicleReservation().getTotalPrice());
 						vehicleReservation.setReservationEndDate(r.getReservationDTO().getVehicleReservation().getReservationEndDate());

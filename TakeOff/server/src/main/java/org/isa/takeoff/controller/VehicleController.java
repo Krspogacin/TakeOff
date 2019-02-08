@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,6 +63,7 @@ public class VehicleController
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_RENTACAR_ADMIN')")
 	public ResponseEntity<VehicleDTO> addVehicle(@RequestBody VehicleDTO vehicleDTO) 
 	{
 		if (vehicleDTO.getRentACar() == null)
@@ -84,6 +86,7 @@ public class VehicleController
 	}
 	
 	@RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_RENTACAR_ADMIN')")
 	public ResponseEntity<VehicleDTO> updateVehicle(@RequestBody VehicleDTO vehicleDTO) 
 	{
 		if (vehicleDTO.isReserved() || vehicleDTO.getRentACar() == null)
@@ -110,6 +113,7 @@ public class VehicleController
 	}
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasRole('ROLE_RENTACAR_ADMIN')")
 	public ResponseEntity<?> deleteVehicle(@PathVariable Long id) 
 	{
 		try 
@@ -131,6 +135,7 @@ public class VehicleController
 	}
 	
 	@RequestMapping(value="/prices", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_RENTACAR_ADMIN')")
 	public ResponseEntity<List<VehiclePriceDTO>> addVehiclePrices(@RequestBody List<VehiclePriceDTO> vehiclePriceDTOs) 
 	{
 		try 
@@ -161,6 +166,7 @@ public class VehicleController
 	}
 	
 	@RequestMapping(value="/prices", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_RENTACAR_ADMIN')")
 	public ResponseEntity<List<VehiclePriceDTO>> updateVehiclePrices(@RequestBody List<VehiclePriceDTO> vehiclePriceDTOs) 
 	{
 		try 
@@ -194,6 +200,7 @@ public class VehicleController
 	}
 	
 	@RequestMapping(value="/rateVehicle", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<?> rateVehicle(@RequestBody UserRatingVehicleDTO userRatingVehicleDTO) 
 	{
 		if (userRatingVehicleDTO.getVehicle() == null || userRatingVehicleDTO.getRating() == null || userRatingVehicleDTO.getUsername() == null)
