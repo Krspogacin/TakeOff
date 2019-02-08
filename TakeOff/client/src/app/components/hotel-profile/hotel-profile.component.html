@@ -1,8 +1,8 @@
 <div *ngIf="!loadingHotel && !loadingRooms && !loadingPrices">
     <div *ngIf="hotelExists" style="width: 100%; overflow: hidden;">
         <h1 style="text-align: center">{{hotel.name}}</h1>
-        <button mat-raised-button color="primary" style="float: right;margin: 5px;" (click)="openAddRoomDialog()"><mat-icon>add</mat-icon> Add room</button>
-        <button mat-raised-button color="primary" style="float: right;margin: 5px;" (click)="openUpdateDialog()"><mat-icon>edit</mat-icon> Update hotel</button>
+        <button *ngIf="userRole && userRole === 'ROLE_HOTEL_ADMIN'" mat-raised-button color="primary" style="float: right;margin: 5px;" (click)="openAddRoomDialog()"><mat-icon>add</mat-icon> Add room</button>
+        <button *ngIf="userRole && userRole === 'ROLE_HOTEL_ADMIN'" mat-raised-button color="primary" style="float: right;margin: 5px;" (click)="openUpdateDialog()"><mat-icon>edit</mat-icon> Update hotel</button>
         <p><font size="5"><b>Description:</b> {{hotel.description}}</font></p>
         <b><font size="5">Rating:</font> </b>
         <div class="star-ratings-css mx-2">
@@ -105,18 +105,14 @@
             <ng-container matColumnDef="update">
                 <th mat-header-cell *matHeaderCellDef> Update </th>
                 <td mat-cell *matCellDef="let room">
-                    <span matTooltip="Cannot be updated because it is reserved!" [matTooltipDisabled]="!room.reserved">
-                        <button mat-button color="primary" (click)="openUpdateRoomDialog(room)" [disabled]="room.reserved"><mat-icon>edit</mat-icon></button>
-                    </span>
+                    <button *ngIf="userRole && userRole === 'ROLE_HOTEL_ADMIN'" mat-button color="primary" (click)="openUpdateRoomDialog(room)"><mat-icon>edit</mat-icon></button>
                 </td>
             </ng-container>
 
             <ng-container matColumnDef="delete">
                 <th mat-header-cell *matHeaderCellDef> Delete </th>
                 <td mat-cell *matCellDef="let room">
-                    <span matTooltip="Cannot be deleted because it is reserved!" [matTooltipDisabled]="!room.reserved">
-                        <button mat-button color="primary" (click)="deleteRoom(room.id)" [disabled]="room.reserved"><mat-icon>delete</mat-icon></button>
-                    </span>
+                    <button *ngIf="userRole && userRole === 'ROLE_HOTEL_ADMIN'" mat-button color="primary" (click)="deleteRoom(room.id)"><mat-icon>delete</mat-icon></button>
                 </td>
             </ng-container>
 
@@ -187,8 +183,8 @@
     </div>
     <br><br>
     <b><font size="5">Additional services: </font></b>&nbsp;&nbsp;
-    <button mat-button color="primary" *ngIf="!edit" (click)="edit = true"><mat-icon>edit</mat-icon></button>
-    <button mat-button color="primary" *ngIf="edit" (click)="save()"> Save changes</button>
+    <button mat-button color="primary" *ngIf="!edit && userRole && userRole === 'ROLE_HOTEL_ADMIN'" (click)="edit = true"><mat-icon>edit</mat-icon></button>
+    <button mat-button color="primary" *ngIf="edit && userRole && userRole === 'ROLE_HOTEL_ADMIN'" (click)="save()"> Save changes</button>
     <div *ngIf="edit">
         <form [formGroup]="additionalServices">
         <table style="width: 40%" mat-table matSort [dataSource]="defaultServices">

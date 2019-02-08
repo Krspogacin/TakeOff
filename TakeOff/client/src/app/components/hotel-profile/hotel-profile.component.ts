@@ -232,6 +232,12 @@ export class HotelProfileComponent implements OnInit {
         }
       );
     }
+
+    this.authService.onSubject.subscribe(
+      () => {
+        this.userRole = this.authService.getAuthority();
+      }
+    );
   }
 
   pageFunction(event: PageEvent) {

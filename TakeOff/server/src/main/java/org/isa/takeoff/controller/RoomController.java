@@ -1,5 +1,6 @@
 package org.isa.takeoff.controller;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import org.isa.takeoff.model.Room;
 import org.isa.takeoff.model.RoomPrice;
 import org.isa.takeoff.model.RoomRating;
 import org.isa.takeoff.model.RoomRatingId;
+import org.isa.takeoff.model.RoomReservationRooms;
 import org.isa.takeoff.model.User;
 import org.isa.takeoff.service.HotelService;
 import org.isa.takeoff.service.RoomService;
@@ -54,21 +56,19 @@ public class RoomController {
 	@PreAuthorize("hasRole('ROLE_HOTEL_ADMIN')")
 	public ResponseEntity<RoomDTO> addRoom(@RequestBody RoomDTO roomDTO) 
 	{
-		if (roomDTO.getHotel() == null)
-		{
+		if (roomDTO.getHotel() == null){
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
-		try 
-		{
+		try {
+			
 			Hotel hotel = this.hotelService.findOne(roomDTO.getHotel().getId());
 			Room room = new Room(roomDTO);
 			room.setHotel(hotel);
 			room = roomService.save(room);
 			return new ResponseEntity<>(new RoomDTO(room), HttpStatus.OK);
 		}
-		catch (Exception e)
-		{
+		catch (Exception e){
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
@@ -81,6 +81,11 @@ public class RoomController {
 		try 
 		{
 			Room room = this.roomService.findOne(roomDTO.getId());
+			for(RoomReservationRooms rrr: room.getRoomReservations()){
+				if (rrr.getRoomReservation().getReservationEndDate().isAfter(LocalDate.now())){
+					return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+				}
+			}
 			room.setDefaultPrice(roomDTO.getDefaultPrice());
 			room.setDiscount(roomDTO.getDiscount());
 			room.setIsReserved(roomDTO.isReserved());
@@ -105,6 +110,12 @@ public class RoomController {
 	{
 		try 
 		{
+			Room room = this.roomService.findOne(id);
+			for(RoomReservationRooms rrr: room.getRoomReservations()){
+				if (rrr.getRoomReservation().getReservationEndDate().isAfter(LocalDate.now())){
+					return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+				}
+			}
 			this.roomService.delete(id);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}
