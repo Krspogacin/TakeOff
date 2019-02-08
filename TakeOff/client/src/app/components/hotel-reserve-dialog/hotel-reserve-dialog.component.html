@@ -50,13 +50,15 @@
                                 Minimum {{nightsNumberMin}} guest </div>
                   <div *ngIf="parametersForm.get('guestsNumber').errors.sameNumber">
                              Number of guests and number of beds must match </div>
+                  <div *ngIf="parametersForm.get('guestsNumber').errors.max">
+                              Can't be greater than number of passengers </div>
               </mat-error>
               </mat-form-field>
           </div>
           <div class="col">
               <mat-form-field appearance="outline">
                 <mat-label>Number of rooms</mat-label>
-                <input matInput autocomplete="off" type="number" formControlName="roomsNumber" step="1" (input)="change($event.target.value)" required>
+                <input max='10' onkeydown="return false" matInput autocomplete="off" type="number" formControlName="roomsNumber" step="1" (input)="change($event.target.value)" required>
                 <mat-error *ngIf="parametersForm.get('roomsNumber').invalid && (parametersForm.get('roomsNumber').dirty || parametersForm.get('roomsNumber').touched)">
                   <div *ngIf="parametersForm.get('roomsNumber').errors.min">
                                 Minimum {{nightsNumberMin}} room </div>

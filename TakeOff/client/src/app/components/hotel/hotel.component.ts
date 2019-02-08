@@ -91,12 +91,14 @@ export class HotelComponent implements OnInit {
     this.endDate = this.startDate;
   }
   openReservationDialog(hotel: any, reservation: any){
+  console.log(reservation);
   const ladningDate = new Date(reservation.ticket.flight.landingDate);
   const dialogRef = this.dialog.open(HotelReserveDialogComponent,
     {
       data: {
         'hotel': hotel,
-        'landingDate': ladningDate
+        'landingDate': ladningDate,
+        'reservation': reservation.reservationDTO.id
       },
       disableClose: true,
       autoFocus: true,
@@ -145,7 +147,6 @@ export class HotelComponent implements OnInit {
                     reservation = availableReservation;
                   }
                 });
-                console.log(reservation);
                 this.openReservationDialog(hotel, reservation);
               } else {
                 this.appComponent.showSnackBar('You have no active flight reservation at the moment at the place you are looking for!');

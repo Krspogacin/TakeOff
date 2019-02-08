@@ -23,4 +23,8 @@ export class ReservationService {
   createRoomReservation(roomReservation: any) {
     return this.http.post('/reservations/roomReservations', roomReservation);
   }
+
+  getNumberOfUsers(id: number){
+    return this.http.get('/reservations/getNumberOfUsers/' + id);
+  }
 }
